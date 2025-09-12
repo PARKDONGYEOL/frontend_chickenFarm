@@ -1,0 +1,115 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 병아리 중앙 배치 */
+  padding: 10px 20px;
+  position: relative;
+}
+
+.logoArea {
+  display: flex;
+  justify-content: center;
+  flex: 1; /* 가운데 정렬 유지 */
+}
+
+.img {
+  width: 80px;
+  height: auto;
+  border-radius: 1rem;
+}
+
+.userArea {
+  position: absolute;
+  right: 20px; /* 오른쪽 끝으로 이동 */
+  display: flex;
+  gap: 15px;
+  font-size: 16px;
+  font-weight: 900;
+  color: #333;
+  cursor: pointer;
+}
+
+.menu {
+  display: flex;
+  width: 100%;
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+  position: relative;
+}
+
+.menuItem {
+  flex: 1; /* 균등 분배 */
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.menuTitle {
+  padding: 12px 0;
+  font-weight: bold;
+  color: #004080;
+  transition: color 0.3s;
+}
+
+.menuItem:hover .menuTitle {
+  color: #ff6600;
+}
+
+.submenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%; /* 셀 너비와 동일하게 */
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+
+.submenu li {
+  list-style: none;
+  padding: 8px 0;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  opacity: 0;
+  transform: translateY(-5px);
+  animation: fadeInUp 0.3s forwards;
+}
+
+.submenu li:hover {
+  background-color: #f0f0f0;
+  font-weight: bolder;
+}
+
+/* 순차적 지연 효과 */
+.submenu li:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.submenu li:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.submenu li:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.submenu li:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.submenu li:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+/* 필요한 만큼 nth-child 더 추가 가능 */
+
+/* 애니메이션 정의 */
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
