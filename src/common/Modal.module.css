@@ -1,0 +1,35 @@
+.modal_overlay{
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: start;
+}
+
+.modal_content{
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 60px;
+  position: relative;
+}
+
+.close_btn{
+  position: absolute;
+  top : 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #666666;
+}
+
+.content_div{
+  margin-top: 12px;
+}

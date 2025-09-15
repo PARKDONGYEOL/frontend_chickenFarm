@@ -9,6 +9,9 @@ const UserLayout = () => {
       <div>
         <UserHeader/>
       </div>
+      <div>
+        <Outlet/>
+      </div>
     </div>
   )
 }
