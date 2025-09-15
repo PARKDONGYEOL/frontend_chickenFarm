@@ -4,6 +4,9 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { Route, Routes } from 'react-router-dom'
 import UserLayout from './layout/UserLayout'
+import Login from './layout/Login'
+import VideoStream from './common/VideoStream'
+
 
 function App() {
 
@@ -11,7 +14,11 @@ function App() {
     <>
       <Routes>
         
-        <Route path='/' element={<UserLayout/>}/>
+        <Route path='login' element={<Login/>}/>
+
+        <Route path='/' element={<UserLayout/>}>
+        
+        </Route>
 
 
       </Routes>
