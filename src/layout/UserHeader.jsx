@@ -12,7 +12,7 @@ const UserHeader = () => {
     { title: "등록", items: ["상품 등록", "회원 등록", "이벤트 등록"] },
     { title: "조회", items: ["상품 조회", "회원 조회"] },
     { title: "제어", items: ["접근 제어", "기기 제어"] },
-    { title: "보안", items: ["비밀번호 변경", "접속 기록"] },
+    { title: "보안", items: ["비밀번호 변경", "CCTV"] },
   ];
 
   return (

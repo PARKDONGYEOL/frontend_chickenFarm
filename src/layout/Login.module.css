@@ -10,19 +10,13 @@
 }
 
 .title {
-  font-size: 2.5rem; 
+  font-size: 2.5rem;
   font-weight: bold;
   margin-bottom: 40px;
   color: #111;
 }
 
 .form {
-  width: 500px;
-
-  /* 모바일이나 작은 화면에서는 500px 고정이면 화면을 넘어가서 스크롤이 생길 수 있음. */
-  /* max-width: 90%를 사용하면 화면이 작을 때 요소가 화면 너비의 90%까지 줄어들어 자동으로 적응 */
-  max-width: 90%; 
-
   padding: 50px 40px; 
   background-color: #fff;
   border-radius: 12px;
@@ -33,6 +27,7 @@
 }
 
 .input_div {
+  position: relative;
   width: 100%;
 }
 
@@ -42,14 +37,19 @@
 }
 
 .input {
+  box-sizing: border-box;
   width: 100%;
-  padding: 14px 18px; 
+  padding: 14px 50px 14px 18px; 
   border: 1px solid #ddd;
   border-radius: 6px;
-  font-size: 1.1rem; 
+  font-size: 1.1rem;
   outline: none;
   transition: all 0.2s ease-in-out;
   margin-bottom: 18px;
+  overflow: hidden;          
+  text-overflow: ellipsis;   
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .input:focus {
@@ -90,4 +90,20 @@
 
 .options a:hover {
   text-decoration: underline;
+}
+
+.input_inButton {
+  position: absolute;
+  right: 23px;
+  top: 35%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #999;
+  cursor: pointer;
+}
+
+.input_inButton:hover {
+  color: #555;
 }

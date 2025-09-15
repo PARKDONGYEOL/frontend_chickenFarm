@@ -6,6 +6,7 @@ import { Route, Routes } from 'react-router-dom'
 import UserLayout from './layout/UserLayout'
 import Login from './layout/Login'
 import VideoStream from './common/VideoStream'
+import Security from './page/Security'
 
 
 function App() {
