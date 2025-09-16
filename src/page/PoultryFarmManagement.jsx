@@ -3,7 +3,7 @@ import styles from './PoultryFarmManagement.module.css'
 
 const PoultryFarmManagement = () => {
   return (
-    <div>PoultryFarmManagement</div>
+    <div>77777</div>
   )
 }
 
