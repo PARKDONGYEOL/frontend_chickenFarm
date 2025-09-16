@@ -1,0 +1,18 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #161b2a;
+  padding: 0 16px;
+  height: 64px;
+  color: white;
+  font-family: 'Roboto', sans-serif;
+  box-sizing: border-box;
+}
+
+.backButton {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  user-select: none;
+}

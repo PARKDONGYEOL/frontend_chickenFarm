@@ -2,20 +2,3 @@
   width: 1280px;
   margin: 0 auto;
 }
-
-.image_div {
-  width: 100%;
-  height: 400px; 
-  overflow: hidden; 
-}
-
-.backgroundImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; 
-  display: block;
-}
-
-.outlet_div {
-  padding: 20px;
-}

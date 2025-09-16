@@ -9,17 +9,9 @@ const UserLayout = () => {
       <div>
         <UserHeader/>
       </div>
-      <div className={styles.image_div}>
-        <img 
-          src="33003.jpg"
-          alt="" 
-          className={styles.backgroundImage}
-        />
-        <div className={styles.outlet_div}>
-          <Outlet/>
-        </div>
+      <div>
+        <Outlet/>
       </div>
-      <div></div>
     </div>
   )
 }
