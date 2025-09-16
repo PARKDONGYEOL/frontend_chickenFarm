@@ -4,34 +4,52 @@ import Input from '../common/Input'
 import Button from '../common/Button'
 import styles from './Login.module.css'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
 
-  // const testData = useState({
-  //   'memId' : 'admin123',
-  //   'memPw' : '123456'
-  // })
+  const nav = useNavigate();
 
-  const [logindate, setLoginDate] = useState({
+  const [loginDate, setLoginDate] = useState({
     'memId' : '',
     'memPw' : ''
-  })
-
-
-  // const login = () => {
-  //   console.log(testData);
-  //   setLoginDate({
-  //     ...testData
-  //   });
-  //   console.log(logindate);
-  // }
+  });
 
   const handleLoginData = (e) => {
     setLoginDate({
-      ...logindate,
+      ...loginDate,
       [e.target.name] : e.target.value
-    })
+    });
   }
+
+  const login = () => {
+    axios.get('/api/member', { params: loginDate })
+      .then(res => {
+        if (res.data) { 
+
+        const loginInfo = {
+          'memId': res.data.memId,
+          'name': res.data.name,
+          'role': res.data.role
+        };
+
+        sessionStorage.setItem('loginInfo', JSON.stringify(loginInfo));
+
+          if (res.data.role === 'ADMIN') {
+            alert('환영합니다.');
+            nav('/');
+            setLoginDate({ 'memId': '', 'memPw': '' });
+          }
+
+          // 일반 유저는 아무 동작 없음
+
+        } else { 
+          alert('ID 혹은 비밀번호가 잘못 입력되었습니다.');
+        }
+
+    })
+    .catch(e => console.log(e));
+}
 
   return (
     <div className={styles.container}>
@@ -43,19 +61,19 @@ const Login = () => {
             height='45px'
             placeholder='아이디 또는 전화번호'
             name='memId'
-            value={logindate.memId}
+            value={loginDate.memId}
             onChange={e => handleLoginData(e)}
             className={styles.input}
           />
           {
-            logindate.memId && (
+            loginDate.memId && (
               <Button
                 className={styles.input_inButton}
                 size='10px'
                 title='x'
                 onClick={() => {
                   setLoginDate({
-                    ...logindate,
+                    ...loginDate,
                     'memId' : ''
                   })
                 }}
@@ -69,20 +87,20 @@ const Login = () => {
             height='45px'
             placeholder='비밀번호'
             name='memPw'
-            value={logindate.memPw}
+            value={loginDate.memPw}
             onChange={e => handleLoginData(e)}
             className={styles.input}
             type='password'
           />
           {
-            logindate.memPw && (
+            loginDate.memPw && (
               <Button
                 className={styles.input_inButton}
                 size='10px'
                 title='x'
                 onClick={() => {
                   setLoginDate({
-                    ...logindate,
+                    ...loginDate,
                     'memPw' : ''
                   })
                 }}
@@ -96,7 +114,7 @@ const Login = () => {
             className={styles.button}
             size='500px'
             height='45px'
-            // onClick={login}
+            onClick={() => login()}
           />
         </div>
       </div>
