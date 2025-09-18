@@ -30,15 +30,7 @@
 }
 
 .admin_sidebar__nav li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #ccc;
-  transition: background-color 0.2s;
+  margin-bottom: 5px;
 }
 
 .admin_sidebar__nav li:hover {
@@ -46,7 +38,27 @@
   color: white;
 }
 
-.admin_sidebar__nav li.active {
+/* NavLink 기본 스타일 */
+.admin_sidebar__nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #ccc;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+/* Hover 효과 */
+.admin_sidebar__nav a:hover {
+  background-color: #1a1f2b;
+  color: white;
+}
+
+/* ✅ NavLink가 활성화됐을 때 적용될 스타일 */
+.active {
   background-color: #2e374a;
   color: white;
   font-weight: bold;

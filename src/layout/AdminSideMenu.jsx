@@ -1,5 +1,6 @@
 import React from 'react'
 import styles from './AdminSideMenu.module.css'
+import { NavLink } from 'react-router-dom'
 
 const AdminSideMenu = () => {
   return (
@@ -11,17 +12,32 @@ const AdminSideMenu = () => {
 
       <nav className={styles.admin_sidebar__nav}>
         <ul>
-          <li className={styles.active}>
-            <span>📋</span>
-            <span>양계장 상태</span>
+          <li>
+            <NavLink
+              to="/admin/pfm" 
+              className={({ isActive }) => isActive ? styles.active : undefined}
+            >
+              <span>📋</span>
+              <span>실시간 정보</span>
+            </NavLink>
           </li>
           <li>
-            <span>📋</span>
-            <span>양계 상태</span>
+            <NavLink
+              to="/admin/daily" 
+              className={({ isActive }) => isActive ? styles.active : undefined}
+            >
+              <span>📋</span>
+              <span>일일 정보</span>
+            </NavLink>
           </li>
           <li>
-            <span>📋</span>
-            <span>보안</span>
+            <NavLink
+              to="/admin/weekly"
+              className={({ isActive }) => isActive ? styles.active : undefined}
+            >
+              <span>📋</span>
+              <span>주간 정보</span>
+            </NavLink>
           </li>
           <li>
             <span>📋</span>

@@ -1,0 +1,26 @@
+.container {
+  color: white;
+  padding: 20px;
+}
+
+.chartBox {
+  height: 300px;
+  margin-bottom: 40px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: white;
+}
+
+.table th, .table td {
+  border: 1px solid white;
+  padding: 8px;
+  text-align: center;
+}
+
+.table th {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+

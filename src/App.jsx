@@ -8,6 +8,8 @@ import Login from './layout/Login'
 import Security from './page/Security'
 import AdminLayout from './layout/AdminLayout'
 import PoultryFarmManagement from './page/PoultryFarmManagement'
+import DailyInformation from './page/DailyInformation'
+import WeeklyInformation from './page/WeeklyInformation'
 
 
 function App() {
@@ -23,6 +25,10 @@ function App() {
       <Route path='/admin' element={<AdminLayout />}>
       
         <Route path='pfm' element={<PoultryFarmManagement/>} />
+
+        <Route path='daily' element={<DailyInformation/>}/>
+
+        <Route path='weekly' element={<WeeklyInformation/>}/>
 
       </Route>
 

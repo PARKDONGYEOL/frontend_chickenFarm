@@ -1,0 +1,35 @@
+.container {
+  color: white;
+  padding: 20px;
+}
+
+.dateInput {
+  margin-bottom: 40px;   /* ⬅️ 날짜 선택과 제목 사이 간격 */
+}
+
+.chartTitle {
+  margin-top: 20px;      /* ⬅️ 제목 위쪽 여백 */
+  margin-bottom: 20px;   /* ⬅️ 제목과 차트 사이 여백 */
+}
+
+.chartBox {
+  height: 300px;
+  margin-bottom: 40px;   /* ⬅️ 차트와 테이블 사이 간격 */
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: white;
+}
+
+.table th,
+.table td {
+  border: 1px solid white;
+  padding: 8px;
+  text-align: center;
+}
+
+.table th {
+  background-color: rgba(255, 255, 255, 0.1);
+}
