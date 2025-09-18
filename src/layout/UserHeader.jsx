@@ -15,17 +15,34 @@ const UserHeader = () => {
     { title: "보안", items: ["비밀번호 변경", "CCTV"] },
   ];
 
+  const loginInfo = sessionStorage.getItem('loginInfo');
+
+  const loginDate = JSON.parse(loginInfo);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.logoArea}>
-          <img src="병아리 그림.png" className={styles.img} />
-          <div className={styles.userArea}>
-            <span 
-              className={styles.login}
-              onClick={() => nav('login')}
-            >로그인</span>
-            <span className={styles.mypage}>마이페이지</span>
+        <div className={styles.imageArea}>
+          <img src="33003.jpg" alt="" className={styles.bannerImage} />
+  
+          {/* 배너 위에 올릴 로그인 영역 */}
+          <div className={styles.bannerTextArea}>
+            {
+              !loginInfo ? (
+                <>
+                  <span 
+                    className={styles.login}
+                    onClick={() => nav('login')}
+                   >로그인</span>
+                  <span className={styles.mypage}>마이페이지</span>
+                </>
+              ) : (
+                <>
+                  <span>{loginDate.memId}님 반갑습니다.</span>
+                  <span className={styles.mypage}>마이페이지</span>
+                </>
+              )
+            }
           </div>
         </div>
       </div>

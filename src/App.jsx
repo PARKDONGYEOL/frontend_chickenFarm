@@ -5,26 +5,28 @@ import './App.css'
 import { Route, Routes } from 'react-router-dom'
 import UserLayout from './layout/UserLayout'
 import Login from './layout/Login'
-import VideoStream from './common/VideoStream'
 import Security from './page/Security'
+import AdminLayout from './layout/AdminLayout'
+import PoultryFarmManagement from './page/PoultryFarmManagement'
 
 
 function App() {
 
-  return (
-    <>
-      <Routes>
-        
-        <Route path='login' element={<Login/>}/>
+   return (
+    <Routes>
+      <Route path='login' element={<Login />} />
+      
+      <Route path='/' element={<UserLayout />}>
+        {/* 유저 페이지 라우팅 추가 가능 */}
+      </Route>
 
-        <Route path='/' element={<UserLayout/>}>
-        
-        </Route>
+      <Route path='/admin' element={<AdminLayout />}>
+      
+        <Route path='pfm' element={<PoultryFarmManagement/>} />
 
+      </Route>
 
-      </Routes>
-    </>
+    </Routes>
   )
 }
-
 export default App
