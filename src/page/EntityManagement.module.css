@@ -1,0 +1,47 @@
+.container {
+  width: 100%;
+  padding: 20px;
+  background-color: #1e1e1e;
+  color: #eee;
+}
+
+.tabMenu {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tabMenu button {
+  padding: 10px 20px;
+  background: #333;
+  border: none;
+  color: #eee;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.tabMenu button:hover {
+  background: #444;
+}
+
+.active {
+  background: #007bff;
+  color: #fff;
+}
+
+.content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  text-align: center;
+  table-layout: fixed;   /* 📌 열 크기를 균등하게 */
+}
+
+.content th,
+.content td {
+  border: 1px solid #444;
+  padding: 10px;
+  width: 25%;           /* 📌 4개의 열일 때 동일한 폭 */
+  word-wrap: break-word; /* 📌 긴 텍스트 자동 줄바꿈 */
+}
+

@@ -34,12 +34,14 @@ const UserHeader = () => {
                     className={styles.login}
                     onClick={() => nav('login')}
                    >로그인</span>
-                  <span className={styles.mypage}>마이페이지</span>
                 </>
               ) : (
                 <>
                   <span>{loginDate.memId}님 반갑습니다.</span>
-                  <span className={styles.mypage}>마이페이지</span>
+                  <span 
+                    className={styles.mypage}
+                    onClick={() => nav('/admin')}
+                  >마이페이지</span>
                 </>
               )
             }

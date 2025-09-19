@@ -10,6 +10,7 @@ import AdminLayout from './layout/AdminLayout'
 import PoultryFarmManagement from './page/PoultryFarmManagement'
 import DailyInformation from './page/DailyInformation'
 import WeeklyInformation from './page/WeeklyInformation'
+import EntityManagement from './page/EntityManagement'
 
 
 function App() {
@@ -23,13 +24,11 @@ function App() {
       </Route>
 
       <Route path='/admin' element={<AdminLayout />}>
-      
-        <Route path='pfm' element={<PoultryFarmManagement/>} />
-
-        <Route path='daily' element={<DailyInformation/>}/>
-
-        <Route path='weekly' element={<WeeklyInformation/>}/>
-
+        <Route index element={<PoultryFarmManagement />} />   {/* 기본 페이지 */}
+        <Route path='pfm' element={<PoultryFarmManagement />} />
+        <Route path='daily' element={<DailyInformation />} />
+        <Route path='weekly' element={<WeeklyInformation />} />
+        <Route path='entity' element={<EntityManagement />} />
       </Route>
 
     </Routes>

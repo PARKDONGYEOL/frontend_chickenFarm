@@ -40,6 +40,15 @@ const AdminSideMenu = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink
+              to="/admin/entity"
+              className={({ isActive }) => isActive ? styles.active : undefined}
+            >
+              <span>📋</span>
+              <span>개체 관리</span>
+            </NavLink>
+          </li>
+          <li>
             <span>📋</span>
             <span>CCTV</span>
           </li>
