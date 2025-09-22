@@ -50,3 +50,12 @@ table {
   box-sizing: border-box;
 	
 }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;  /* ✅ 브라우저 기본 스크롤 제거 */
+  font-family: Arial, sans-serif;
+}
+

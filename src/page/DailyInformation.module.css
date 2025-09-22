@@ -1,35 +1,117 @@
 .container {
-  color: white;
+  color: #333;
   padding: 20px;
+  font-family: 'Roboto', sans-serif;
 }
 
+/* 제목 */
+h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+/* 날짜 입력 */
 .dateInput {
-  margin-bottom: 40px;   /* ⬅️ 날짜 선택과 제목 사이 간격 */
+  margin-bottom: 30px;
+}
+.dateInput input {
+  background: #ffffff;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.dateInput input:focus {
+  border-color: #4caf50;
 }
 
-.chartTitle {
-  margin-top: 20px;      /* ⬅️ 제목 위쪽 여백 */
-  margin-bottom: 20px;   /* ⬅️ 제목과 차트 사이 여백 */
+/* ✅ 차트 + 테이블 가로 배치 */
+.chartAndTable {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 30px;
 }
 
+/* 공통 wrapper */
+.chartWrapper,
+.tableWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 제목 스타일 */
+.chartTitle,
+.tableTitle {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #4caf50;
+  text-align: center;
+}
+
+/* 차트 박스 */
 .chartBox {
-  height: 300px;
-  margin-bottom: 40px;   /* ⬅️ 차트와 테이블 사이 간격 */
+  flex: 1;
+  min-height: 400px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
+/* 테이블 박스 */
+.tableBox {
+  flex: 1;
+  background: #fff;
+  border-radius: 12px;
+  padding: 0; /* 제목은 밖으로 빼므로 패딩 제거 */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ✅ 스크롤 되는 부분 */
+.tableScroll {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+/* 테이블 */
 .table {
   width: 100%;
   border-collapse: collapse;
-  color: white;
+  font-size: 14px;
+  color: #333;
 }
 
 .table th,
 .table td {
-  border: 1px solid white;
-  padding: 8px;
+  padding: 10px 6px;
   text-align: center;
+  border: 1px solid #eee;
 }
 
 .table th {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #f1f8f4;
+  font-weight: 600;
+  color: #2e7d32;
+  position: sticky; /* ✅ 헤더 고정 */
+  top: 0;
+  z-index: 2;
+}
+
+.table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.table tr:hover {
+  background-color: #f1f8f4;
 }

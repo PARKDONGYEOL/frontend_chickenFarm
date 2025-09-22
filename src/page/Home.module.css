@@ -1,0 +1,203 @@
+.container {
+  background-color: #f9f9f9; /* 밝은 배경 */
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+}
+
+/* 헤더 */
+.header {
+  display: flex;
+  justify-content: space-between; /* 좌: 로고 / 가운데: nav / 우: 유저 메뉴 */
+  align-items: center;            /* 세로 중앙 정렬 */
+  padding: 0 40px;                /* 위아래 여백을 줄이고 수평 공간 확보 */
+  height: 64px;                   /* 고정된 헤더 높이 */
+  background: #ffffff;
+  border-bottom: 1px solid #ddd;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #4caf50; /* 초록 포인트 */
+}
+
+/* 네비게이션 */
+.nav {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* ✅ 세로 기준 중앙 정렬 */
+  gap: 30px;           /* 메뉴 간격 */
+  height: 100%;        /* 헤더 높이에 맞게 */
+}
+
+.nav span {
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.2s;
+  color: #333;
+}
+.nav span:hover {
+  color: #388e3c; /* hover 시 짙은 초록 */
+}
+
+/* ✅ 유저 메뉴 (프로필 + ⋮ + 드롭다운) */
+.userMenuWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.userMenuTrigger {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.userMenuTrigger:hover {
+  background: #f1f8f4; /* 연한 초록 hover 효과 */
+}
+
+.userAvatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2e7d32; /* 진한 초록 */
+}
+
+.moreIcon {
+  font-size: 18px;
+  margin-left: 4px;
+  color: #2e7d32;
+}
+
+.userDropdown {
+  position: absolute;
+  top: 60px; /* 헤더 높이 아래로 자연스럽게 */
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  min-width: 140px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  z-index: 10;
+  text-align: center;
+  padding: 12px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.userDropdown button {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.2s;
+}
+.userDropdown button:hover {
+  background: #dc2626;
+}
+
+/* 드롭다운 등장 애니메이션 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero Section */
+.hero {
+  flex: 1;
+  background: linear-gradient(to right, #e8f5e9, #ffffff); /* 은은한 그린 그라데이션 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.heroContent h1 {
+  font-size: 40px;
+  margin-bottom: 20px;
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.heroContent p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+.buttons button {
+  margin: 0 10px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #4caf50;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  transition: background 0.2s, transform 0.2s;
+}
+.buttons button:hover {
+  background: #388e3c;
+  transform: scale(1.05);
+}
+
+/* 기능 소개 섹션 */
+.features {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap; /* 화면 작으면 줄바꿈 */
+  padding: 60px 20px;
+  background: #ffffff;
+}
+
+.card {
+  background: #ffffff;
+  padding: 24px;
+  margin: 10px;
+  border-radius: 12px;
+  width: 22%;
+  min-width: 240px; /* 작은 화면에서도 보기 좋게 */
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+.card h3 {
+  margin-bottom: 12px;
+  color: #4caf50;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+/* Footer */
+.footer {
+  background: #e8f5e9;
+  padding: 18px;
+  text-align: center;
+  font-size: 13px;
+  color: #2e7d32;
+  border-top: 1px solid #c8e6c9;
+}

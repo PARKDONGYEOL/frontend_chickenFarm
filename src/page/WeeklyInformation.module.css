@@ -1,26 +1,57 @@
 .container {
   color: white;
   padding: 20px;
+  font-family: 'Roboto', sans-serif;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+h3 {
+  margin-top: 30px;      /* 제목 위쪽 간격 (차트와의 간격) */
+  margin-bottom: 20px;   /* 제목 아래쪽 간격 (테이블과의 간격) */
+  font-size: 18px;
+  font-weight: 600;
+  color: #90caf9;        /* 파란 포인트 */
 }
 
 .chartBox {
   height: 300px;
   margin-bottom: 40px;
+  background: #1e1e2f;   /* 차트 배경 */
+  border-radius: 12px;   /* 둥근 모서리 */
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6); /* 카드 느낌 */
 }
 
 .table {
+  margin-top: 10px;      /* 제목과 테이블 사이 간격 */
   width: 100%;
   border-collapse: collapse;
   color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 14px;
 }
 
 .table th, .table td {
-  border: 1px solid white;
-  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.2); /* 경계선 색상 은은하게 */
+  padding: 12px 8px;
   text-align: center;
 }
 
 .table th {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #2a2a3d; /* 테이블 헤더 진한 배경 */
+  font-weight: 600;
 }
 
+.table tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.05); /* 줄무늬 효과 */
+}
+
+.table tr:hover {
+  background-color: rgba(255, 255, 255, 0.1);  /* hover 시 강조 */
+}

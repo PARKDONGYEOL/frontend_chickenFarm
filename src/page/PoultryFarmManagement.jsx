@@ -36,29 +36,30 @@ const PoultryFarmManagement = () => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { 
-        display: false,
-        labels: {
-          color: '#ffffff'   // ✅ 범례 글씨 흰색
-        }
-      },
-      title: { 
-        display: true, 
+      legend: { display: false },
+      title: {
+        display: true,
         text: title,
-        color: '#ffffff'     // ✅ 차트 제목 글씨 흰색
+        color: '#2e7d32', // ✅ 진한 초록
+        font: { size: 16, weight: 'bold' },
+        padding: { top: 10, bottom: 10 },
       },
     },
-  scales: {
-    x: { 
-      ticks: { color: '#ffffff' },  // ✅ X축 라벨 흰색
-      grid: { color: '#444' }       // ✅ X축 그리드 색 (어두운 회색)
+    elements: {
+      line: { borderWidth: 2 },
+      point: { radius: 3, backgroundColor: '#fff' }, // ✅ 포인트를 흰색 안쪽
     },
-    y: { 
-      ticks: { color: '#ffffff' },  // ✅ Y축 라벨 흰색
-      grid: { color: '#444' }       // ✅ Y축 그리드 색
+    scales: {
+      x: {
+        ticks: { color: '#555', font: { size: 12 } },
+        grid: { color: 'rgba(0,0,0,0.05)' }, // ✅ 은은한 그리드
+      },
+      y: {
+        ticks: { color: '#555', font: { size: 12 } },
+        grid: { color: 'rgba(0,0,0,0.05)' },
+      },
     },
-  },
-});
+  });
 
   const labels = sensorData.map(entry => {
     const date = new Date(entry.recTime);
@@ -74,40 +75,40 @@ const PoultryFarmManagement = () => {
       {
         label: '온도 (°C)',
         data: sensorData.map(d => d.tempData),
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        tension: 0.3,
+        borderColor: 'rgba(255, 138, 157, 1)',     // ✅ 파스텔 핑크
+        backgroundColor: 'rgba(255, 138, 157, 0.3)',
+        tension: 0.4,
       },
     ],
   };
 
-  // 습도 데이터
-  const humidityData = {
-    labels,
-    datasets: [
-      {
-        label: '습도 (%)',
-        data: sensorData.map(d => d.humData),
-        borderColor: 'rgb(54, 162, 235)',
-        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-        tension: 0.3,
-      },
-    ],
-  };
+// 습도 데이터 (파스텔 블루)
+const humidityData = {
+  labels,
+  datasets: [
+    {
+      label: '습도 (%)',
+      data: sensorData.map(d => d.humData),
+      borderColor: 'rgba(100, 181, 246, 1)',     // ✅ 파스텔 블루
+      backgroundColor: 'rgba(100, 181, 246, 0.3)',
+      tension: 0.4,
+    },
+  ],
+};
 
-  // 조도 데이터
-  const lightData = {
-    labels,
-    datasets: [
-      {
-        label: '조도 (Lux)',
-        data: sensorData.map(d => d.luxData),
-        borderColor: 'rgb(255, 206, 86)',
-        backgroundColor: 'rgba(255, 206, 86, 0.5)',
-        tension: 0.3,
-      },
-    ],
-  };
+// 조도 데이터 (파스텔 옐로우/그린)
+const lightData = {
+  labels,
+  datasets: [
+    {
+      label: '조도 (Lux)',
+      data: sensorData.map(d => d.luxData),
+      borderColor: 'rgba(255, 241, 118, 1)',     // ✅ 파스텔 옐로우
+      backgroundColor: 'rgba(255, 241, 118, 0.4)',
+      tension: 0.4,
+    },
+  ],
+};
 
   // 통계 계산 함수
   const calcStats = (arr, key) => {
@@ -249,4 +250,4 @@ const fetchSensorData = async () => {
   );
 };
 
-export default PoultryFarmManagement;
+export default PoultryFarmManagement

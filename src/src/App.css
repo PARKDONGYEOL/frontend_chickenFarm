@@ -1,0 +1,26 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #166534;
+  color: white;
+  padding: 1rem;
+}
+
+header nav a {
+  margin-right: 1rem;
+  color: white;
+  text-decoration: none;
+}
+
+header nav a:hover {
+  text-decoration: underline;
+}
+
+button {
+  margin: 0.5rem;
+  padding: 0.5rem 1rem;
+}

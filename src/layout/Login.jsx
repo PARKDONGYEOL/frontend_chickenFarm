@@ -37,7 +37,7 @@ const Login = () => {
 
           if (res.data.role === 'ADMIN') {
             alert('환영합니다.');
-            nav('/admin');
+            nav('/home');
             setLoginDate({ 'memId': '', 'memPw': '' });
           }
 

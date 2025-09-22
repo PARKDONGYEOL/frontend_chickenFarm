@@ -99,12 +99,12 @@ const WeeklyInformation = () => {
 
   return (
     <div className={styles.container}>
-      <h2>📅 최근 7일 센서 데이터</h2>
+      <h2> 최근 7일 센서 데이터</h2>
       <div className={styles.chartBox}>
         <Line data={chartData} options={chartOptions} />
       </div>
 
-      <h3>📊 데이터 테이블 (일 평균)</h3>
+      <h3> 데이터 테이블 (일 평균)</h3>
       <table className={styles.table}>
         <thead>
           <tr>
