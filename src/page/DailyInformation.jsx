@@ -141,7 +141,6 @@ const DailyInformation = () => {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>센서 ID</th>
                     <th>온도(°C)</th>
                     <th>습도(%)</th>
                     <th>조도(lux)</th>
@@ -156,7 +155,6 @@ const DailyInformation = () => {
                   ) : (
                     rows.map((r, i) => (
                       <tr key={i}>
-                        <td>{r.thSensorId}</td>
                         <td>{r.tempData}</td>
                         <td>{r.humData}</td>
                         <td>{r.luxData}</td>

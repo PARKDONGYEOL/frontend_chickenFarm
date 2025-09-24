@@ -28,7 +28,10 @@ const Home = () => {
     <div className={styles.container}>
       {/* Header */}
       <header className={styles.header}>
-        <div className={styles.logo}>🐓 SmartFarm</div>
+        <div 
+          className={styles.logo}
+          onClick={() => nav('/home')}
+        >🐓 SmartFarm</div>
         <nav className={styles.nav}>
           <span onClick={() => nav("/home/pfm")}>실시간 정보</span>
           <span onClick={() => nav("/home/daily")}>일일 데이터</span>

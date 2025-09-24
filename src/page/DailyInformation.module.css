@@ -2,48 +2,38 @@
   color: #333;
   padding: 20px;
   font-family: 'Roboto', sans-serif;
+
+  /* ✅ Hero 여백 무시하고 살짝 위로 올리기 */
+  margin-top: -300px;
+  position: relative;
+  z-index: 5;
 }
 
 /* 제목 */
 h2 {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   font-size: 22px;
   font-weight: 600;
   color: #2e7d32;
+  text-align: center;
 }
 
-/* 날짜 입력 */
-.dateInput {
-  margin-bottom: 30px;
-}
-.dateInput input {
-  background: #ffffff;
-  color: #333;
-  border: 1px solid #ccc;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.dateInput input:focus {
-  border-color: #4caf50;
-}
-
-/* ✅ 차트 + 테이블 가로 배치 */
+/* ✅ 차트 + 테이블 나란히 (상하 중앙 정렬) */
 .chartAndTable {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 30px;
+  justify-content: center;   /* 좌우 중앙 */
+  align-items: center;       /* ✅ 상하 중앙 정렬 */
+  gap: 40px;                 /* 간격 */
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 /* 공통 wrapper */
 .chartWrapper,
 .tableWrapper {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 /* 제목 스타일 */
@@ -58,60 +48,93 @@ h2 {
 
 /* 차트 박스 */
 .chartBox {
-  flex: 1;
-  min-height: 400px;
+  width: 480px;
+  height: 360px;
   background: #fff;
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;   /* ✅ 차트 세로 중앙 */
+  justify-content: center;
 }
 
 /* 테이블 박스 */
 .tableBox {
-  flex: 1;
+  width: 700px;
+  height: 360px;             /* ✅ 차트와 같은 높이 */
   background: #fff;
   border-radius: 12px;
-  padding: 0; /* 제목은 밖으로 빼므로 패딩 제거 */
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  justify-content: center;   /* ✅ 테이블 세로 중앙 */
 }
 
-/* ✅ 스크롤 되는 부분 */
+/* ✅ 테이블 스크롤 */
 .tableScroll {
-  max-height: 350px;
+  max-height: 320px;
   overflow-y: auto;
+  overflow-x: auto;
 }
 
 /* 테이블 */
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 13px;
   color: #333;
+  table-layout: fixed;
+  white-space: nowrap;
 }
 
+/* 셀 스타일 */
 .table th,
 .table td {
-  padding: 10px 6px;
-  text-align: center;
   border: 1px solid #eee;
+  padding: 8px 6px;
+  text-align: center;
+  min-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* 헤더 */
 .table th {
   background-color: #f1f8f4;
   font-weight: 600;
   color: #2e7d32;
-  position: sticky; /* ✅ 헤더 고정 */
+  position: sticky;
   top: 0;
   z-index: 2;
 }
 
+/* 줄무늬 + hover 효과 */
 .table tr:nth-child(even) {
   background-color: #fafafa;
 }
-
 .table tr:hover {
   background-color: #f1f8f4;
+}
+
+/* 날짜 입력 */
+.dateInput {
+  position: absolute;
+  top: 10px;
+  right: 40px;
+}
+.dateInput input {
+  background: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.dateInput input:focus {
+  border-color: #4caf50;
 }

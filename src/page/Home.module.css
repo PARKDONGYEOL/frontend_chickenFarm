@@ -23,6 +23,7 @@
   font-size: 20px;
   font-weight: bold;
   color: #4caf50; /* 초록 포인트 */
+  cursor: pointer;
 }
 
 /* 네비게이션 */
