@@ -1,83 +1,60 @@
-import React, { useState, useEffect } from "react";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import styles from "./Home.module.css";
+import Header from "../layout/Header";
+import SubMenu from "../layout/SubMenu";
 
 const Home = () => {
-  const nav = useNavigate();
-  const location = useLocation(); // ✅ 현재 경로 가져오기
-  const [loginInfo, setLoginInfo] = useState(null);
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const info = sessionStorage.getItem("loginInfo");
-    if (info) {
-      setLoginInfo(JSON.parse(info));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    sessionStorage.removeItem("loginInfo");
-    setLoginInfo(null);
-    nav("/"); // 로그인 페이지로 이동
-  };
-
-  // ✅ 홈 기본 화면 여부 체크
+  const location = useLocation();
   const isHomeRoot = location.pathname === "/home";
+  const [sideOpen, setSideOpen] = useState(false);
 
   return (
     <div className={styles.container}>
-      {/* Header */}
-      <header className={styles.header}>
-        <div 
-          className={styles.logo}
-          onClick={() => nav('/home')}
-        >🐓 SmartFarm</div>
-        <nav className={styles.nav}>
-          <span onClick={() => nav("/home/pfm")}>실시간 정보</span>
-          <span onClick={() => nav("/home/daily")}>일일 데이터</span>
-          <span onClick={() => nav("/home/weekly")}>주간 데이터</span>
-          <span>CCTV</span>
+      {/* 상단 헤더 */}
+      <Header toggleMenu={() => setSideOpen(!sideOpen)} />
 
-          {loginInfo ? (
-            <div className={styles.userMenuWrapper}>
-              <div
-                className={styles.userMenuTrigger}
-                onClick={() => setMenuOpen(!menuOpen)}
-              >
-                <img
-                  src={`https://ui-avatars.com/api/?name=${loginInfo.name}&background=4caf50&color=fff`}
-                  alt="프로필"
-                  className={styles.userAvatar}
-                />
-                <span className={styles.userName}>{loginInfo.name}</span>
-                <span className={styles.moreIcon}>⋮</span>
-              </div>
+      {/* 메인 레이아웃 */}
+      <div className={styles.mainLayout}>
+        {/* ✅ 사이드 서브메뉴 */}
+        {sideOpen && (
+          <div className={styles.sidebar}>
+            <SubMenu
+              items={[
+                {
+                  label: "모니터링",
+                  children: [
+                    { label: "실시간 정보", to: "/home/pfm" },
+                    { label: "일일 데이터", to: "/home/daily" },
+                    { label: "주간 데이터", to: "/home/weekly" },
+                    { label: "CCTV", to: "/home/cctv" },
+                  ],
+                },
+                {
+                  label: "개체 관리",
+                  children: [
+                    { label: "개체 등록", to: "/home/entity/register" },
+                    { label: "개체 현황", to: "/home/entity" },
+                  ],
+                },
+              ]}
+            />
+          </div>
+        )}
 
-              {menuOpen && (
-                <div className={styles.userDropdown}>
-                  <button onClick={handleLogout}>로그아웃</button>
-                </div>
-              )}
+        {/* ✅ 메인 콘텐츠 */}
+        <div
+          className={`${styles.content} ${sideOpen ? styles.withSidebar : ""}`}
+        >
+          {isHomeRoot ? (
+            <div className={styles.heroContent}>
+              <h1>자연과 함께하는 스마트 양계 관리</h1>
             </div>
           ) : (
-            <span onClick={() => nav("/login")}>로그인</span>
-          )}
-        </nav>
-      </header>
-
-      {/* Hero */}
-      <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          {isHomeRoot ? (
-            <>
-              <h1>자연과 함께하는 스마트 양계 관리</h1>
-              <p>친환경적이고 체계적인 데이터 기반 솔루션</p>
-            </>
-          ) : (
-            <Outlet /> // ✅ 서브 라우트일 경우에는 Outlet만 출력
+            <Outlet /> // 서브 라우트 내용 표시
           )}
         </div>
-      </section>
+      </div>
     </div>
   );
 };

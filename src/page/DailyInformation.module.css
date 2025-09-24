@@ -4,7 +4,7 @@
   font-family: 'Roboto', sans-serif;
 
   /* ✅ Hero 여백 무시하고 살짝 위로 올리기 */
-  margin-top: -300px;
+  
   position: relative;
   z-index: 5;
 }

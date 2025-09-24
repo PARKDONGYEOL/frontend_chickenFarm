@@ -3,8 +3,8 @@ import styles from "./EntityManagement.module.css";
 import EntityModal from "./EntityModal";  // 📌 모달 불러오기
 
 const EntityManagement = () => {
-  const [activeTab, setActiveTab] = useState("chick"); // 기본 병아리 탭
-  const [selectedEntity, setSelectedEntity] = useState(null); // 📌 선택된 개체 상태
+  const [activeTab, setActiveTab] = useState("chick");
+  const [selectedEntity, setSelectedEntity] = useState(null);
 
   const chickData = [
     { id: "CH-001", type: "chick", age: "5일", weight: "120", feed: 30, water: 50, status: "정상" },
@@ -18,7 +18,7 @@ const EntityManagement = () => {
 
   return (
     <div className={styles.container}>
-      <h2>개체 관리 페이지</h2>
+      <h2>🐓 개체 관리 페이지</h2>
 
       {/* 탭 버튼 */}
       <div className={styles.tabMenu}>
@@ -54,7 +54,7 @@ const EntityManagement = () => {
                 {chickData.map((chick) => (
                   <tr
                     key={chick.id}
-                    onClick={() => setSelectedEntity(chick)} // 📌 클릭 시 모달 열기
+                    onClick={() => setSelectedEntity(chick)}
                     style={{ cursor: "pointer" }}
                   >
                     <td>{chick.id}</td>
@@ -84,7 +84,7 @@ const EntityManagement = () => {
                 {chickenData.map((chicken) => (
                   <tr
                     key={chicken.id}
-                    onClick={() => setSelectedEntity(chicken)} // 📌 클릭 시 모달 열기
+                    onClick={() => setSelectedEntity(chicken)}
                     style={{ cursor: "pointer" }}
                   >
                     <td>{chicken.id}</td>

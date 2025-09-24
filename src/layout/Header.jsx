@@ -1,0 +1,68 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaBars } from "react-icons/fa";
+import styles from "./Header.module.css";
+
+const Header = ({ toggleMenu }) => {
+  const nav = useNavigate();
+  const [loginInfo, setLoginInfo] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const info = sessionStorage.getItem("loginInfo");
+    if (info) setLoginInfo(JSON.parse(info));
+  }, []);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("loginInfo");
+    setLoginInfo(null);
+    nav("/");
+  };
+
+  return (
+    <header className={styles.header}>
+      {/* 왼쪽: 버튼 + 로고 */}
+      <div className={styles.logoWrapper}>
+        <button className={styles.menuButton} onClick={toggleMenu}>
+          <FaBars size={20} />
+        </button>
+        <div
+          className={styles.logo}
+          onClick={() => {
+            nav("/home");
+          }}
+        >
+          🐓 SmartFarm
+        </div>
+      </div>
+
+      {/* 오른쪽: 로그인/유저메뉴 */}
+      {loginInfo ? (
+        <div className={styles.userMenuWrapper}>
+          <div
+            className={styles.userMenuTrigger}
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <img
+              src={`https://ui-avatars.com/api/?name=${loginInfo.name}&background=4caf50&color=fff`}
+              alt="프로필"
+              className={styles.userAvatar}
+            />
+            <span className={styles.userName}>{loginInfo.name}</span>
+            <span className={styles.moreIcon}>⋮</span>
+          </div>
+
+          {menuOpen && (
+            <div className={styles.userDropdown}>
+              <button onClick={handleLogout}>로그아웃</button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <span onClick={() => nav("/login")}>로그인</span>
+      )}
+    </header>
+  );
+};
+
+export default Header;
