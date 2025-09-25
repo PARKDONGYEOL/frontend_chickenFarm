@@ -4,12 +4,12 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { Route, Routes } from 'react-router-dom'
 import Login from './layout/Login'
-import Security from './page/Security'
 import PoultryFarmManagement from './page/PoultryFarmManagement'
 import DailyInformation from './page/DailyInformation'
 import WeeklyInformation from './page/WeeklyInformation'
 import EntityManagement from './page/EntityManagement'
 import Home from './page/Home'
+import RealTimeMonitoring from './page/RealTimeMonitoring'
 
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
       <Route path='/' element={<Login />} />
 
       <Route path='home' element={<Home />} >
-        <Route path='pfm' element={<PoultryFarmManagement />} />
+        <Route path='real' element={<RealTimeMonitoring />} />
         <Route path='daily' element={<DailyInformation />} />
         <Route path='weekly' element={<WeeklyInformation />} />
         <Route path='entity' element={<EntityManagement />} />

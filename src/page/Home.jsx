@@ -24,10 +24,10 @@ const Home = () => {
                 {
                   label: "모니터링",
                   children: [
-                    { label: "실시간 정보", to: "/home/pfm" },
+                    { label: "실시간 정보", to: "/home/real" },
                     { label: "일일 데이터", to: "/home/daily" },
                     { label: "주간 데이터", to: "/home/weekly" },
-                    { label: "CCTV", to: "/home/cctv" },
+                    { label: "CCTV", to: "192.168.30.71:5090" },
                   ],
                 },
                 {
