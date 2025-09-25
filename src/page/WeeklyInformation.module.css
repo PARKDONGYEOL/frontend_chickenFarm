@@ -1,0 +1,106 @@
+.container {
+  color: #333;
+  padding: 20px;
+  font-family: 'Roboto', sans-serif;
+  position: relative;
+  z-index: 5;
+}
+
+/* 제목 */
+h2 {
+  margin-bottom: 40px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #2e7d32;
+  text-align: center;   /* ✅ 제목 가운데 정렬 */
+}
+
+/* ✅ 차트 + 테이블 나란히 */
+.chartAndTable {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;   /* ✅ 높이를 동일하게 맞춤 */
+  gap: 80px;
+}
+
+/* 공통 wrapper */
+.chartWrapper,
+.tableWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 제목 스타일 */
+.chartTitle,
+.tableTitle {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #4caf50;
+  text-align: center;
+}
+
+/* 차트 박스 */
+.chartBox {
+  flex: 1;
+  min-height: 400px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 600px;
+}
+
+/* 테이블 박스 */
+.tableBox {
+  background: #fff;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  /* flex: unset;  ✅ 불필요하게 늘어나지 않도록 */
+}
+
+/* ✅ 테이블 스크롤 */
+.tableScroll {
+  max-height: 400px;   /* 차트와 동일한 높이 */
+  overflow-y: auto;
+  height: 100%;        /* ✅ 내용 높이에 맞게 */
+}
+
+/* 테이블 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: #333;
+  table-layout: auto;     /* ✅ 내용에 맞춰 열 너비 자동 조정 */
+  white-space: nowrap;    /* ✅ 줄바꿈 방지 */
+}
+
+.table th,
+.table td {
+  border: 1px solid #eee;
+  padding: 10px 8px;
+  text-align: center;
+  white-space: nowrap;    /* ✅ 셀 내부 줄바꿈 방지 */
+}
+
+.table th {
+  background-color: #f1f8f4;
+  font-weight: 600;
+  color: #2e7d32;
+  position: sticky; 
+  top: 0;
+  z-index: 2;
+}
+
+.table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.table tr:hover {
+  background-color: #f1f8f4;
+}

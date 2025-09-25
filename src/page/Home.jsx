@@ -1,0 +1,62 @@
+import React, { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import styles from "./Home.module.css";
+import Header from "../layout/Header";
+import SubMenu from "../layout/SubMenu";
+
+const Home = () => {
+  const location = useLocation();
+  const isHomeRoot = location.pathname === "/home";
+  const [sideOpen, setSideOpen] = useState(false);
+
+  return (
+    <div className={styles.container}>
+      {/* 상단 헤더 */}
+      <Header toggleMenu={() => setSideOpen(!sideOpen)} />
+
+      {/* 메인 레이아웃 */}
+      <div className={styles.mainLayout}>
+        {/* ✅ 사이드 서브메뉴 */}
+        {sideOpen && (
+          <div className={styles.sidebar}>
+            <SubMenu
+              items={[
+                {
+                  label: "모니터링",
+                  children: [
+                    { label: "실시간 정보", to: "/home/pfm" },
+                    { label: "일일 데이터", to: "/home/daily" },
+                    { label: "주간 데이터", to: "/home/weekly" },
+                    { label: "CCTV", to: "/home/cctv" },
+                  ],
+                },
+                {
+                  label: "개체 관리",
+                  children: [
+                    { label: "개체 등록", to: "/home/entity/register" },
+                    { label: "개체 현황", to: "/home/entity" },
+                  ],
+                },
+              ]}
+            />
+          </div>
+        )}
+
+        {/* ✅ 메인 콘텐츠 */}
+        <div
+          className={`${styles.content} ${sideOpen ? styles.withSidebar : ""}`}
+        >
+          {isHomeRoot ? (
+            <div className={styles.heroContent}>
+              <h1>자연과 함께하는 스마트 양계 관리</h1>
+            </div>
+          ) : (
+            <Outlet /> // 서브 라우트 내용 표시
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Home

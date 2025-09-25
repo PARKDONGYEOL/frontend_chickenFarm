@@ -37,7 +37,7 @@ const Login = () => {
 
           if (res.data.role === 'ADMIN') {
             alert('환영합니다.');
-            nav('/');
+            nav('/home');
             setLoginDate({ 'memId': '', 'memPw': '' });
           }
 
@@ -114,7 +114,9 @@ const Login = () => {
             className={styles.button}
             size='500px'
             height='45px'
-            onClick={() => login()}
+            onClick={() => {
+              login()
+            }}
           />
         </div>
       </div>
