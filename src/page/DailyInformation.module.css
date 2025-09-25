@@ -1,43 +1,84 @@
+  /* 전체 컨테이너 */
 .container {
   color: #333;
   padding: 20px;
   font-family: 'Roboto', sans-serif;
-
-  /* ✅ Hero 여백 무시하고 살짝 위로 올리기 */
-  
   position: relative;
   z-index: 5;
+
+  max-width: 1100px;
+  margin: 0 auto;
+
+  /* ✅ 스크롤 가능하게 설정 */
+  min-height: 100vh;
+  height: auto;
+  overflow-y: auto; /* ✅ 페이지 전체 스크롤 허용 */
 }
 
 /* 제목 */
 h2 {
+  margin-top: 0;
   margin-bottom: 30px;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 600;
   color: #2e7d32;
   text-align: center;
 }
 
-/* ✅ 차트 + 테이블 나란히 (상하 중앙 정렬) */
+/* ✅ 전체 레이아웃: 세로 정렬 */
 .chartAndTable {
   display: flex;
-  justify-content: center;   /* 좌우 중앙 */
-  align-items: center;       /* ✅ 상하 중앙 정렬 */
-  gap: 40px;                 /* 간격 */
-  max-width: 1000px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 40px;
+  width: 100%;
+}
+
+/* ✅ 차트 래퍼 */
+.chartWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.chartTitle {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #4caf50;
+  text-align: center;
+}
+
+/* ✅ 차트와 테이블 공통 너비 */
+.chartBox,
+.tableBox {
+  width: 90%;
+  max-width: 800px;
   margin: 0 auto;
 }
 
-/* 공통 wrapper */
-.chartWrapper,
+/* ✅ 차트 박스 */
+.chartBox {
+  height: 360px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ✅ 테이블 래퍼 */
 .tableWrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 
-/* 제목 스타일 */
-.chartTitle,
 .tableTitle {
   margin-bottom: 12px;
   font-size: 18px;
@@ -46,50 +87,34 @@ h2 {
   text-align: center;
 }
 
-/* 차트 박스 */
-.chartBox {
-  width: 480px;
-  height: 360px;
-  background: #fff;
-  border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  display: flex;
-  align-items: center;   /* ✅ 차트 세로 중앙 */
-  justify-content: center;
-}
-
-/* 테이블 박스 */
+/* ✅ 테이블 박스 */
 .tableBox {
-  width: 700px;
-  height: 360px;             /* ✅ 차트와 같은 높이 */
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  justify-content: center;   /* ✅ 테이블 세로 중앙 */
+  max-height: 500px;
 }
 
-/* ✅ 테이블 스크롤 */
+/* ✅ 테이블 내부 스크롤 */
 .tableScroll {
-  max-height: 320px;
+  max-height: 400px;
   overflow-y: auto;
   overflow-x: auto;
 }
 
-/* 테이블 */
+/* ✅ 테이블 */
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 14px;
   color: #333;
   table-layout: fixed;
   white-space: nowrap;
 }
 
-/* 셀 스타일 */
 .table th,
 .table td {
   border: 1px solid #eee;
@@ -101,7 +126,6 @@ h2 {
   text-overflow: ellipsis;
 }
 
-/* 헤더 */
 .table th {
   background-color: #f1f8f4;
   font-weight: 600;
@@ -111,20 +135,21 @@ h2 {
   z-index: 2;
 }
 
-/* 줄무늬 + hover 효과 */
 .table tr:nth-child(even) {
   background-color: #fafafa;
 }
+
 .table tr:hover {
   background-color: #f1f8f4;
 }
 
-/* 날짜 입력 */
+/* ✅ 날짜 입력 */
 .dateInput {
   position: absolute;
   top: 10px;
   right: 40px;
 }
+
 .dateInput input {
   background: #fff;
   color: #333;
@@ -135,6 +160,7 @@ h2 {
   outline: none;
   transition: border-color 0.2s;
 }
+
 .dateInput input:focus {
   border-color: #4caf50;
 }

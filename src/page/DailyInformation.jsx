@@ -150,7 +150,7 @@ const DailyInformation = () => {
                 <tbody>
                   {rows.length === 0 ? (
                     <tr>
-                      <td colSpan="5">데이터가 없습니다.</td>
+                      <td colSpan="4">데이터가 없습니다.</td>
                     </tr>
                   ) : (
                     rows.map((r, i) => (

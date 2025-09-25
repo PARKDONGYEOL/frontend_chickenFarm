@@ -5,22 +5,31 @@
   display: flex;
   flex-direction: column;
   font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+
+  /* ✅ 높이 전체 확보 */
+  height: 100vh;
 }
 
 /* 전체 레이아웃: SubMenu + Content */
 .mainLayout {
   display: flex;
   flex: 1;
-  min-height: calc(100vh - 64px); /* Header 제외 영역 */
+
+  /* ✅ 자식 스크롤 허용을 위해 반드시 필요 */
+  min-height: 0;
+
+  /* ✅ 헤더 높이를 제외한 전체 영역 확보 */
+  height: calc(100vh - 64px);
 }
 
 /* 사이드바 */
 .sidebar {
-  width: 200px; /* 서브메뉴 너비 */
+  width: 200px;
   background: #fff;
   border-right: 1px solid #ddd;
   box-shadow: 2px 0 6px rgba(0,0,0,0.05);
   z-index: 50;
+  flex-shrink: 0;
 }
 
 /* 메인 콘텐츠 */
@@ -28,9 +37,15 @@
   flex: 1;
   padding: 40px;
   transition: all 0.3s ease;
+
+  /* ✅ 이 부분이 핵심: 스크롤 허용 */
+  overflow-y: auto;
+  overflow-x: visible;
+  height: 100%;        /* ✅ 부모 높이(calc(100vh - 64px))를 따라감 */
+  box-sizing: border-box;
 }
 
-/* 서브메뉴 열렸을 때 여백 줄이기 */
+/* 서브메뉴 열렸을 때 */
 .withSidebar {
   flex: 1;
 }
