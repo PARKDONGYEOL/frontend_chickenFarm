@@ -3,11 +3,14 @@ import { Outlet, useLocation } from "react-router-dom";
 import styles from "./Home.module.css";
 import Header from "../layout/Header";
 import SubMenu from "../layout/SubMenu";
+import ModalFull from "../common/ModalFull"; //추가 cctv
+
 
 const Home = () => {
   const location = useLocation();
   const isHomeRoot = location.pathname === "/home";
   const [sideOpen, setSideOpen] = useState(false);
+  const [isCctvModalOpen, setCctvModalOpen] = useState(false); //추가 cctv
 
   return (
     <div className={styles.container}>
@@ -27,7 +30,11 @@ const Home = () => {
                     { label: "실시간 정보", to: "/home/pfm" },
                     { label: "일일 데이터", to: "/home/daily" },
                     { label: "주간 데이터", to: "/home/weekly" },
-                    { label: "CCTV", to: "/home/cctv" },
+                    {
+                      label: "CCTV",
+                      // ✅ 수정1: to 대신 onClick을 사용 (라우터 이동 없이 모달 열기)
+                      onClick: () => setCctvModalOpen(true),
+                    },
                   ],
                 },
                 {
@@ -55,6 +62,19 @@ const Home = () => {
           )}
         </div>
       </div>
+      {/* ✅ CCTV 모달 */}
+      <ModalFull
+        isOpen={isCctvModalOpen}
+        onClose={() => setCctvModalOpen(false)} // ✅ 수정2: 닫기 이벤트 연결
+        title="CCTV 모니터링"
+      >
+        {/* ✅ 수정3: iframe 기본 속성 확실히 명시 */}
+        <iframe
+          src="http://192.168.30.71:5090"
+          style={{ width: "100%", height: "100%", border: "none" }}
+          title="CCTV Viewer"
+        />
+      </ModalFull>     
     </div>
   );
 };

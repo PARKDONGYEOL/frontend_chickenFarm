@@ -14,11 +14,14 @@ const SubMenu = ({ items = [] }) => {
       <nav className={styles.menu}>
         {items.map((item) => (
           <div key={item.label} className={styles.menuItem}>
-            {/* 상위 메뉴 */}
+            {/* ✅ 상위 메뉴 */}
             <div
               className={styles.parent}
-              onClick={() => item.children ? handleToggle(item.label) : null}
+              onClick={() =>
+                item.children ? handleToggle(item.label) : item.onClick?.()
+              }
             >
+              {/* to가 있으면 NavLink, 없으면 span */}
               {item.to ? (
                 <NavLink
                   to={item.to}
@@ -29,8 +32,17 @@ const SubMenu = ({ items = [] }) => {
                   {item.label}
                 </NavLink>
               ) : (
-                <span className={styles.link}>{item.label}</span>
+                <span
+                  className={styles.link}
+                  onClick={item.onClick} // ✅ 여기도 직접 연결 (CCTV 같은 메뉴용)
+                  role="button"
+                  tabIndex={0}
+                >
+                  {item.label}
+                </span>
               )}
+
+              {/* ▼/▲ 화살표 */}
               {item.children && (
                 <span className={styles.arrow}>
                   {openItem === item.label ? "▲" : "▼"}
@@ -38,20 +50,32 @@ const SubMenu = ({ items = [] }) => {
               )}
             </div>
 
-            {/* 서브 메뉴 */}
+            {/* ✅ 서브 메뉴 */}
             {item.children && openItem === item.label && (
               <div className={styles.subMenu}>
-                {item.children.map((sub) => (
-                  <NavLink
-                    key={sub.to}
-                    to={sub.to}
-                    className={({ isActive }) =>
-                      `${styles.subLink} ${isActive ? styles.active : ""}`
-                    }
-                  >
-                    {sub.label}
-                  </NavLink>
-                ))}
+                {item.children.map((sub) =>
+                  sub.to ? (
+                    <NavLink
+                      key={sub.label}
+                      to={sub.to}
+                      className={({ isActive }) =>
+                        `${styles.subLink} ${isActive ? styles.active : ""}`
+                      }
+                    >
+                      {sub.label}
+                    </NavLink>
+                  ) : (
+                    <span
+                      key={sub.label}
+                      className={styles.subLink}
+                      onClick={sub.onClick}
+                      role="button"
+                      tabIndex={0}
+                    >
+                      {sub.label}
+                    </span>
+                  )
+                )}
               </div>
             )}
           </div>
