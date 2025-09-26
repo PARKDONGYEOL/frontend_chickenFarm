@@ -3,7 +3,6 @@ import styles from "./RealTimeMonitoring.module.css";
 import GaugeCard from "../common/GaugeCard";
 import LineTrendChart from "../common/LineTrendChart";
 import ModalFloat from "../common/ModalFloat";
-import DataTable from "../common/DataTable";
 
 const RealTimeMonitoring = () => {
   const [data, setData] = useState({
@@ -23,6 +22,7 @@ const RealTimeMonitoring = () => {
     points: [],
   });
 
+  // ✅ 값 갱신 (5분마다)
   useEffect(() => {
     const updateData = () => {
       setData({
@@ -40,6 +40,7 @@ const RealTimeMonitoring = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // ✅ 24시간 시계열 데이터 생성기
   const generateTimeSeries = (points = 96, fn) => {
     const now = Date.now();
     const step = (24 * 60 * 60 * 1000) / points;
@@ -55,6 +56,7 @@ const RealTimeMonitoring = () => {
     setTrendOpen(true);
   };
 
+  // ✅ 더미 데이터 함수
   const genTemp = (i) => 22 + Math.sin(i / 6) * 3 + Math.random();
   const genHum = () => 60 + Math.random() * 25;
   const genLux = (i) => 300 + Math.sin(i / 4) * 150 + Math.random() * 30;
@@ -66,13 +68,36 @@ const RealTimeMonitoring = () => {
   return (
     <>
       <div className={styles.container}>
+        {/* ✅ 반원 게이지 섹션 */}
         <div className={styles.gaugeSection}>
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>쾌적 지수</h3>
             <div className={`${styles.cards} ${styles.cards3}`}>
-              <GaugeCard label="온도 (°C)" value={data.temp} max={40} warning={35} unit="°C" onClick={() => openTrend("온도 (최근 24시간)", "°C", genTemp)} />
-              <GaugeCard label="습도 (%)" value={data.hum} max={100} warning={40} below unit="%" onClick={() => openTrend("습도 (최근 24시간)", "%", genHum)} />
-              <GaugeCard label="조도 (lux)" value={data.lux} max={1000} warning={800} unit="lux" onClick={() => openTrend("조도 (최근 24시간)", "lux", genLux)} />
+              <GaugeCard
+                label="온도 (°C)"
+                value={data.temp}
+                max={40}
+                warning={35}
+                unit="°C"
+                onClick={() => openTrend("온도 (최근 24시간)", "°C", genTemp)}
+              />
+              <GaugeCard
+                label="습도 (%)"
+                value={data.hum}
+                max={100}
+                warning={40}
+                below
+                unit="%"
+                onClick={() => openTrend("습도 (최근 24시간)", "%", genHum)}
+              />
+              <GaugeCard
+                label="조도 (lux)"
+                value={data.lux}
+                max={1000}
+                warning={800}
+                unit="lux"
+                onClick={() => openTrend("조도 (최근 24시간)", "lux", genLux)}
+              />
             </div>
           </section>
 
@@ -88,22 +113,47 @@ const RealTimeMonitoring = () => {
         </div>
       </div>
 
-      {/* ✅ 모달 (라인차트 + 최근 5개 테이블) */}
-      <ModalFloat isOpen={trendOpen} onClose={() => setTrendOpen(false)} title={trend.title} width={920} height={640}>
-        <LineTrendChart title="" data={trend.points} yUnit={trend.unit} />
+      {/* ✅ 모달 (차트 + 테이블 좌우 배치) */}
+      <ModalFloat
+        isOpen={trendOpen}
+        onClose={() => setTrendOpen(false)}
+        title={trend.title}
+        width={1200}
+        height={600}
+      >
+        <div className={styles.modalContent}>
+          {/* 📈 라인차트 */}
+          <div className={styles.modalChart}>
+            <LineTrendChart
+              title=""
+              data={trend.points}
+              yUnit={trend.unit}
+            />
+          </div>
 
-        <DataTable
-          title="📊 최근 5개 데이터"
-          columns={[
-            { key: "time", label: "시간" },
-            { key: "value", label: `값 (${trend.unit})` },
-          ]}
-          data={trend.points.map((p) => ({
-            time: p.t.toLocaleString(),
-            value: p.value.toFixed(2),
-          }))}
-          limit={5}
-        />
+          {/* 📊 최근 5개 데이터 테이블 */}
+          <div className={styles.modalTable}>
+            <h4 className={styles.trendTableTitle}>최근 5개 데이터</h4>
+            <table className={styles.trendTable}>
+              <thead>
+                <tr>
+                  <th>시간</th>
+                  <th>값 ({trend.unit})</th>
+                </tr>
+              </thead>
+              <tbody>
+                {trend.points
+                  .slice(-5) // ✅ 최근 5개만 표시
+                  .map((p, idx) => (
+                    <tr key={idx}>
+                      <td>{p.t.toLocaleString()}</td>
+                      <td>{p.value.toFixed(2)}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </ModalFloat>
     </>
   );

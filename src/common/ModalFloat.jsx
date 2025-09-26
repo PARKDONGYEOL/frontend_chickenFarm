@@ -33,7 +33,7 @@ const ModalFloat = ({
             className={styles.closeBtn}
             onClick={onClose}
             aria-label="닫기"
-          >
+          > 
             ×
           </button>
         </div>

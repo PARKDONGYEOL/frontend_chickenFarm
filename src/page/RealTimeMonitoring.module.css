@@ -1,135 +1,129 @@
 .container {
   padding: 20px;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
-h2 {
-  font-size: 26px;
-  margin-bottom: 30px;
-  color: #2e7d32;
-  text-align: center;
-}
-
-/* ✅ 전체 레이아웃 : 왼쪽(게이지) + 오른쪽(테이블) */
 .layout {
   display: flex;
-  gap:  40px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 50px;
+  align-items: center;
 }
 
-/* ✅ 왼쪽 게이지 컬럼 */
 .gaugeSection {
   display: flex;
   flex-direction: column;
-  gap: 40px;
-  flex: 2;
+  gap: 50px;
+  width: 100%;
 }
 
-/* ── 공통 섹션 ───────────────────────────── */
 .section {
   display: flex;
   flex-direction: column;
-  align-items: center;   /* 제목과 카드 중앙 정렬 */
-  gap: 10px;
+  align-items: center;
+  gap: 20px;
 }
 
 .sectionTitle {
   margin: 0;
-  font-size: 18px;
-  color: #374151;
+  font-size: 20px;
+  color: #1f2937;
+  font-weight: 600;
   text-align: center;
 }
 
-/* ── 카드 그리드 기본 ───────────────────── */
 .cards {
   display: grid;
   gap: 20px;
   justify-content: center;
 }
 
-/* 쾌적 지수 3개 */
 .cards3 {
-  grid-template-columns: repeat(3, 180px);
+  grid-template-columns: repeat(3, 200px);
 }
 
-/* 공기질 4개 (기본은 그리드 4열) */
 .cards4 {
-  grid-template-columns: repeat(4, 180px);
+  grid-template-columns: repeat(4, 200px);
 }
 
-/* 한 줄 강제 + 가로 스크롤 허용(공기질 전용) */
-.noWrap {
-  /* grid 기본을 덮어씌워 한 줄 고정 */
+/* 📈 모달 내부 레이아웃 */
+.modalContent {
   display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
-  gap: 20px;
-  overflow-x: auto;  /* 화면이 좁으면 스크롤 */
-  -webkit-overflow-scrolling: touch;
-}
-
-/* ✅ 게이지 카드 */
-.gaugeCard {
-  background: #fff;
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  width: 180px;             /* 고정 폭: 레이아웃 안정 */
+  height: 100%;
+  gap: 24px;
+  padding: 20px;
   box-sizing: border-box;
 }
 
-.gaugeTitle {
-  font-size: 16px;
-  margin: 0 0 10px;
-}
-
-.alert {
-  color: #ef4444;
-  font-weight: bold;
-  margin-top: 8px;
-}
-
-.normal {
-  color: #4caf50;
-  font-weight: bold;
-  margin-top: 8px;
-}
-
-/* ✅ 오른쪽 테이블 */
-.tableWrapper {
-  flex: 1;
-  background: #fff;
+/* 📊 차트 영역 (왼쪽) */
+.modalChart {
+  flex: 7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
   border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  max-height: 500px;
-  overflow-y: auto;
-  text-align: center;
+  padding: 12px;
 }
 
-.tableTitle {
-  margin-bottom: 15px;
+/* 📋 테이블 영역 (오른쪽) */
+.modalTable {
+  flex: 3;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
 }
 
-.table {
+.trendTableTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #1f2937;
+}
+
+/* 📊 테이블 스타일 */
+.trendTable {
   width: 100%;
   border-collapse: collapse;
-  font-size: 15px;
+  font-size: 14px;
 }
 
-.table th,
-.table td {
-  border: 1px solid #ccc;
-  padding: 10px;
+.trendTable th,
+.trendTable td {
+  border: 1px solid #e5e7eb;
+  padding: 10px 14px;
   text-align: center;
 }
 
-.table th {
-  background: #f1f8f4;
+.trendTable th {
+  background: #f3f4f6;
+  font-weight: 600;
+  color: #111827;
 }
 
-.card180 { 
-  width: 180px !important; 
+.trendTable td {
+  color: #374151;
+}
+
+.trendTable tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.trendTable tbody tr:hover {
+  background: #eef2ff;
+}
+
+/* 📱 반응형 */
+@media (max-width: 900px) {
+  .modalContent {
+    flex-direction: column;
+  }
+  .modalChart,
+  .modalTable {
+    flex: 1;
+  }
 }
