@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
 import styles from "./RealTimeMonitoring.module.css";
+import GaugeCard from "../common/GaugeCard";
+import LineTrendChart from "../common/LineTrendChart";
+import ModalFloat from "../common/ModalFloat";
+import DataTable from "../common/DataTable";
 
 const RealTimeMonitoring = () => {
   const [data, setData] = useState({
@@ -13,7 +16,13 @@ const RealTimeMonitoring = () => {
     co: 0,
   });
 
-  // ✅ 5분마다 데이터 갱신 (현재는 랜덤값)
+  const [trendOpen, setTrendOpen] = useState(false);
+  const [trend, setTrend] = useState({
+    title: "",
+    unit: "",
+    points: [],
+  });
+
   useEffect(() => {
     const updateData = () => {
       setData({
@@ -26,90 +35,78 @@ const RealTimeMonitoring = () => {
         co: Math.random() * 150,
       });
     };
-
-    updateData(); // 초기 실행
+    updateData();
     const interval = setInterval(updateData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <div className={styles.container}>
-      <div className={styles.layout}>
-        {/* ✅ 왼쪽 : 2줄 게이지 */}
-        <div className={styles.gaugeSection}>
-          <div className={styles.gaugeRow}>
-            <div>
-              <h3></h3>
-            </div>
-            <GaugeCard label="온도 (°C)" value={data.temp} max={40} warning={35} unit="°C" />
-            <GaugeCard label="습도 (%)" value={data.hum} max={100} warning={40} below unit="%" />
-            <GaugeCard label="조도 (lux)" value={data.lux} max={1000} warning={800} unit="lux" />
-          </div>
-          <div className={styles.gaugeRow}>
-            <GaugeCard label="암모니아 (ppm)" value={data.nh3} max={40} warning={20} unit="ppm" />
-            <GaugeCard label="이산화탄소 (CO₂)" value={data.co2} max={1000} warning={800} unit="ppm" />
-            <GaugeCard label="이산화질소 (NO₂)" value={data.no2} max={200} warning={150} unit="ppb" />
-            <GaugeCard label="일산화탄소 (CO)" value={data.co} max={150} warning={100} unit="ppm" />
-          </div>
-        </div>
+  const generateTimeSeries = (points = 96, fn) => {
+    const now = Date.now();
+    const step = (24 * 60 * 60 * 1000) / points;
+    return Array.from({ length: points }, (_, i) => {
+      const time = new Date(now - (points - 1 - i) * step);
+      return { t: time, value: fn(i) };
+    });
+  };
 
-        {/* ✅ 오른쪽 : 테이블 */}
-        <div className={styles.tableWrapper}>
-          <div className={styles.tableTitle}>
-            <h3>실시간 환경 데이터</h3>
-          </div>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>항목</th>
-                <th>현재 값</th>
-                <th>단위</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>온도</td><td>{data.temp.toFixed(1)}</td><td>°C</td></tr>
-              <tr><td>습도</td><td>{data.hum.toFixed(1)}</td><td>%</td></tr>
-              <tr><td>조도</td><td>{data.lux.toFixed(1)}</td><td>lux</td></tr>
-              <tr><td>암모니아</td><td>{data.nh3.toFixed(1)}</td><td>ppm</td></tr>
-              <tr><td>이산화탄소 (CO₂)</td><td>{data.co2.toFixed(1)}</td><td>ppm</td></tr>
-              <tr><td>이산화질소 (NO₂)</td><td>{data.no2.toFixed(1)}</td><td>ppb</td></tr>
-              <tr><td>일산화탄소 (CO)</td><td>{data.co.toFixed(1)}</td><td>ppm</td></tr>
-            </tbody>
-          </table>
+  const openTrend = (title, unit, generator) => {
+    const points = generateTimeSeries(96, generator);
+    setTrend({ title, unit, points });
+    setTrendOpen(true);
+  };
+
+  const genTemp = (i) => 22 + Math.sin(i / 6) * 3 + Math.random();
+  const genHum = () => 60 + Math.random() * 25;
+  const genLux = (i) => 300 + Math.sin(i / 4) * 150 + Math.random() * 30;
+  const genNH3 = () => 10 + Math.random() * 25;
+  const genCO2 = () => 400 + Math.random() * 700;
+  const genNO2 = () => 80 + Math.random() * 100;
+  const genCO = () => 20 + Math.random() * 120;
+
+  return (
+    <>
+      <div className={styles.container}>
+        <div className={styles.gaugeSection}>
+          <section className={styles.section}>
+            <h3 className={styles.sectionTitle}>쾌적 지수</h3>
+            <div className={`${styles.cards} ${styles.cards3}`}>
+              <GaugeCard label="온도 (°C)" value={data.temp} max={40} warning={35} unit="°C" onClick={() => openTrend("온도 (최근 24시간)", "°C", genTemp)} />
+              <GaugeCard label="습도 (%)" value={data.hum} max={100} warning={40} below unit="%" onClick={() => openTrend("습도 (최근 24시간)", "%", genHum)} />
+              <GaugeCard label="조도 (lux)" value={data.lux} max={1000} warning={800} unit="lux" onClick={() => openTrend("조도 (최근 24시간)", "lux", genLux)} />
+            </div>
+          </section>
+
+          <section className={styles.section}>
+            <h3 className={styles.sectionTitle}>공기질</h3>
+            <div className={`${styles.cards} ${styles.cards4}`}>
+              <GaugeCard label="암모니아 (ppm)" value={data.nh3} max={40} warning={20} unit="ppm" onClick={() => openTrend("암모니아 (최근 24시간)", "ppm", genNH3)} />
+              <GaugeCard label="이산화탄소 (CO₂)" value={data.co2} max={1000} warning={800} unit="ppm" onClick={() => openTrend("이산화탄소 (최근 24시간)", "ppm", genCO2)} />
+              <GaugeCard label="이산화질소 (NO₂)" value={data.no2} max={200} warning={150} unit="ppb" onClick={() => openTrend("이산화질소 (최근 24시간)", "ppb", genNO2)} />
+              <GaugeCard label="일산화탄소 (CO)" value={data.co} max={150} warning={100} unit="ppm" onClick={() => openTrend("일산화탄소 (최근 24시간)", "ppm", genCO)} />
+            </div>
+          </section>
         </div>
       </div>
-    </div>
+
+      {/* ✅ 모달 (라인차트 + 최근 5개 테이블) */}
+      <ModalFloat isOpen={trendOpen} onClose={() => setTrendOpen(false)} title={trend.title} width={920} height={640}>
+        <LineTrendChart title="" data={trend.points} yUnit={trend.unit} />
+
+        <DataTable
+          title="📊 최근 5개 데이터"
+          columns={[
+            { key: "time", label: "시간" },
+            { key: "value", label: `값 (${trend.unit})` },
+          ]}
+          data={trend.points.map((p) => ({
+            time: p.t.toLocaleString(),
+            value: p.value.toFixed(2),
+          }))}
+          limit={5}
+        />
+      </ModalFloat>
+    </>
   );
 };
 
-// ✅ 게이지 카드 컴포넌트
-const GaugeCard = ({ label, value, max, warning, below = false, unit }) => {
-  const danger = below ? value < warning : value > warning;
-
-  return (
-    <div className={styles.gaugeCard}>
-      <h3>{label}</h3>
-      <Gauge
-        width={150}
-        height={120}
-        startAngle={-90}
-        endAngle={90}
-        value={value}
-        valueMax={max}
-        sx={{
-          [`& .${gaugeClasses.valueArc}`]: {
-            fill: danger ? "#ef4444" : "#4caf50",
-          },
-          [`& .${gaugeClasses.valueText}`]: {
-            fontSize: 22,
-          },
-        }}
-      />
-      <p className={danger ? styles.alert : styles.normal}>
-        {danger ? "⚠️ 위험" : "✅ 정상"} ({value.toFixed(1)} {unit})
-      </p>
-    </div>
-  );
-};
-
-export default RealTimeMonitoring;
+export default RealTimeMonitoring

@@ -1,0 +1,65 @@
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  width: 190px;          /* 카드 폭 (게이지 width보다 약간 넓게) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
+.header {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.title {
+  margin: 0;
+  font-size: 14px;
+  color: #374151;
+  font-weight: 600;
+}
+
+.gaugeWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer {
+  margin-top: 6px;
+}
+
+.badgeOk {
+  display: inline-block;
+  background: #e8f7ee;
+  color: #16a34a;
+  border: 1px solid #b7ebc6;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badgeDanger {
+  display: inline-block;
+  background: #fde8e8;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+}

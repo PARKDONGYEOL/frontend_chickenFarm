@@ -14,11 +14,11 @@ h2 {
 /* ✅ 전체 레이아웃 : 왼쪽(게이지) + 오른쪽(테이블) */
 .layout {
   display: flex;
-  gap: 40px;
+  gap:  40px;
   align-items: flex-start;
 }
 
-/* ✅ 왼쪽 2줄 게이지 */
+/* ✅ 왼쪽 게이지 컬럼 */
 .gaugeSection {
   display: flex;
   flex-direction: column;
@@ -26,10 +26,47 @@ h2 {
   flex: 2;
 }
 
-.gaugeRow {
+/* ── 공통 섹션 ───────────────────────────── */
+.section {
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
+  align-items: center;   /* 제목과 카드 중앙 정렬 */
+  gap: 10px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 18px;
+  color: #374151;
+  text-align: center;
+}
+
+/* ── 카드 그리드 기본 ───────────────────── */
+.cards {
+  display: grid;
   gap: 20px;
+  justify-content: center;
+}
+
+/* 쾌적 지수 3개 */
+.cards3 {
+  grid-template-columns: repeat(3, 180px);
+}
+
+/* 공기질 4개 (기본은 그리드 4열) */
+.cards4 {
+  grid-template-columns: repeat(4, 180px);
+}
+
+/* 한 줄 강제 + 가로 스크롤 허용(공기질 전용) */
+.noWrap {
+  /* grid 기본을 덮어씌워 한 줄 고정 */
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 20px;
+  overflow-x: auto;  /* 화면이 좁으면 스크롤 */
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ✅ 게이지 카드 */
@@ -39,12 +76,13 @@ h2 {
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
-  width: 180px;
+  width: 180px;             /* 고정 폭: 레이아웃 안정 */
+  box-sizing: border-box;
 }
 
-.gaugeCard h3 {
+.gaugeTitle {
   font-size: 16px;
-  margin-bottom: 10px;
+  margin: 0 0 10px;
 }
 
 .alert {
@@ -90,4 +128,8 @@ h2 {
 
 .table th {
   background: #f1f8f4;
+}
+
+.card180 { 
+  width: 180px !important; 
 }
