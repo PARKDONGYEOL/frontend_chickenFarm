@@ -9,6 +9,8 @@ import WeeklyInformation from './page/WeeklyInformation'
 import EntityManagement from './page/EntityManagement'
 import Home from './page/Home'
 import RealTimeMonitoring from './page/RealTimeMonitoring'
+import TrendAnalysis from './page/TrendAnalysis'
+import EnvDashboard from './page/EnvDashboard'
 
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
 
       <Route path='home' element={<Home />} >
         <Route path='real' element={<RealTimeMonitoring />} />
+        <Route path='env' element={<EnvDashboard/>}/>
+        <Route path='trend' element={<TrendAnalysis/>}/>
         <Route path='daily' element={<DailyInformation />} />
         <Route path='weekly' element={<WeeklyInformation />} />
         <Route path='entity' element={<EntityManagement />} />

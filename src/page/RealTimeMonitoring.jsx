@@ -22,7 +22,7 @@ const RealTimeMonitoring = () => {
     points: [],
   });
 
-  // ✅ 값 갱신 (5분마다)
+  // ✅ 값 갱신 (5분마다 랜덤 데이터)
   useEffect(() => {
     const updateData = () => {
       setData({
@@ -40,7 +40,7 @@ const RealTimeMonitoring = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // ✅ 24시간 시계열 데이터 생성기
+  // ✅ 24시간 시계열 데이터 생성
   const generateTimeSeries = (points = 96, fn) => {
     const now = Date.now();
     const step = (24 * 60 * 60 * 1000) / points;
@@ -68,52 +68,51 @@ const RealTimeMonitoring = () => {
   return (
     <>
       <div className={styles.container}>
-        {/* ✅ 반원 게이지 섹션 */}
-        <div className={styles.gaugeSection}>
-          <section className={styles.section}>
-            <h3 className={styles.sectionTitle}>쾌적 지수</h3>
-            <div className={`${styles.cards} ${styles.cards3}`}>
-              <GaugeCard
-                label="온도 (°C)"
-                value={data.temp}
-                max={40}
-                warning={35}
-                unit="°C"
-                onClick={() => openTrend("온도 (최근 24시간)", "°C", genTemp)}
-              />
-              <GaugeCard
-                label="습도 (%)"
-                value={data.hum}
-                max={100}
-                warning={40}
-                below
-                unit="%"
-                onClick={() => openTrend("습도 (최근 24시간)", "%", genHum)}
-              />
-              <GaugeCard
-                label="조도 (lux)"
-                value={data.lux}
-                max={1000}
-                warning={800}
-                unit="lux"
-                onClick={() => openTrend("조도 (최근 24시간)", "lux", genLux)}
-              />
-            </div>
-          </section>
+        {/* ✅ 쾌적 지수 */}
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>쾌적 지수</h3>
+          <div className={`${styles.cards} ${styles.cards3}`}>
+            <GaugeCard
+              label="온도 (°C)"
+              value={data.temp}
+              max={40}
+              warning={35}
+              unit="°C"
+              onClick={() => openTrend("온도 (최근 24시간)", "°C", genTemp)}
+            />
+            <GaugeCard
+              label="습도 (%)"
+              value={data.hum}
+              max={100}
+              warning={40}
+              below
+              unit="%"
+              onClick={() => openTrend("습도 (최근 24시간)", "%", genHum)}
+            />
+            <GaugeCard
+              label="조도 (lux)"
+              value={data.lux}
+              max={1000}
+              warning={800}
+              unit="lux"
+              onClick={() => openTrend("조도 (최근 24시간)", "lux", genLux)}
+            />
+          </div>
+        </div>
 
-          <section className={styles.section}>
-            <h3 className={styles.sectionTitle}>공기질</h3>
-            <div className={`${styles.cards} ${styles.cards4}`}>
-              <GaugeCard label="암모니아 (ppm)" value={data.nh3} max={40} warning={20} unit="ppm" onClick={() => openTrend("암모니아 (최근 24시간)", "ppm", genNH3)} />
-              <GaugeCard label="이산화탄소 (CO₂)" value={data.co2} max={1000} warning={800} unit="ppm" onClick={() => openTrend("이산화탄소 (최근 24시간)", "ppm", genCO2)} />
-              <GaugeCard label="이산화질소 (NO₂)" value={data.no2} max={200} warning={150} unit="ppb" onClick={() => openTrend("이산화질소 (최근 24시간)", "ppb", genNO2)} />
-              <GaugeCard label="일산화탄소 (CO)" value={data.co} max={150} warning={100} unit="ppm" onClick={() => openTrend("일산화탄소 (최근 24시간)", "ppm", genCO)} />
-            </div>
-          </section>
+        {/* ✅ 공기질 */}
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>공기질</h3>
+          <div className={`${styles.cards} ${styles.cards4}`}>
+            <GaugeCard label="암모니아 (ppm)" value={data.nh3} max={40} warning={20} unit="ppm" onClick={() => openTrend("암모니아 (최근 24시간)", "ppm", genNH3)} />
+            <GaugeCard label="이산화탄소 (CO₂)" value={data.co2} max={1000} warning={800} unit="ppm" onClick={() => openTrend("이산화탄소 (최근 24시간)", "ppm", genCO2)} />
+            <GaugeCard label="이산화질소 (NO₂)" value={data.no2} max={200} warning={150} unit="ppb" onClick={() => openTrend("이산화질소 (최근 24시간)", "ppb", genNO2)} />
+            <GaugeCard label="일산화탄소 (CO)" value={data.co} max={150} warning={100} unit="ppm" onClick={() => openTrend("일산화탄소 (최근 24시간)", "ppm", genCO)} />
+          </div>
         </div>
       </div>
 
-      {/* ✅ 모달 (차트 + 테이블 좌우 배치) */}
+      {/* ✅ 클릭 시 모달 */}
       <ModalFloat
         isOpen={trendOpen}
         onClose={() => setTrendOpen(false)}
@@ -122,16 +121,9 @@ const RealTimeMonitoring = () => {
         height={600}
       >
         <div className={styles.modalContent}>
-          {/* 📈 라인차트 */}
           <div className={styles.modalChart}>
-            <LineTrendChart
-              title=""
-              data={trend.points}
-              yUnit={trend.unit}
-            />
+            <LineTrendChart title="" data={trend.points} yUnit={trend.unit} />
           </div>
-
-          {/* 📊 최근 5개 데이터 테이블 */}
           <div className={styles.modalTable}>
             <h4 className={styles.trendTableTitle}>최근 5개 데이터</h4>
             <table className={styles.trendTable}>
@@ -142,14 +134,12 @@ const RealTimeMonitoring = () => {
                 </tr>
               </thead>
               <tbody>
-                {trend.points
-                  .slice(-5) // ✅ 최근 5개만 표시
-                  .map((p, idx) => (
-                    <tr key={idx}>
-                      <td>{p.t.toLocaleString()}</td>
-                      <td>{p.value.toFixed(2)}</td>
-                    </tr>
-                  ))}
+                {trend.points.slice(-5).map((p, idx) => (
+                  <tr key={idx}>
+                    <td>{p.t.toLocaleString()}</td>
+                    <td>{p.value.toFixed(2)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -159,4 +149,4 @@ const RealTimeMonitoring = () => {
   );
 };
 
-export default RealTimeMonitoring
+export default RealTimeMonitoring;

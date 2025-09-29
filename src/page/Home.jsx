@@ -27,7 +27,8 @@ const Home = () => {
                 {
                   label: "모니터링",
                   children: [
-                    { label: "실시간 정보", to: "/home/real" },
+                    { label: "실시간 데이터", to: "/home/real" },
+                    { label: "통계 데이터", to: "/home/env" },
                     { label: "일일 데이터", to: "/home/daily" },
                     { label: "주간 데이터", to: "/home/weekly" },
                     {

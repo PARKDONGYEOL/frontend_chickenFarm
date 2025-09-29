@@ -4,33 +4,22 @@
   margin: 0 auto;
 }
 
-.layout {
-  display: flex;
-  flex-direction: column;
-  gap: 50px;
-  align-items: center;
-}
-
-.gaugeSection {
-  display: flex;
-  flex-direction: column;
-  gap: 50px;
-  width: 100%;
-}
-
 .section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin-bottom: 30px;
 }
 
 .sectionTitle {
-  margin: 0;
   font-size: 20px;
-  color: #1f2937;
   font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 20px;
   text-align: center;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 8px;
 }
 
 .cards {
@@ -47,7 +36,7 @@
   grid-template-columns: repeat(4, 200px);
 }
 
-/* 📈 모달 내부 레이아웃 */
+/* 📈 모달 */
 .modalContent {
   display: flex;
   height: 100%;
@@ -56,7 +45,6 @@
   box-sizing: border-box;
 }
 
-/* 📊 차트 영역 (왼쪽) */
 .modalChart {
   flex: 7;
   display: flex;
@@ -67,13 +55,12 @@
   padding: 12px;
 }
 
-/* 📋 테이블 영역 (오른쪽) */
 .modalTable {
   flex: 3;
   background: #ffffff;
   border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
 }
@@ -85,7 +72,6 @@
   color: #1f2937;
 }
 
-/* 📊 테이블 스타일 */
 .trendTable {
   width: 100%;
   border-collapse: collapse;
@@ -117,7 +103,6 @@
   background: #eef2ff;
 }
 
-/* 📱 반응형 */
 @media (max-width: 900px) {
   .modalContent {
     flex-direction: column;

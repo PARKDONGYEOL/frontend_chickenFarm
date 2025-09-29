@@ -1,0 +1,139 @@
+.container {
+  flex: 1;                /* ✅ 부모(App)의 남은 공간을 전부 차지 */
+  padding: 20px;
+  background: #f9fafb;
+  min-height: calc(100vh - 64px); /* ✅ 헤더 높이 빼고 전체 채우기 */
+  color: #111;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;       /* ✅ 가로 스크롤 방지 */
+}
+
+/* 좌우 분할 */
+.splitLayout {
+  display: flex;
+  flex: 1;
+  gap: 40px;
+  overflow: hidden;       /* ✅ 내부도 스크롤 없애고 */
+}
+
+.leftSection,
+.rightSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sectionTitle {
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  color: #2e7d32;
+}
+
+/* 카드 (미니 차트) */
+.chartCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.chartCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 미니 차트 */
+.chartWrapperMini {
+  flex: 1;
+  min-height: 200px;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* 라벨 */
+.chartLabel {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 쾌적 지수 (2x2) */
+.comfortGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+.comfortGrid > :last-child {
+  grid-column: span 2;
+}
+
+/* 공기질 (2x2) */
+.airGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* 모달 */
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.controls {
+  margin-bottom: 16px;
+  text-align: right;
+}
+
+.controls select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.chartWrapper {
+  flex: 1;
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 반응형 */
+@media (max-width: 1200px) {
+  .splitLayout {
+    flex-direction: column;
+  }
+  .comfortGrid,
+  .airGrid {
+    grid-template-columns: 1fr;
+  }
+  .comfortGrid > :last-child {
+    grid-column: auto;
+  }
+}
