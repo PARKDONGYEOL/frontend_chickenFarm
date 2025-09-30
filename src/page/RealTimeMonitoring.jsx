@@ -4,6 +4,49 @@ import GaugeCard from "../common/GaugeCard";
 import LineTrendChart from "../common/LineTrendChart";
 import ModalFloat from "../common/ModalFloat";
 
+// 아이콘 컴포넌트
+const ThermoIcon = () => (
+  <div style={{background: 'linear-gradient(135deg, #3b82f6, #2563eb)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+    🌡️
+  </div>
+);
+
+const HumidityIcon = () => (
+  <div style={{background: 'linear-gradient(135deg, #06b6d4, #0891b2)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+    💧
+  </div>
+);
+
+const LightIcon = () => (
+  <div style={{background: 'linear-gradient(135deg, #facc15, #eab308)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+    ☀️
+  </div>
+);
+
+const AmmoniaIcon = () => (
+  <div style={{background: 'linear-gradient(135deg, #a855f7, #9333ea)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+    🧪
+  </div>
+);
+
+const CO2Icon = () => (
+  <div style={{background: 'linear-gradient(135deg, #22c55e, #16a34a)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+    🌿
+  </div>
+);
+
+const NO2Icon = () => (
+  <div style={{background: 'linear-gradient(135deg, #f59e0b, #d97706)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+    ⚠️
+  </div>
+);
+
+const COIcon = () => (
+  <div style={{background: 'linear-gradient(135deg, #ef4444, #dc2626)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+    🔥
+  </div>
+);
+
 const RealTimeMonitoring = () => {
   const [data, setData] = useState({
     temp: 0,
@@ -65,49 +108,99 @@ const RealTimeMonitoring = () => {
   const genNO2 = () => 80 + Math.random() * 100;
   const genCO = () => 20 + Math.random() * 120;
 
+  const activeSensors = 7;
+  const totalSensors = 7;
+  const alerts = data.temp > 30 || data.hum > 80 || data.nh3 > 25 ? 1 : 0;
+
   return (
     <>
       <div className={styles.container}>
-        {/* ✅ 쾌적 지수 */}
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>쾌적 지수</h3>
-          <div className={`${styles.cards} ${styles.cards3}`}>
+        <div className={styles.mainGrid}>
+          {/* 센서 카드들 */}
+          <div className={styles.sensorsGrid}>
             <GaugeCard
-              label="온도 (°C)"
+              icon={<ThermoIcon />}
+              label="온도"
               value={data.temp}
               max={40}
-              warning={35}
+              min={15}
+              optimalMax={30}
               unit="°C"
               onClick={() => openTrend("온도 (최근 24시간)", "°C", genTemp)}
             />
             <GaugeCard
-              label="습도 (%)"
+              icon={<HumidityIcon />}
+              label="습도"
               value={data.hum}
               max={100}
-              warning={40}
-              below
+              min={40}
+              optimalMax={80}
               unit="%"
               onClick={() => openTrend("습도 (최근 24시간)", "%", genHum)}
             />
             <GaugeCard
-              label="조도 (lux)"
+              icon={<LightIcon />}
+              label="조도"
               value={data.lux}
               max={1000}
-              warning={800}
+              min={1}
+              optimalMax={50}
               unit="lux"
               onClick={() => openTrend("조도 (최근 24시간)", "lux", genLux)}
             />
+            <GaugeCard
+              icon={<AmmoniaIcon />}
+              label="암모니아"
+              value={data.nh3}
+              max={60}
+              min={0}
+              optimalMax={25}
+              unit="ppm"
+              onClick={() => openTrend("암모니아 (최근 24시간)", "ppm", genNH3)}
+            />
+            <GaugeCard
+              icon={<CO2Icon />}
+              label="이산화탄소"
+              value={data.co2}
+              max={6000}
+              min={1000}
+              optimalMax={5000}
+              unit="ppm"
+              onClick={() => openTrend("이산화탄소 (최근 24시간)", "ppm", genCO2)}
+            />
+            <GaugeCard
+              icon={<NO2Icon />}
+              label="이산화질소"
+              value={data.no2}
+              max={200}
+              min={0}
+              optimalMax={50}
+              unit="ppb"
+              onClick={() => openTrend("이산화질소 (최근 24시간)", "ppb", genNO2)}
+            />
+            <GaugeCard
+              icon={<COIcon />}
+              label="일산화탄소"
+              value={data.co}
+              max={150}
+              min={0}
+              optimalMax={50}
+              unit="ppm"
+              onClick={() => openTrend("일산화탄소 (최근 24시간)", "ppm", genCO)}
+            />
           </div>
-        </div>
 
-        {/* ✅ 공기질 */}
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>공기질</h3>
-          <div className={`${styles.cards} ${styles.cards4}`}>
-            <GaugeCard label="암모니아 (ppm)" value={data.nh3} max={40} warning={20} unit="ppm" onClick={() => openTrend("암모니아 (최근 24시간)", "ppm", genNH3)} />
-            <GaugeCard label="이산화탄소 (CO₂)" value={data.co2} max={1000} warning={800} unit="ppm" onClick={() => openTrend("이산화탄소 (최근 24시간)", "ppm", genCO2)} />
-            <GaugeCard label="이산화질소 (NO₂)" value={data.no2} max={200} warning={150} unit="ppb" onClick={() => openTrend("이산화질소 (최근 24시간)", "ppb", genNO2)} />
-            <GaugeCard label="일산화탄소 (CO)" value={data.co} max={150} warning={100} unit="ppm" onClick={() => openTrend("일산화탄소 (최근 24시간)", "ppm", genCO)} />
+          {/* 시스템 상태 패널 */}
+          <div className={styles.statusPanel}>
+            <h3 className={styles.statusTitle}>시스템 상태</h3>
+            <div className={styles.statusItem}>
+              <span className={styles.statusLabel}>활성 센서</span>
+              <span className={styles.statusValue}>{activeSensors}/{totalSensors}</span>
+            </div>
+            <div className={styles.statusItem}>
+              <span className={styles.statusLabel}>알림</span>
+              <span className={`${styles.statusValue} ${alerts > 0 ? styles.alertActive : ''}`}>{alerts}</span>
+            </div>
           </div>
         </div>
       </div>

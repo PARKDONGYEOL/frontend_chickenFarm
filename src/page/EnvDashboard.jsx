@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import styles from "./EnvDashboard.module.css";
-import ModalFloat from "../common/ModalFloat";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -15,234 +14,172 @@ ChartJS.register(
 );
 
 const EnvDashboard = () => {
-  const [modal, setModal] = useState({ open: false, metric: null });
-  const [period, setPeriod] = useState("daily");
+  const [period] = useState("daily");
 
-  // 📌 실제 계사 환경 기준값
+  // 📌 센서 항목 정의
   const metrics = {
-    temp: { label: "온도", unit: "°C", min: 18, max: 30 },
-    hum: { label: "습도", unit: "%", min: 50, max: 70 },
-    lux: { label: "조도", unit: "lux", min: 100, max: 800 },
-    nh3: { label: "암모니아", unit: "ppm", min: 0, max: 20 },
-    co2: { label: "이산화탄소", unit: "ppm", min: 400, max: 1500 },
-    no2: { label: "이산화질소", unit: "ppb", min: 0, max: 100 },
-    co: { label: "일산화탄소", unit: "ppm", min: 0, max: 50 },
+    temp: { label: "Temperature", unit: "°C", min: 18, max: 30, color: "#e53935" },
+    hum: { label: "Humidity", unit: "%", min: 50, max: 70, color: "#1e88e5" },
+    lux: { label: "Illumination", unit: "lx", min: 100, max: 800, color: "#fbc02d" },
+    nh3: { label: "NH₃", unit: "ppm", min: 0, max: 20, color: "#43a047" },
+    co2: { label: "CO₂", unit: "ppm", min: 400, max: 1500, color: "#8e24aa" },
+    no2: { label: "NO₂", unit: "ppb", min: 0, max: 100, color: "#ff5722" },
+    co: { label: "CO", unit: "ppm", min: 0, max: 50, color: "#6d4c41" },
   };
 
   // 📌 더미 데이터 생성
-  const generateTimeSeries = (points, fn) => {
+  const generateTimeSeries = (points, min, max) => {
     const now = Date.now();
     const step = (24 * 60 * 60 * 1000) / points;
     return Array.from({ length: points }, (_, i) => ({
       t: new Date(now - (points - i - 1) * step),
-      v: fn(i),
+      v: min + Math.random() * (max - min),
     }));
   };
 
-  const getDummyData = (metric, type = "daily") => {
-    let points = 24;
-    if (type === "weekly") points = 7;
-    if (type === "monthly") points = 30;
-
+  const getDummyData = (metric) => {
     const { min, max } = metrics[metric];
-    return generateTimeSeries(points, () =>
-      min + Math.random() * (max - min)
-    );
+    return generateTimeSeries(24, min, max);
   };
 
-  const openModal = (metric) => {
-    setModal({ open: true, metric });
-    setPeriod("daily");
-  };
-
-  // 📌 공통 X축 옵션
   const xAxisOptions = {
     type: "time",
-    time: {
-      unit: "hour",
-      stepSize: 2,
-      displayFormats: { hour: "HH" },
-    },
-    ticks: {
-      color: "#333",
-      callback: (value) => {
-        const hour = new Date(value).getHours();
-        return hour % 2 === 0 ? `${hour}` : "";
-      },
-    },
-    grid: { color: "#ddd" },
+    time: { unit: "hour", stepSize: 2, displayFormats: { hour: "HH" } },
+    ticks: { color: "#666" },
+    grid: { color: "#eee" },
   };
+
+  // 📌 데이터 카드용 샘플 값
+  const overview = [
+    { key: "temp", value: 24.5, diff: "+2.1% from yesterday" },
+    { key: "hum", value: 62, diff: "-1.3% from yesterday" },
+    { key: "lux", value: 850, diff: "+12.5% from yesterday" },
+    { key: "air", value: "Good", diff: "Normal levels" },
+  ];
 
   return (
     <div className={styles.container}>
-      <div className={styles.splitLayout}>
-        {/* 쾌적 지수 */}
-        <div className={styles.leftSection}>
-          <h3 className={styles.sectionTitle}>쾌적 지수</h3>
-          <div className={styles.comfortGrid}>
-            {["temp", "hum", "lux"].map((key) => (
-              <div
-                key={key}
-                className={styles.chartCard}
-                onClick={() => openModal(key)}
-              >
-                <div className={styles.chartWrapperMini}>
-                  <Line
-                    data={{
-                      datasets: [
-                        {
-                          data: getDummyData(key, "daily").map((p) => ({
-                            x: p.t,
-                            y: p.v,
-                          })),
-                          borderColor: "#2e7d32",
-                          backgroundColor: "rgba(46,125,50,0.1)",
-                          tension: 0.3,
-                          pointRadius: 0,
-                        },
-                      ],
-                    }}
-                    options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                      scales: {
-                        x: xAxisOptions,
-                        y: {
-                          min: metrics[key].min,
-                          max: metrics[key].max,
-                          ticks: { color: "#666" },
-                          grid: { display: false },
-                        },
-                      },
-                    }}
-                  />
-                </div>
-                <div className={styles.chartLabel}>
-                  {metrics[key].label} ({metrics[key].unit})
-                </div>
-              </div>
-            ))}
+      {/* 상단 데이터 요약 */}
+      <div className={styles.overview}>
+        {overview.map((item) => (
+          <div key={item.key} className={styles.overviewCard}>
+            <div className={styles.overviewValue}>
+              {item.value}
+              {metrics[item.key]?.unit && (
+                <span className={styles.unit}> {metrics[item.key].unit}</span>
+              )}
+            </div>
+            <div className={styles.overviewLabel}>
+              {metrics[item.key]?.label || "Air Quality"}
+            </div>
+            <div className={styles.overviewDiff}>{item.diff}</div>
           </div>
-        </div>
-
-        {/* 공기질 */}
-        <div className={styles.rightSection}>
-          <h3 className={styles.sectionTitle}>공기질</h3>
-          <div className={styles.airGrid}>
-            {["nh3", "co2", "no2", "co"].map((key) => (
-              <div
-                key={key}
-                className={styles.chartCard}
-                onClick={() => openModal(key)}
-              >
-                <div className={styles.chartWrapperMini}>
-                  <Line
-                    data={{
-                      datasets: [
-                        {
-                          data: getDummyData(key, "daily").map((p) => ({
-                            x: p.t,
-                            y: p.v,
-                          })),
-                          borderColor: "#2e7d32",
-                          backgroundColor: "rgba(46,125,50,0.1)",
-                          tension: 0.3,
-                          pointRadius: 0,
-                        },
-                      ],
-                    }}
-                    options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                      scales: {
-                        x: xAxisOptions,
-                        y: {
-                          min: metrics[key].min,
-                          max: metrics[key].max,
-                          ticks: { color: "#666" },
-                          grid: { display: false },
-                        },
-                      },
-                    }}
-                  />
-                </div>
-                <div className={styles.chartLabel}>
-                  {metrics[key].label} ({metrics[key].unit})
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* 모달 */}
-      {modal.open && (
-        <ModalFloat
-          isOpen={modal.open}
-          onClose={() => setModal({ open: false, metric: null })}
-          title={`${metrics[modal.metric].label} 추세`}
-          width={1000}
-          height={600}
-        >
-          <div className={styles.modalContent}>
-            <div className={styles.controls}>
-              <label>기간: </label>
-              <select
-                value={period}
-                onChange={(e) => setPeriod(e.target.value)}
-              >
-                <option value="daily">일일</option>
-                <option value="weekly">주간</option>
-                <option value="monthly">월간</option>
-              </select>
-            </div>
+      {/* 차트 그리드 */}
+      <div className={styles.chartGrid}>
+        {/* 온도 */}
+        <div className={styles.chartCard}>
+          <h4 className={styles.chartTitle}>Temperature</h4>
+          <Line
+            data={{
+              datasets: [{
+                data: getDummyData("temp").map((p) => ({ x: p.t, y: p.v })),
+                borderColor: metrics.temp.color,
+                backgroundColor: `${metrics.temp.color}33`,
+                tension: 0.3,
+                pointRadius: 0,
+              }],
+            }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: xAxisOptions,
+                y: { min: metrics.temp.min, max: metrics.temp.max, ticks: { color: "#666" } },
+              },
+            }}
+          />
+        </div>
 
-            <div className={styles.chartWrapper}>
-              <Line
-                data={{
-                  datasets: [
-                    {
-                      label: `${metrics[modal.metric].label} (${metrics[modal.metric].unit})`,
-                      data: getDummyData(modal.metric, period).map((p) => ({
-                        x: p.t,
-                        y: p.v,
-                      })),
-                      borderColor: "#2e7d32",
-                      backgroundColor: "rgba(46,125,50,0.2)",
-                      tension: 0.3,
-                    },
-                  ],
-                }}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: { position: "bottom", labels: { color: "#333" } },
-                  },
-                  scales: {
-                    x: {
-                      ...xAxisOptions,
-                      time: {
-                        unit: period === "daily" ? "hour" : "day",
-                        stepSize: period === "daily" ? 2 : 1,
-                        displayFormats: { hour: "HH", day: "MM/dd" },
-                      },
-                    },
-                    y: {
-                      min: metrics[modal.metric].min,
-                      max: metrics[modal.metric].max,
-                      ticks: { color: "#333" },
-                      grid: { color: "#ddd" },
-                    },
-                  },
-                }}
-              />
-            </div>
-          </div>
-        </ModalFloat>
-      )}
+        {/* 습도 */}
+        <div className={styles.chartCard}>
+          <h4 className={styles.chartTitle}>Humidity</h4>
+          <Line
+            data={{
+              datasets: [{
+                data: getDummyData("hum").map((p) => ({ x: p.t, y: p.v })),
+                borderColor: metrics.hum.color,
+                backgroundColor: `${metrics.hum.color}33`,
+                tension: 0.3,
+                pointRadius: 0,
+              }],
+            }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: xAxisOptions,
+                y: { min: metrics.hum.min, max: metrics.hum.max, ticks: { color: "#666" } },
+              },
+            }}
+          />
+        </div>
+
+        {/* 조도 */}
+        <div className={styles.chartCard}>
+          <h4 className={styles.chartTitle}>Illumination</h4>
+          <Line
+            data={{
+              datasets: [{
+                data: getDummyData("lux").map((p) => ({ x: p.t, y: p.v })),
+                borderColor: metrics.lux.color,
+                backgroundColor: `${metrics.lux.color}33`,
+                tension: 0.3,
+                pointRadius: 0,
+              }],
+            }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: xAxisOptions,
+                y: { min: metrics.lux.min, max: metrics.lux.max, ticks: { color: "#666" } },
+              },
+            }}
+          />
+        </div>
+
+        {/* 공기질 (복합 차트) */}
+        <div className={styles.chartCard}>
+          <h4 className={styles.chartTitle}>Gas Levels</h4>
+          <Line
+            data={{
+              datasets: ["nh3", "co2", "no2", "co"].map((key) => ({
+                label: metrics[key].label,
+                data: getDummyData(key).map((p) => ({ x: p.t, y: p.v })),
+                borderColor: metrics[key].color,
+                backgroundColor: `${metrics[key].color}33`,
+                tension: 0.3,
+                pointRadius: 0,
+              })),
+            }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { position: "bottom" } },
+              scales: {
+                x: xAxisOptions,
+                y: { beginAtZero: true, ticks: { color: "#666" } },
+              },
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 };

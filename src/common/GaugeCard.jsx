@@ -1,83 +1,71 @@
-// GaugeCard.jsx
 import React from "react";
-import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
 import styles from "./GaugeCard.module.css";
+import { ArcElement, Chart as ChartJS, Tooltip } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
 
-/**
- * 반원 게이지 카드 (요약)
- * props:
- *  - label: 카드 제목 (예: "온도 (°C)")
- *  - value: 현재 값 (number)
- *  - unit: 단위 표시 (예: "°C")
- *  - max: 게이지 최대값 (number)
- *  - warning: 경고 임계치 (number)
- *  - below: true면 값이 warning보다 "작을 때" 위험, false면 "클 때" 위험
- *  - width, height: 게이지 캔버스 크기 (기본 160 x 120)
- *  - onClick: 클릭 핸들러 (예: 모달 열기)
- *  - className: 추가 클래스
- */
-const GaugeCard = ({
-  label,
-  value = 0,
-  unit = "",
-  max = 100,
-  warning = 80,
-  below = false,
-  width = 160,
-  height = 120,
-  onClick,
-  className = "",
-}) => {
-  const danger = below ? value < warning : value > warning;
-  const statusText = danger ? "⚠️ 위험" : "✅ 정상";
-  const valueText = Number.isFinite(value) ? value.toFixed(1) : "-";
+ChartJS.register(ArcElement, Tooltip);
+
+const GaugeCard = ({ icon, label, value, max, min, optimalMax, unit, onClick }) => {
+  // 상태 판단
+  let status = "Normal";
+  if (value > optimalMax) status = "Caution";
+  if (value > max * 0.9) status = "Danger";
+
+  // 게이지 데이터
+  const data = {
+    datasets: [
+      {
+        data: [value, Math.max(max - value, 0)],
+        backgroundColor: ["#22c55e", "#e5e7eb"],
+        borderWidth: 0,
+        cutout: "80%",
+        circumference: 180,
+        rotation: 270,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: { tooltip: { enabled: false } },
+  };
 
   return (
-    <div
-      className={`${styles.card} ${onClick ? styles.clickable : ""} ${className}`}
-      onClick={onClick}
-      role={onClick ? "button" : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      onKeyDown={(e) => {
-        if (!onClick) return;
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-      aria-label={`${label} ${statusText} (${valueText} ${unit})`}
-    >
+    <div className={styles.card} onClick={onClick}>
+      {/* 상단: 아이콘 + 라벨/단위 */}
       <div className={styles.header}>
-        <h4 className={styles.title}>{label}</h4>
+        <div className={styles.icon}>{icon}</div>
+        <div className={styles.labelBlock}>
+          <div className={styles.label}>{label}</div>
+          <div className={styles.unit}>{unit}</div> {/* ✅ 라벨 밑 단위 */}
+        </div>
       </div>
 
-      <div className={styles.gaugeWrap}>
-        <Gauge
-          width={width}
-          height={height}
-          startAngle={-90}
-          endAngle={90}
-          value={value}
-          valueMax={max}
-          sx={{
-            [`& .${gaugeClasses.valueArc}`]: {
-              fill: danger ? "#ef4444" : "#22c55e", // 빨강/초록
-              transition: "fill 200ms ease",
-            },
-            [`& .${gaugeClasses.referenceArc}`]: {
-              fill: "#e5e7eb", // 회색 트랙
-            },
-            [`& .${gaugeClasses.valueText}`]: {
-              fontSize: 20,
-            },
-          }}
-        />
+      {/* 수치 값 + 상태 */}
+      <div className={styles.valueRow}>
+        <div className={styles.value}>{value.toFixed(1)}</div>
+        <div
+          className={`${styles.status} ${
+            status === "Normal"
+              ? styles.normal
+              : status === "Caution"
+              ? styles.caution
+              : styles.danger
+          }`}
+        >
+          {status}
+        </div>
       </div>
 
-      <div className={styles.footer}>
-        <span className={danger ? styles.badgeDanger : styles.badgeOk}>
-          {statusText} ({valueText} {unit})
-        </span>
+      {/* 게이지 */}
+      <div className={styles.gaugeWrapper}>
+        <Doughnut data={data} options={options} />
+      </div>
+
+      {/* 최소/최대 값 */}
+      <div className={styles.minMax}>
+        <span>{min}</span>
+        <span>{max}</span>
       </div>
     </div>
   );
