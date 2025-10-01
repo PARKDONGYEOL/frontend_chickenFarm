@@ -35,13 +35,12 @@
 /* 메인 콘텐츠 */
 .content {
   flex: 1;
-  padding: 40px;
+  padding: 0;
   transition: all 0.3s ease;
 
-  /* ✅ 이 부분이 핵심: 스크롤 허용 */
-  overflow-y: auto;
-  overflow-x: visible;
-  height: 100%;        /* ✅ 부모 높이(calc(100vh - 64px))를 따라감 */
+  /* ✅ 스크롤 제거 */
+  overflow: hidden;
+  height: 100%;
   box-sizing: border-box;
 }
 
