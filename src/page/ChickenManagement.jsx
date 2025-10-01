@@ -59,7 +59,7 @@ const ChickenManagement = () => {
         </div>
       </div>
       <div>
-        <h3>개체 표</h3>
+        <h3>수정</h3>
       </div>
     </div>
   )
