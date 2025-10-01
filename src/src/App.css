@@ -24,3 +24,10 @@ button {
   margin: 0.5rem;
   padding: 0.5rem 1rem;
 }
+
+@font-face {
+    font-family: 'Aggravo';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroL.woff') format('woff');
+    font-weight: 300;
+    font-display: swap;
+}
