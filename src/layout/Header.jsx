@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import styles from "./Header.module.css";
 
-const Header = ({ toggleMenu }) => {
+const Header = ({ onGuideClick }) => {
   const nav = useNavigate();
   const [loginInfo, setLoginInfo] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,7 +21,7 @@ const Header = ({ toggleMenu }) => {
 
   return (
     <header className={styles.header}>
-      {/* 왼쪽: 버튼 + 로고 */}
+      {/* 로고 */}
       <div className={styles.logoWrapper}>
         <div
           className={styles.logo}
@@ -29,7 +29,7 @@ const Header = ({ toggleMenu }) => {
             nav("/home");
           }}
         >
-          🐓 SmartFarm
+          <p>SmartFarm</p>
         </div>
       </div>
 
@@ -40,7 +40,8 @@ const Header = ({ toggleMenu }) => {
             <div onClick={() => nav("/home/weekly")}>통계</div>
             <div onClick={() => nav("/home/daily")}>실시간</div>
             <div onClick={() => nav("/home/pfm")}>통합관리</div>
-            <div onClick={() => nav("/home/entity")}>개체관리</div>
+            <div onClick={() => nav("/home/chickenmanagement")}>개체관리</div>
+            <div onClick={onGuideClick} className={styles.guideMenu}>가이드</div>
           </div>
           <div
             className={styles.userMenuTrigger}
@@ -54,7 +55,6 @@ const Header = ({ toggleMenu }) => {
             <span className={styles.userName}>{loginInfo.name}</span>
             <span className={styles.moreIcon}>⋮</span>
           </div>
-
           {menuOpen && (
             <div className={styles.userDropdown}>
               <button onClick={handleLogout}>로그아웃</button>

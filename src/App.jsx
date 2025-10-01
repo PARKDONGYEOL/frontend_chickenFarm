@@ -8,9 +8,8 @@ import Security from './page/Security'
 import PoultryFarmManagement from './page/PoultryFarmManagement'
 import DailyInformation from './page/DailyInformation'
 import WeeklyInformation from './page/WeeklyInformation'
-import EntityManagement from './page/EntityManagement'
-import Home from './page/Home'
 import ChickenManagement from './page/ChickenManagement'
+import Home from './page/Home'
 
 
 function App() {
@@ -23,8 +22,7 @@ function App() {
         <Route path='pfm' element={<PoultryFarmManagement />} />
         <Route path='daily' element={<DailyInformation />} />
         <Route path='weekly' element={<WeeklyInformation />} />
-        <Route path='entity' element={<EntityManagement />} />
-        <Route path='chicken' element={ <ChickenManagement /> } />
+        <Route path='chickenmanagement' element={<ChickenManagement />} />
       </Route>
 
     </Routes>
