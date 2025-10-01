@@ -1,0 +1,68 @@
+import React, { useState } from 'react'
+import styles from './ChickenManagement.module.css'
+import Input from '../common/Input'
+import Button from '../common/Button'
+
+const ChickenManagement = () => {
+  //축사 정보 저장
+  const [farmName, setFarmName] = useState('')
+
+  //배치 정보 저장
+  const [batch, setBatch] = useState({
+    'farmNum' : '',
+    'entryDate' : '',
+    'initialCount' : ''
+  })
+
+  //축사 등록
+
+  //배치 등록
+
+  return (
+    <div className={styles.container}>
+      <h2>닭 관리</h2>
+      <div>
+        <h3>축사 등록</h3>
+        <div>
+          <span>축사 이름</span>
+          <Input />
+          <Button title='등록'/>
+        </div>
+      </div>
+      <div>
+        <h3>배치 등록</h3>
+        <div>
+          <span>축사 번호</span>
+          <Input />
+          <span>입식일</span>
+          <Input />
+          <span>닭의 수</span>
+          <Input />
+          <Button title='등록'/>
+        </div>
+      </div>
+      <div>
+        <h3>배치 표</h3>
+        <div>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <td>축사 번호</td>
+                <td>배치 번호</td>
+                <td>입식일</td>
+                <td>초기 닭의 수</td>
+                <td>현재 닭의 수</td>
+                <td>출하 여부</td>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3>개체 표</h3>
+      </div>
+    </div>
+  )
+}
+
+export default ChickenManagement
