@@ -6,43 +6,43 @@ import ModalFloat from "../common/ModalFloat";
 
 // 아이콘 컴포넌트
 const ThermoIcon = () => (
-  <div style={{background: 'linear-gradient(135deg, #3b82f6, #2563eb)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
     🌡️
   </div>
 );
 
 const HumidityIcon = () => (
-  <div style={{background: 'linear-gradient(135deg, #06b6d4, #0891b2)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
-    💧
+  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+    <img width="40" height="40" src="https://img.icons8.com/office/40/hygrometer.png" alt="hygrometer"/>
   </div>
 );
 
 const LightIcon = () => (
-  <div style={{background: 'linear-gradient(135deg, #facc15, #eab308)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
     ☀️
   </div>
 );
 
 const AmmoniaIcon = () => (
-  <div style={{background: 'linear-gradient(135deg, #a855f7, #9333ea)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
-    🧪
+  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+    <img width="50" height="50" src="https://cdn-icons-png.flaticon.com/512/3050/3050392.png" alt="ammonia"/>
   </div>
 );
 
 const CO2Icon = () => (
-  <div style={{background: 'linear-gradient(135deg, #22c55e, #16a34a)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
-    🌿
+  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+    <img width="50" height="50" src="https://img.icons8.com/ios-filled/50/co2.png" alt="co2"/>
   </div>
 );
 
 const NO2Icon = () => (
-  <div style={{background: 'linear-gradient(135deg, #f59e0b, #d97706)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
     ⚠️
   </div>
 );
 
 const COIcon = () => (
-  <div style={{background: 'linear-gradient(135deg, #ef4444, #dc2626)', width: '100%', height: '100%', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
     🔥
   </div>
 );
