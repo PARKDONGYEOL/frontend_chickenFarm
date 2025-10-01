@@ -23,9 +23,6 @@ const Header = ({ toggleMenu }) => {
     <header className={styles.header}>
       {/* 왼쪽: 버튼 + 로고 */}
       <div className={styles.logoWrapper}>
-        <button className={styles.menuButton} onClick={toggleMenu}>
-          <FaBars size={20} />
-        </button>
         <div
           className={styles.logo}
           onClick={() => {
@@ -39,6 +36,12 @@ const Header = ({ toggleMenu }) => {
       {/* 오른쪽: 로그인/유저메뉴 */}
       {loginInfo ? (
         <div className={styles.userMenuWrapper}>
+          <div className={styles.head_list}>
+            <div onClick={() => nav("/home/weekly")}>통계</div>
+            <div onClick={() => nav("/home/daily")}>실시간</div>
+            <div onClick={() => nav("/home/pfm")}>통합관리</div>
+            <div onClick={() => nav("/home/entity")}>개체관리</div>
+          </div>
           <div
             className={styles.userMenuTrigger}
             onClick={() => setMenuOpen(!menuOpen)}

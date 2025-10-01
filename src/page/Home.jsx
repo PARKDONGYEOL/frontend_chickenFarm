@@ -4,6 +4,7 @@ import styles from "./Home.module.css";
 import Header from "../layout/Header";
 import SubMenu from "../layout/SubMenu";
 import ModalFull from "../common/ModalFull"; //추가 cctv
+import roosterImg from "../assets/rooster-285432_1280.jpg";
 
 
 const Home = () => {
@@ -56,7 +57,11 @@ const Home = () => {
         >
           {isHomeRoot ? (
             <div className={styles.heroContent}>
-              <h1>자연과 함께하는 스마트 양계 관리</h1>
+              <img src={roosterImg} alt="Rooster" />
+              <div className={styles.bannerText}>
+                <p>SMART CHICKEN FARM</p>
+                <p>team::dc.kim</p>
+              </div>
             </div>
           ) : (
             <Outlet /> // 서브 라우트 내용 표시
