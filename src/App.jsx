@@ -10,6 +10,7 @@ import DailyInformation from './page/DailyInformation'
 import WeeklyInformation from './page/WeeklyInformation'
 import EntityManagement from './page/EntityManagement'
 import Home from './page/Home'
+import ChickenManagement from './page/ChickenManagement'
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         <Route path='daily' element={<DailyInformation />} />
         <Route path='weekly' element={<WeeklyInformation />} />
         <Route path='entity' element={<EntityManagement />} />
+        <Route path='chicken' element={ <ChickenManagement /> } />
       </Route>
 
     </Routes>
