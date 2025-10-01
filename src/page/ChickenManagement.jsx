@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import styles from './ChickenManagement.module.css'
 import Input from '../common/Input'
 import Button from '../common/Button'
+import axios from 'axios'
 
 const ChickenManagement = () => {
   //축사 정보 저장
@@ -15,6 +16,13 @@ const ChickenManagement = () => {
   })
 
   //축사 등록
+  const regFarmName = () => {
+    axios.post(`/api/farm`, {farmName : farmName})
+    .then(res => alert('등록 완료'))
+    .catch(e => {
+      console.log(e)
+    });
+  }
 
   //배치 등록
 
@@ -25,8 +33,8 @@ const ChickenManagement = () => {
         <h3>양계장 등록</h3>
         <div>
           <span>양계장 이름</span>
-          <Input />
-          <Button title='등록'/>
+          <Input value={farmName} onChange={(e) => {setFarmName(e.target.value)}}/>
+          <Button title='등록' onClick={() => {regFarmName()}}/>
         </div>
       </div>
       <div>
