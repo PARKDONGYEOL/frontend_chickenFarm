@@ -22,9 +22,9 @@ const ChickenManagement = () => {
     <div className={styles.container}>
       <h2>닭 관리</h2>
       <div>
-        <h3>축사 등록</h3>
+        <h3>양계장 등록</h3>
         <div>
-          <span>축사 이름</span>
+          <span>양계장 이름</span>
           <Input />
           <Button title='등록'/>
         </div>
