@@ -1,0 +1,63 @@
+/* 전체 화면에 고정 배치하지만, 배경을 막지 않음 */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;        /* <- 배경 클릭 통과 */
+  background: transparent;     /* <- 어둡게 하지 않음 */
+}
+
+/* 가운데 떠 있는 패널(여기는 클릭 가능) */
+.panel {
+  pointer-events: auto;
+  position: absolute;
+  left: 50%;
+  top: 200px;                   /* 원하는 위치로 조정 */
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 상단 툴바 */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 12px 0 16px;
+  border-bottom: 1px solid #eee;
+  background: #fafafa;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+}
+
+.closeBtn {
+  appearance: none;
+  border: none;
+  background: #e5e7eb;
+  color: #111827;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 26px;
+}
+.closeBtn:hover {
+  background: #d1d5db;
+}
+
+/* 내용 영역은 패널을 가득 채움 */
+.content {
+  flex: 1;
+  min-height: 0; /* 자식 차트가 높이 100% 사용할 수 있게 */
+}

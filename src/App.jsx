@@ -4,12 +4,14 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { Route, Routes } from 'react-router-dom'
 import Login from './layout/Login'
-import Security from './page/Security'
-import PoultryFarmManagement from './page/PoultryFarmManagement'
 import DailyInformation from './page/DailyInformation'
 import WeeklyInformation from './page/WeeklyInformation'
-import ChickenManagement from './page/ChickenManagement'
+import EntityManagement from './page/EntityManagement'
 import Home from './page/Home'
+import RealTimeMonitoring from './page/RealTimeMonitoring'
+import TrendAnalysis from './page/TrendAnalysis'
+import EnvDashboard from './page/EnvDashboard'
+import ChickenManagement from './page/ChickenManagement'
 import Settings from './page/Settings'
 
 
@@ -21,7 +23,9 @@ function App() {
       <Route path='/settings' element={<Settings />} />
 
       <Route path='home' element={<Home />} >
-        <Route path='pfm' element={<PoultryFarmManagement />} />
+        <Route path='real' element={<RealTimeMonitoring />} />
+        <Route path='env' element={<EnvDashboard/>}/>
+        <Route path='trend' element={<TrendAnalysis/>}/>
         <Route path='daily' element={<DailyInformation />} />
         <Route path='weekly' element={<WeeklyInformation />} />
         <Route path='chickenmanagement' element={<ChickenManagement />} />

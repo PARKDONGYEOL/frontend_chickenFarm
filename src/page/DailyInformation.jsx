@@ -10,7 +10,8 @@ import {
   Title,
   Tooltip,
   Legend,
-  TimeScale
+  TimeScale,
+  Filler
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 import styles from "./DailyInformation.module.css";
@@ -23,14 +24,15 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  TimeScale
+  TimeScale,
+  Filler
 );
 
 const DailyInformation = () => {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [rows, setRows] = useState([]);
 
-  // ✅ 데이터 불러오기
+  // 데이터 불러오기
   useEffect(() => {
     if (!date) return;
     axios
@@ -39,80 +41,96 @@ const DailyInformation = () => {
       .catch((err) => console.error(err));
   }, [date]);
 
-  // ✅ 차트 데이터
-  const chartData = {
+  // 개별 차트 생성 함수
+  const createChartData = (label, dataKey, color) => ({
     datasets: [
       {
-        label: "온도(°C)",
-        data: rows.map((r) => ({ x: new Date(r.recTime), y: r.tempData })),
-        borderColor: "rgba(255, 138, 157, 1)",
-        backgroundColor: "rgba(255, 138, 157, 0.3)",
-        yAxisID: "y",
+        label,
+        data: rows.map((r) => ({ x: new Date(r.recTime), y: r[dataKey] })),
+        borderColor: color,
+        backgroundColor: color.replace('1)', '0.1)'),
+        fill: true,
         tension: 0.4,
-      },
-      {
-        label: "습도(%)",
-        data: rows.map((r) => ({ x: new Date(r.recTime), y: r.humData })),
-        borderColor: "rgba(100, 181, 246, 1)",
-        backgroundColor: "rgba(100, 181, 246, 0.3)",
-        yAxisID: "y",
-        tension: 0.4,
-      },
-      {
-        label: "조도(lux)",
-        data: rows.map((r) => ({ x: new Date(r.recTime), y: r.luxData })),
-        borderColor: "rgba(255, 241, 118, 1)",
-        backgroundColor: "rgba(255, 241, 118, 0.4)",
-        yAxisID: "y1",
-        tension: 0.4,
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 4,
       },
     ],
-  };
+  });
 
-  // ✅ 차트 옵션
-  const chartOptions = {
+  // 차트 옵션
+  const createChartOptions = (label, unit, color) => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        position: "bottom",
-        labels: {
-          color: "#333",
-          padding: 15,
-          usePointStyle: true,
-          boxWidth: 10,
-        },
+      legend: { display: false },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
       },
-    },
-    elements: {
-      line: { borderWidth: 2 },
-      point: { radius: 3, hoverRadius: 6, backgroundColor: "#fff" },
     },
     scales: {
       x: {
         type: "time",
         time: { unit: "hour", displayFormats: { hour: "HH:mm" } },
-        ticks: { color: "#555", font: { size: 12 } },
-        grid: { color: "rgba(0,0,0,0.05)" },
+        ticks: { color: "#9ca3af", font: { size: 10 } },
+        grid: { display: false },
+        border: { display: false },
       },
       y: {
-        type: "linear",
-        position: "left",
-        ticks: { color: "#555", font: { size: 12 } },
-        grid: { color: "rgba(0,0,0,0.05)" },
-      },
-      y1: {
-        type: "linear",
-        position: "right",
-        ticks: { color: "#555", font: { size: 12 } },
-        grid: { drawOnChartArea: false },
+        ticks: { color: "#9ca3af", font: { size: 10 }, precision: 0 },
+        grid: { color: "rgba(0,0,0,0.05)", drawBorder: false },
+        border: { display: false },
       },
     },
+  });
+
+  // 최신 값 계산
+  const getLatestValue = (dataKey) => {
+    if (rows.length === 0) return "0";
+    return rows[rows.length - 1]?.[dataKey]?.toFixed(1) || "0";
   };
+
+  // 차트 카드 컴포넌트
+  const ChartCard = ({ icon, title, value, unit, dataKey, color, status }) => (
+    <div className={styles.chartCard}>
+      <div className={styles.cardHeader}>
+        <div className={styles.iconWrapper} style={{ background: color }}>
+          {icon}
+        </div>
+        <div className={styles.cardInfo}>
+          <div className={styles.cardTitle}>{title}</div>
+          <div className={styles.cardValue}>
+            {value} <span className={styles.unit}>{unit}</span>
+          </div>
+        </div>
+        <div className={`${styles.status} ${styles[status]}`}>{status === 'normal' ? 'Normal' : 'Caution'}</div>
+      </div>
+      <div className={styles.chartWrap}>
+        <Line
+          data={createChartData(title, dataKey, color)}
+          options={createChartOptions(title, unit, color)}
+        />
+      </div>
+    </div>
+  );
 
   return (
     <div className={styles.container}>
-      <h2>하루 센서 데이터</h2>
+      {/* 헤더 */}
+      <div className={styles.header}>
+        <div className={styles.headerLeft}>
+          <h2 className={styles.title}>Data Monitoring</h2>
+          <p className={styles.subtitle}>Smart device data environmental indicators</p>
+        </div>
+        <div className={styles.headerRight}>
+          <div className={styles.dateDisplay}>
+            <span className={styles.dateLabel}>Today</span>
+            <span className={styles.dateValue}>{date}</span>
+          </div>
+          <button className={styles.refreshBtn}>↻ Refresh</button>
+        </div>
+      </div>
 
       {/* 날짜 입력 */}
       <div className={styles.dateInput}>
@@ -123,53 +141,74 @@ const DailyInformation = () => {
         />
       </div>
 
-      {/* ✅ 차트와 테이블 가로 배치 */}
-      <div className={styles.chartAndTable}>
-        {/* 차트 영역 */}
-        <div className={styles.chartWrapper}>
-          <h3 className={styles.chartTitle}>{date} 라인 차트</h3>
-          <div className={styles.chartBox}>
-            <Line data={chartData} options={chartOptions} />
-          </div>
-        </div>
-
-        {/* 테이블 영역 */}
-        <div className={styles.tableWrapper}>
-          <h3 className={styles.tableTitle}>{date} 데이터 테이블</h3>
-          <div className={styles.tableBox}>
-            <div className={styles.tableScroll}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>온도(°C)</th>
-                    <th>습도(%)</th>
-                    <th>조도(lux)</th>
-                    <th>기록 시간</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.length === 0 ? (
-                    <tr>
-                      <td colSpan="4">데이터가 없습니다.</td>
-                    </tr>
-                  ) : (
-                    rows.map((r, i) => (
-                      <tr key={i}>
-                        <td>{r.tempData}</td>
-                        <td>{r.humData}</td>
-                        <td>{r.luxData}</td>
-                        <td>{new Date(r.recTime).toLocaleString()}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+      {/* 차트 그리드 */}
+      <div className={styles.chartsGrid}>
+        <ChartCard
+          icon="🌡️"
+          title="Temperature"
+          value={getLatestValue('tempData')}
+          unit="°C"
+          dataKey="tempData"
+          color="rgba(239, 68, 68, 1)"
+          status="normal"
+        />
+        <ChartCard
+          icon="💧"
+          title="Humidity"
+          value={getLatestValue('humData')}
+          unit="%"
+          dataKey="humData"
+          color="rgba(59, 130, 246, 1)"
+          status="normal"
+        />
+        <ChartCard
+          icon="☀️"
+          title="Illumination"
+          value={getLatestValue('luxData')}
+          unit="lux"
+          dataKey="luxData"
+          color="rgba(245, 158, 11, 1)"
+          status="normal"
+        />
+        <ChartCard
+          icon="🧪"
+          title="Ammonia (NH₃)"
+          value={(Math.random() * 15 + 5).toFixed(1)}
+          unit="ppm"
+          dataKey="nh3Data"
+          color="rgba(168, 85, 247, 1)"
+          status="normal"
+        />
+        <ChartCard
+          icon="🌿"
+          title="Carbon Dioxide (CO₂)"
+          value={(Math.random() * 400 + 400).toFixed(0)}
+          unit="ppm"
+          dataKey="co2Data"
+          color="rgba(34, 197, 94, 1)"
+          status="normal"
+        />
+        <ChartCard
+          icon="⚠️"
+          title="Nitrogen Dioxide (NO₂)"
+          value={(Math.random() * 1 + 0.5).toFixed(1)}
+          unit="ppb"
+          dataKey="no2Data"
+          color="rgba(249, 115, 22, 1)"
+          status="caution"
+        />
+        <ChartCard
+          icon="🔥"
+          title="Carbon Monoxide (CO)"
+          value={(Math.random() * 3 + 1).toFixed(1)}
+          unit="ppm"
+          dataKey="coData"
+          color="rgba(100, 100, 100, 1)"
+          status="normal"
+        />
       </div>
     </div>
   );
 };
 
-export default DailyInformation
+export default DailyInformation;
