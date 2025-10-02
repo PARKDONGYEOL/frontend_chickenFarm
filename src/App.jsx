@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { Route, Routes } from 'react-router-dom'
 import Login from './layout/Login'
@@ -12,6 +9,8 @@ import TrendAnalysis from './page/TrendAnalysis'
 import EnvDashboard from './page/EnvDashboard'
 import ChickenManagement from './page/ChickenManagement'
 import Settings from './page/Settings'
+import CCTV from './page/CCTV'
+import Diary from './page/Diary'
 import ChickenInoculation from './page/ChickenInoculation'
 import ChickenInoculationList from './page/ChickenInoculationList'
 import ChickenInoculationSchedule from './page/ChickenInoculationSchedule'
@@ -31,6 +30,8 @@ function App() {
         <Route path='daily' element={<DailyInformation />} />
         <Route path='weekly' element={<WeeklyInformation />} />
         <Route path='chickenmanagement' element={<ChickenManagement />} />
+        <Route path='cctv' element={<CCTV />} />
+        <Route path='diary' element={<Diary />} />
         <Route path='inoculation' element={<ChickenInoculation />} />
         <Route path='inoculation-list' element={<ChickenInoculationList />} />
         <Route path='inoculation-schedule' element={<ChickenInoculationSchedule />} />

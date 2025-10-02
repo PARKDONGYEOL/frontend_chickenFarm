@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  min-height: 200px;
+  min-height: 240px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
 }
@@ -89,7 +89,7 @@
 
 .gaugeWrapper {
   width: 100%;
-  height: 110px;
+  height: 150px;
   margin: -5px 0 0 0;
   display: flex;
   justify-content: center;
@@ -98,7 +98,7 @@
 }
 
 .gaugeWrapper > div {
-  width: 90%;
+  width: 95%;
   height: 100%;
 }
 
