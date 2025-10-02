@@ -5,15 +5,97 @@
 }
 
 .mainGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  display: flex;
+  gap: 40px;
   max-width: 1400px;
   margin: 0 auto;
 }
 
-.sensorsGrid {
-  display: contents;
+.leftSection {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.rightSection {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+}
+
+.weatherPanel {
+  background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('/cloud-sky.jpg');
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.weatherContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.weatherTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.weatherIcon {
+  width: 100px;
+  height: 100px;
+}
+
+.weatherMainInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+  flex: 1;
+}
+
+.weatherTemp {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.weatherDesc {
+  font-size: 16px;
+  color: #6b7280;
+  text-transform: capitalize;
+}
+
+.weatherInfo {
+  font-size: 14px;
+  color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+}
+
+.weatherInfo > div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.infoIcon {
+  width: 20px;
+  height: 20px;
 }
 
 .statusPanel {
@@ -24,6 +106,7 @@
   border: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
+  grid-column: span 1;
 }
 
 .statusTitle {
@@ -33,6 +116,14 @@
   margin: 0 0 16px 0;
   padding-bottom: 10px;
   border-bottom: 2px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.titleWeatherIcon {
+  width: 24px;
+  height: 24px;
 }
 
 .statusItem {

@@ -6,8 +6,8 @@ import ModalFloat from "../common/ModalFloat";
 
 // 아이콘 컴포넌트
 const ThermoIcon = () => (
-  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
-    🌡️
+  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+    <img width="40" height="40" src="/free-icon-temperature-2652881.png" alt="temperature"/>
   </div>
 );
 
@@ -18,20 +18,20 @@ const HumidityIcon = () => (
 );
 
 const LightIcon = () => (
-  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
-    ☀️
+  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+    <img width="40" height="40" src="/free-icon-lightbulb-2684825.png" alt="light"/>
   </div>
 );
 
 const AmmoniaIcon = () => (
   <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-    <img width="50" height="50" src="https://cdn-icons-png.flaticon.com/512/3050/3050392.png" alt="ammonia"/>
+    <img width="40" height="40" src="/ammonia.png" alt="ammonia"/>
   </div>
 );
 
 const CO2Icon = () => (
   <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-    <img width="50" height="50" src="https://img.icons8.com/ios-filled/50/co2.png" alt="co2"/>
+    <img width="40" height="40" src="https://img.icons8.com/ios-filled/50/co2.png" alt="co2"/>
   </div>
 );
 
@@ -42,8 +42,8 @@ const NO2Icon = () => (
 );
 
 const COIcon = () => (
-  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
-    🔥
+  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+    <img width="40" height="40" src="/free-icon-carbon-monoxide-958528.png" alt="carbon monoxide"/>
   </div>
 );
 
@@ -58,12 +58,54 @@ const RealTimeMonitoring = () => {
     co: 0,
   });
 
+  const [weather, setWeather] = useState({
+    temp: 0,
+    feels_like: 0,
+    temp_min: 0,
+    temp_max: 0,
+    description: "",
+    humidity: 0,
+    icon: "",
+  });
+
   const [trendOpen, setTrendOpen] = useState(false);
   const [trend, setTrend] = useState({
     title: "",
     unit: "",
     points: [],
   });
+
+  // ✅ 날씨 데이터 가져오기
+  useEffect(() => {
+    const fetchWeather = async () => {
+      const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
+      const city = "Ulsan"; // 원하는 도시명으로 변경 가능
+
+      try {
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=kr`
+        );
+        const data = await response.json();
+
+        setWeather({
+          temp: data.main.temp,
+          feels_like: data.main.feels_like,
+          temp_min: data.main.temp_min,
+          temp_max: data.main.temp_max,
+          description: data.weather[0].description.replace('온', ''),
+          humidity: data.main.humidity,
+          icon: data.weather[0].icon,
+        });
+      } catch (error) {
+        console.error("날씨 데이터를 가져오는데 실패했습니다:", error);
+      }
+    };
+
+    fetchWeather();
+    // 10분마다 날씨 업데이트
+    const weatherInterval = setInterval(fetchWeather, 10 * 60 * 1000);
+    return () => clearInterval(weatherInterval);
+  }, []);
 
   // ✅ 값 갱신 (5분마다 랜덤 데이터)
   useEffect(() => {
@@ -116,8 +158,8 @@ const RealTimeMonitoring = () => {
     <>
       <div className={styles.container}>
         <div className={styles.mainGrid}>
-          {/* 센서 카드들 */}
-          <div className={styles.sensorsGrid}>
+          {/* 왼쪽: 센서 카드들 + 시스템 상태 */}
+          <div className={styles.leftSection}>
             <GaugeCard
               icon={<ThermoIcon />}
               label="온도"
@@ -188,18 +230,75 @@ const RealTimeMonitoring = () => {
               unit="ppm"
               onClick={() => openTrend("일산화탄소 (최근 24시간)", "ppm", genCO)}
             />
+
+            {/* 시스템 상태 패널 */}
+            <div className={styles.statusPanel}>
+              <h3 className={styles.statusTitle}>시스템 상태</h3>
+              <div className={styles.statusItem}>
+                <span className={styles.statusLabel}>활성 센서</span>
+                <span className={styles.statusValue}>{activeSensors}/{totalSensors}</span>
+              </div>
+              <div className={styles.statusItem}>
+                <span className={styles.statusLabel}>알림</span>
+                <span className={`${styles.statusValue} ${alerts > 0 ? styles.alertActive : ''}`}>{alerts}</span>
+              </div>
+            </div>
           </div>
 
-          {/* 시스템 상태 패널 */}
-          <div className={styles.statusPanel}>
-            <h3 className={styles.statusTitle}>시스템 상태</h3>
-            <div className={styles.statusItem}>
-              <span className={styles.statusLabel}>활성 센서</span>
-              <span className={styles.statusValue}>{activeSensors}/{totalSensors}</span>
-            </div>
-            <div className={styles.statusItem}>
-              <span className={styles.statusLabel}>알림</span>
-              <span className={`${styles.statusValue} ${alerts > 0 ? styles.alertActive : ''}`}>{alerts}</span>
+          {/* 오른쪽: 날씨 정보 패널 */}
+          <div className={styles.rightSection}>
+            <div className={styles.weatherPanel}>
+              <h3 className={styles.statusTitle}>
+              {weather.icon && (
+                <img
+                  src={`https://openweathermap.org/img/wn/${weather.icon}.png`}
+                  alt={weather.description}
+                  className={styles.titleWeatherIcon}
+                />
+              )}
+              날씨 정보 (울산)
+              </h3>
+              <div className={styles.weatherContent}>
+                <div className={styles.weatherTop}>
+                  {weather.icon && (
+                    <img
+                      src={`https://openweathermap.org/img/wn/${weather.icon}@4x.png`}
+                      alt={weather.description}
+                      className={styles.weatherIcon}
+                    />
+                  )}
+                  <div className={styles.weatherMainInfo}>
+                    <div className={styles.weatherTemp}>{weather.temp.toFixed(1)}°C</div>
+                    <div className={styles.weatherDesc}>{weather.description}</div>
+                  </div>
+                </div>
+                <div className={styles.weatherInfo}>
+                  <div>
+                    <img
+                      src={`https://openweathermap.org/img/wn/${weather.icon}.png`}
+                      alt="체감온도"
+                      className={styles.infoIcon}
+                    />
+                    체감: {weather.feels_like.toFixed(1)}°C
+                  </div>
+                  <div>
+                    <img
+                      src={`https://openweathermap.org/img/wn/01d.png`}
+                      alt="최저최고"
+                      className={styles.infoIcon}
+                    />
+                    최저/최고: {weather.temp_min.toFixed(1)}°C / {weather.temp_max.toFixed(1)}°C
+                  </div>
+                  <div>
+                    <img
+                      src={`https://openweathermap.org/img/wn/09d.png`}
+                      alt="습도"
+                      className={styles.infoIcon}
+                    />
+                    습도: {weather.humidity}%
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

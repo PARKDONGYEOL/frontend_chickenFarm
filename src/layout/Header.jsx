@@ -37,8 +37,8 @@ const Header = ({ toggleMenu }) => {
       {loginInfo ? (
         <div className={styles.userMenuWrapper}>
           <div className={styles.head_list}>
-            <div onClick={() => nav("/home/weekly")}>통계</div>
-            <div onClick={() => nav("/home/daily")}>실시간</div>
+            <div onClick={() => nav("/home/env")}>통계</div>
+            <div onClick={() => nav("/home/real")}>실시간</div>
             <div onClick={() => nav("/home/pfm")}>통합관리</div>
             <div onClick={() => nav("/home/entity")}>개체관리</div>
           </div>

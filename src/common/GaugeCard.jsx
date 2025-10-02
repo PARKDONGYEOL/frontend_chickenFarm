@@ -11,6 +11,15 @@ const GaugeCard = ({ icon, label, value, max, min, optimalMax, unit, onClick }) 
   if (value > optimalMax) status = "Caution";
   if (value > max * 0.9) status = "Danger";
 
+  // 자릿수 계산
+  const getDigitClass = (num) => {
+    const digits = String(num).length;
+    if (digits === 1) return styles.digit1;
+    if (digits === 2) return styles.digit2;
+    if (digits === 3) return styles.digit3;
+    return styles.digit4;
+  };
+
   // 게이지 데이터
   const data = {
     datasets: [
@@ -18,7 +27,7 @@ const GaugeCard = ({ icon, label, value, max, min, optimalMax, unit, onClick }) 
         data: [value, Math.max(max - value, 0)],
         backgroundColor: ["#22c55e", "#e5e7eb"],
         borderWidth: 0,
-        cutout: "80%",
+        cutout: "60%",
         circumference: 180,
         rotation: 270,
       },
@@ -32,28 +41,28 @@ const GaugeCard = ({ icon, label, value, max, min, optimalMax, unit, onClick }) 
 
   return (
     <div className={styles.card} onClick={onClick}>
-      {/* 상단: 아이콘 + 라벨/단위 */}
+      {/* 상단: 아이콘 + 라벨/단위 + 수치/상태 */}
       <div className={styles.header}>
-        <div className={styles.icon}>{icon}</div>
-        <div className={styles.labelBlock}>
-          <div className={styles.label}>{label}</div>
-          <div className={styles.unit}>{unit}</div> {/* ✅ 라벨 밑 단위 */}
+        <div className={styles.leftSection}>
+          <div className={styles.icon}>{icon}</div>
+          <div className={styles.labelBlock}>
+            <div className={styles.label}>{label}</div>
+            <div className={styles.unit}>{unit}</div>
+          </div>
         </div>
-      </div>
-
-      {/* 수치 값 + 상태 */}
-      <div className={styles.valueRow}>
-        <div className={styles.value}>{value.toFixed(1)}</div>
-        <div
-          className={`${styles.status} ${
-            status === "Normal"
-              ? styles.normal
-              : status === "Caution"
-              ? styles.caution
-              : styles.danger
-          }`}
-        >
-          {status}
+        <div className={styles.rightSection}>
+          <div className={styles.value}>{value.toFixed(1)}</div>
+          <div
+            className={`${styles.status} ${
+              status === "Normal"
+                ? styles.normal
+                : status === "Caution"
+                ? styles.caution
+                : styles.danger
+            }`}
+          >
+            {status}
+          </div>
         </div>
       </div>
 
@@ -64,8 +73,8 @@ const GaugeCard = ({ icon, label, value, max, min, optimalMax, unit, onClick }) 
 
       {/* 최소/최대 값 */}
       <div className={styles.minMax}>
-        <span>{min}</span>
-        <span>{max}</span>
+        <span className={`${styles.minValue} ${getDigitClass(min)}`}>{min}</span>
+        <span className={`${styles.maxValue} ${getDigitClass(max)}`}>{max}</span>
       </div>
     </div>
   );
