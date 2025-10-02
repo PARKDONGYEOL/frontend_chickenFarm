@@ -50,6 +50,7 @@ const Header = ({ onGuideClick }) => {
                 <div className={styles.integratedDropdown}>
                   <div onClick={() => nav("/home/cctv")}>CCTV</div>
                   <div onClick={() => nav("/home/diary")}>관찰일지</div>
+                  <div onClick={() => nav("/home/inoculation")}>예방접종</div>
                 </div>
               )}
             </div>
