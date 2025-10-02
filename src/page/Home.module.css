@@ -37,10 +37,18 @@
   flex: 1;
   transition: all 0.3s ease;
 
-  /* ✅ 스크롤 제거 */
-  overflow: hidden;
+  /* ✅ 스크롤 활성화, 스크롤바 숨김 */
+  overflow-y: auto;
   height: 100%;
   box-sizing: border-box;
+
+  /* 스크롤바 숨김 (Chrome, Safari, Edge) */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE, Edge */
+}
+
+.content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
 }
 
 /* 서브메뉴 열렸을 때 */

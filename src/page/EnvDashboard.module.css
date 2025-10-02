@@ -1,25 +1,179 @@
 .container {
-  padding: 32px;
+  padding: 12px;
   background: #f9fafb;
-  min-height: 100vh;
+  height: 100vh;
   box-sizing: border-box;
   font-family: "Inter", sans-serif;
   max-width: 1400px;
   margin: 0 auto;
+  overflow: auto;
+}
+
+/* 헤더 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+  background: #4caf50;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: #111;
+}
+
+.subtitle {
+  font-size: 11px;
+  color: #666;
+  margin: 2px 0 0 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lastUpdated {
+  font-size: 11px;
+  color: #666;
+}
+
+/* 컨트롤 패널 */
+.controlPanel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.controlLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.controlTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  color: #111;
+}
+
+.periodTabs {
+  display: flex;
+  gap: 4px;
+  background: #f3f4f6;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.periodTab {
+  padding: 6px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.periodTab:hover {
+  color: #333;
+}
+
+.periodTab.active {
+  background: white;
+  color: #4caf50;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.controlRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.datePicker {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+  background: white;
+}
+
+.datePicker:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+
+.refreshButton {
+  padding: 8px 16px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.2s;
+}
+
+.refreshButton:hover {
+  background: #43a047;
 }
 
 /* 상단 데이터 요약 */
 .overview {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 32px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .overviewCard {
   background: #fff;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 8px;
+  padding: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
@@ -27,51 +181,64 @@
 }
 
 .overviewValue {
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .unit {
-  font-size: 14px;
+  font-size: 10px;
   color: #777;
 }
 
 .overviewLabel {
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 500;
   color: #2e7d32;
 }
 
 .overviewDiff {
-  font-size: 12px;
+  font-size: 9px;
   color: #888;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 /* 차트 그리드 */
 .chartGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  gap: 10px;
 }
 
 .chartCard {
   background: #fff;
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  height: 350px;
+  height: 250px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .chartTitle {
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   color: #333;
   text-align: left;
+  flex-shrink: 0;
+}
+
+.chartCard > div:last-child {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.chartCard canvas {
+  max-width: 100%;
+  max-height: 100%;
 }
 
 /* 반응형 */
