@@ -10,6 +10,7 @@ import DailyInformation from './page/DailyInformation'
 import WeeklyInformation from './page/WeeklyInformation'
 import ChickenManagement from './page/ChickenManagement'
 import Home from './page/Home'
+import Settings from './page/Settings'
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
    return (
     <Routes>
       <Route path='/' element={<Login />} />
+      <Route path='/settings' element={<Settings />} />
 
       <Route path='home' element={<Home />} >
         <Route path='pfm' element={<PoultryFarmManagement />} />

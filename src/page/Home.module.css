@@ -81,12 +81,19 @@
 .bannerText > p:nth-child(1){
   font-weight: 700;
   font-size: 100px;
+  text-shadow:
+    2px 2px 8px rgba(0, 0, 0, 0.7);
+  -webkit-text-stroke: 2px rgba(0, 0, 0, 0.8);
+  paint-order: stroke fill;
 }
 
 .bannerText > p:nth-child(2){
   font-weight: 300;
   font-size: 20px;
   color: rgb(196, 196, 196);
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.6);
+  paint-order: stroke fill;
 }
 
 /* 가이드 버튼 */

@@ -32,8 +32,18 @@ const TourGuide = ({ isOpen, onClose, steps }) => {
 
   return (
     <div className={styles.overlay}>
-      {/* 어두운 배경 */}
-      <div className={styles.backdrop} />
+      {/* 하이라이트 영역 (타겟 요소 강조) */}
+      {step.targetElement && (
+        <div
+          className={styles.spotlight}
+          style={{
+            top: step.targetElement.top,
+            left: step.targetElement.left,
+            width: step.targetElement.width,
+            height: step.targetElement.height,
+          }}
+        />
+      )}
 
       {/* 설명 박스 (화살표 시작점) */}
       {step.tooltipPosition && (

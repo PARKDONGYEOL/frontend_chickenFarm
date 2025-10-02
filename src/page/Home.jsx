@@ -31,10 +31,10 @@ const Home = () => {
       const rect = item.getBoundingClientRect();
       const titles = ["통계 페이지", "실시간 모니터링", "통합관리", "개체관리"];
       const descriptions = [
-        "주간 데이터와 통계를 확인할 수 있습니다. 양계장의 온도, 습도, 사료 소비량 등을 차트로 볼 수 있습니다.",
-        "실시간으로 양계장의 상태를 모니터링합니다. 일일 데이터를 확인하고 즉각적인 대응이 가능합니다.",
-        "양계장 전체를 통합 관리하는 페이지입니다. 설정 변경 및 시스템 관리를 할 수 있습니다.",
-        "닭 개체별 정보를 관리합니다. 개체 등록, 현황 조회, 건강 상태 확인 등을 할 수 있습니다."
+        "주간 데이터와 통계를 확인할 수 있습니다.\n양계장의 온도, 습도, 사료 소비량 등을 차트로 볼 수 있습니다.",
+        "실시간으로 양계장의 상태를 모니터링합니다.\n일일 데이터를 확인하고 즉각적인 대응이 가능합니다.",
+        "양계장 전체를 통합 관리하는 페이지입니다.\n설정 변경 및 시스템 관리를 할 수 있습니다.",
+        "닭 개체별 정보를 관리합니다.\n개체 등록, 현황 조회, 건강 상태 확인 등을 할 수 있습니다."
       ];
 
       // 설명 박스 위치를 각 단계마다 다르게 배치
@@ -66,10 +66,10 @@ const Home = () => {
         title: titles[index],
         description: descriptions[index],
         targetElement: {
-          top: rect.top,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height,
+          top: rect.top - 10,
+          left: rect.left - 10,
+          width: rect.width + 20,
+          height: rect.height + 10,
         },
         tooltipPosition: {
           top: `${tooltipY}px`,
@@ -104,7 +104,7 @@ const Home = () => {
             <div className={styles.heroContent}>
               <img src={roosterImg} alt="Rooster" />
               <div className={styles.bannerText}>
-                <p>SMART CHICKEN FARM</p>
+                <p>Smart Chicken Farm</p>
                 <p>team::dc.kim</p>
               </div>
             </div>

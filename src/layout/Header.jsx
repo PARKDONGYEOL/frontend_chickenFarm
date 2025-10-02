@@ -57,6 +57,7 @@ const Header = ({ onGuideClick }) => {
           </div>
           {menuOpen && (
             <div className={styles.userDropdown}>
+              <button onClick={() => nav("/settings")}>설정</button>
               <button onClick={handleLogout}>로그아웃</button>
             </div>
           )}
