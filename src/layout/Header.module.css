@@ -135,7 +135,7 @@
 .head_list {
   display: flex;
   margin-right: 40px;
-  width: 400px;
+  width: 500px;
   justify-content: space-between;
 }
 
@@ -156,9 +156,18 @@
   height: 3px;
   background-color: #4caf50;
   transform: scaleX(0);
-  transition: transform 0.3s ease;
+  transition: transform 0.2s ease;
 }
 
 .head_list>div:hover::after {
   transform: scaleX(1);
+}
+
+.guideMenu {
+  color: #4caf50 !important;
+  font-weight: 600 !important;
+}
+
+.logo>p {
+  font-weight: 700;
 }
