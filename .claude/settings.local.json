@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/01-STUDY/dev/backend-chickenfarm/**)",
+      "Bash(curl http://192.168.30.152:5000/api/realtime)",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

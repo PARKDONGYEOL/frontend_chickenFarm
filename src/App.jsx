@@ -11,6 +11,9 @@ import ChickenManagement from './page/ChickenManagement'
 import Settings from './page/Settings'
 import CCTV from './page/CCTV'
 import Diary from './page/Diary'
+import ChickenInoculation from './page/ChickenInoculation'
+import ChickenInoculationList from './page/ChickenInoculationList'
+import ChickenInoculationSchedule from './page/ChickenInoculationSchedule'
 
 
 function App() {
@@ -29,6 +32,9 @@ function App() {
         <Route path='chickenmanagement' element={<ChickenManagement />} />
         <Route path='cctv' element={<CCTV />} />
         <Route path='diary' element={<Diary />} />
+        <Route path='inoculation' element={<ChickenInoculation />} />
+        <Route path='inoculation-list' element={<ChickenInoculationList />} />
+        <Route path='inoculation-schedule' element={<ChickenInoculationSchedule />} />
       </Route>
 
     </Routes>

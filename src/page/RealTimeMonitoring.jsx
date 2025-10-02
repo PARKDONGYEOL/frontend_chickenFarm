@@ -107,21 +107,47 @@ const RealTimeMonitoring = () => {
     return () => clearInterval(weatherInterval);
   }, []);
 
-  // ✅ 값 갱신 (5분마다 랜덤 데이터)
+  // ✅ 라즈베리파이에서 실시간 데이터 가져오기 (1초마다)
   useEffect(() => {
-    const updateData = () => {
-      setData({
-        temp: Math.random() * 40,
-        hum: Math.random() * 100,
-        nh3: Math.random() * 40,
-        lux: Math.random() * 1000,
-        co2: Math.random() * 1000,
-        no2: Math.random() * 200,
-        co: Math.random() * 150,
-      });
+    const fetchSensorData = async () => {
+      try {
+        const response = await fetch('/raspberry/realtime');
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('라즈베리파이 응답:', result); // 디버깅용
+
+        if (result.success && result.data) {
+          setData({
+            temp: result.data.temperature || 0,
+            hum: result.data.humidity || 0,
+            nh3: result.data.nh3 || 0,
+            lux: result.data.lux || 0,
+            co2: result.data.co2 || 0,
+            no2: result.data.no2 || 0,
+            co: result.data.co || 0,
+          });
+        }
+      } catch (error) {
+        console.error("센서 데이터 가져오기 실패:", error);
+        // 연결 실패 시 더미 데이터로 테스트
+        setData({
+          temp: 20 + Math.random() * 10,
+          hum: 50 + Math.random() * 30,
+          nh3: 10 + Math.random() * 20,
+          lux: Math.floor(200 + Math.random() * 600),
+          co2: 400 + Math.random() * 600,
+          no2: 50 + Math.random() * 100,
+          co: 20 + Math.random() * 80,
+        });
+      }
     };
-    updateData();
-    const interval = setInterval(updateData, 5 * 60 * 1000);
+
+    fetchSensorData();
+    const interval = setInterval(fetchSensorData, 1000); // 1초마다 업데이트
     return () => clearInterval(interval);
   }, []);
 
