@@ -12,6 +12,7 @@ import RealTimeMonitoring from './page/RealTimeMonitoring'
 import TrendAnalysis from './page/TrendAnalysis'
 import EnvDashboard from './page/EnvDashboard'
 import ChickenManagement from './page/ChickenManagement'
+import Settings from './page/Settings'
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
    return (
     <Routes>
       <Route path='/' element={<Login />} />
+      <Route path='/settings' element={<Settings />} />
 
       <Route path='home' element={<Home />} >
         <Route path='real' element={<RealTimeMonitoring />} />
@@ -26,8 +28,7 @@ function App() {
         <Route path='trend' element={<TrendAnalysis/>}/>
         <Route path='daily' element={<DailyInformation />} />
         <Route path='weekly' element={<WeeklyInformation />} />
-        <Route path='entity' element={<EntityManagement />} />
-        <Route path='chicken' element={ <ChickenManagement /> } />
+        <Route path='chickenmanagement' element={<ChickenManagement />} />
       </Route>
 
     </Routes>

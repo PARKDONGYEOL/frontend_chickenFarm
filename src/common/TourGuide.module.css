@@ -1,0 +1,169 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99999;
+  pointer-events: none;
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.001);
+  pointer-events: all;
+  cursor: default;
+  user-select: none;
+  z-index: 99998;
+}
+
+/* 하이라이트 영역 (타겟 강조) */
+.spotlight {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99999;
+  border-radius: 4px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+  cursor: default;
+}
+
+/* 강조 영역 위에 투명한 차단 레이어 */
+.spotlight::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: all;
+  cursor: default;
+}
+
+/* 설명 박스 */
+.descriptionBox {
+  position: fixed;
+  background: white;
+  border-radius: 12px;
+  padding: 24px 28px;
+  max-width: 600px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  pointer-events: all;
+  z-index: 100001;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.title {
+  margin: 0 0 12px 0;
+  font-size: 35px;
+  font-weight: 300;
+  color: #2e7d32;
+}
+
+.description {
+  margin: 0;
+  font-size: 25px;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+/* SVG 화살표 */
+.arrowSvg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100000;
+}
+
+/* 오른쪽 다음 버튼 (큰 > 모양) */
+.nextArrowBtn {
+  position: fixed;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  color: #4caf50;
+  border: none;
+  font-size: 150px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: all;
+  z-index: 100002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nextArrowBtn:hover {
+  transform: translateY(-50%) scale(1.2);
+}
+
+/* 왼쪽 이전 버튼 (큰 < 모양) */
+.prevArrowBtn {
+  position: fixed;
+  left: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  color: #9e9e9e;
+  border: none;
+  font-size: 150px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: all;
+  z-index: 100002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prevArrowBtn:hover {
+  transform: translateY(-50%) scale(1.2);
+}
+
+/* 마지막 단계 완료 버튼 (화면 아래) */
+.completeButtonWrapper {
+  position: fixed;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: all;
+  z-index: 100002;
+}
+
+.completeBtn {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  padding: 16px 48px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+  transition: all 0.3s ease;
+}
+
+.completeBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(76, 175, 80, 0.5);
+  background: linear-gradient(135deg, #45a049 0%, #388e3c 100%);
+}
+

@@ -35,7 +35,6 @@
 /* 메인 콘텐츠 */
 .content {
   flex: 1;
-  padding: 0;
   transition: all 0.3s ease;
 
   /* ✅ 스크롤 제거 */
@@ -56,7 +55,7 @@
   align-items: center;
   overflow: hidden;
   width: 100%;
-  height: 500px;
+  height: 850px;
   position: relative;
   color: white;
 }
@@ -81,10 +80,55 @@
 .bannerText > p:nth-child(1){
   font-weight: 700;
   font-size: 100px;
+  text-shadow:
+    2px 2px 8px rgba(0, 0, 0, 0.7);
+  -webkit-text-stroke: 2px rgba(0, 0, 0, 0.8);
+  paint-order: stroke fill;
 }
 
 .bannerText > p:nth-child(2){
   font-weight: 300;
   font-size: 20px;
   color: rgb(196, 196, 196);
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.6);
+  paint-order: stroke fill;
+}
+
+/* 가이드 버튼 */
+.guideButtonWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.guideButton {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.guideButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+  background: linear-gradient(135deg, #45a049 0%, #388e3c 100%);
+}
+
+.guideButton:active {
+  transform: translateY(0);
+}
+
+.heroContent_image1 > img{
+  width: 50%;
+  border: 1px solid;
 }
