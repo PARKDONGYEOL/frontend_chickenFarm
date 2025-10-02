@@ -1,9 +1,11 @@
 .container {
-  padding: 24px;
+  padding: 32px;
   background: #f9fafb;
   min-height: 100vh;
   box-sizing: border-box;
   font-family: "Inter", sans-serif;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 /* 상단 데이터 요약 */
@@ -57,9 +59,9 @@
 .chartCard {
   background: #fff;
   border-radius: 12px;
-  padding: 16px;
+  padding: 20px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  height: 300px;
+  height: 350px;
   display: flex;
   flex-direction: column;
 }

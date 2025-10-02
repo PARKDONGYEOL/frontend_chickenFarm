@@ -37,8 +37,8 @@ const Header = ({ onGuideClick }) => {
       {loginInfo ? (
         <div className={styles.userMenuWrapper}>
           <div className={styles.head_list}>
-            <div onClick={() => nav("/home/weekly")}>통계</div>
-            <div onClick={() => nav("/home/daily")}>실시간</div>
+            <div onClick={() => nav("/home/env")}>통계</div>
+            <div onClick={() => nav("/home/real")}>실시간</div>
             <div onClick={() => nav("/home/pfm")}>통합관리</div>
             <div onClick={() => nav("/home/chickenmanagement")}>개체관리</div>
             <div onClick={onGuideClick} className={styles.guideMenu}>가이드</div>

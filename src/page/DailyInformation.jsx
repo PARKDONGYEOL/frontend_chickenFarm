@@ -144,7 +144,7 @@ const DailyInformation = () => {
       {/* 차트 그리드 */}
       <div className={styles.chartsGrid}>
         <ChartCard
-          icon="🌡️"
+          icon={<img src="/free-icon-temperature-2652881.png" alt="temperature" style={{width: '32px', height: '32px'}} />}
           title="Temperature"
           value={getLatestValue('tempData')}
           unit="°C"
@@ -162,7 +162,7 @@ const DailyInformation = () => {
           status="normal"
         />
         <ChartCard
-          icon="☀️"
+          icon={<img src="/free-icon-lightbulb-2684825.png" alt="light" style={{width: '32px', height: '32px'}} />}
           title="Illumination"
           value={getLatestValue('luxData')}
           unit="lux"
@@ -171,7 +171,7 @@ const DailyInformation = () => {
           status="normal"
         />
         <ChartCard
-          icon="🧪"
+          icon={<img src="/ammonia.png" alt="ammonia" style={{width: '32px', height: '32px'}} />}
           title="Ammonia (NH₃)"
           value={(Math.random() * 15 + 5).toFixed(1)}
           unit="ppm"
@@ -198,7 +198,7 @@ const DailyInformation = () => {
           status="caution"
         />
         <ChartCard
-          icon="🔥"
+          icon={<img src="/free-icon-carbon-monoxide-958528.png" alt="carbon monoxide" style={{width: '32px', height: '32px'}} />}
           title="Carbon Monoxide (CO)"
           value={(Math.random() * 3 + 1).toFixed(1)}
           unit="ppm"
