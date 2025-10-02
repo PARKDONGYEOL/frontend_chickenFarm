@@ -7,6 +7,7 @@ const Header = ({ onGuideClick }) => {
   const nav = useNavigate();
   const [loginInfo, setLoginInfo] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [integratedMenuOpen, setIntegratedMenuOpen] = useState(false);
 
   useEffect(() => {
     const info = sessionStorage.getItem("loginInfo");
@@ -39,7 +40,19 @@ const Header = ({ onGuideClick }) => {
           <div className={styles.head_list}>
             <div onClick={() => nav("/home/env")}>통계</div>
             <div onClick={() => nav("/home/real")}>실시간</div>
-            <div onClick={() => nav("/home/pfm")}>통합관리</div>
+            <div
+              className={styles.integratedMenu}
+              onMouseEnter={() => setIntegratedMenuOpen(true)}
+              onMouseLeave={() => setIntegratedMenuOpen(false)}
+            >
+              통합관리
+              {integratedMenuOpen && (
+                <div className={styles.integratedDropdown}>
+                  <div onClick={() => nav("/home/cctv")}>CCTV</div>
+                  <div onClick={() => nav("/home/diary")}>관찰일지</div>
+                </div>
+              )}
+            </div>
             <div onClick={() => nav("/home/chickenmanagement")}>개체관리</div>
             <div onClick={onGuideClick} className={styles.guideMenu}>가이드</div>
           </div>

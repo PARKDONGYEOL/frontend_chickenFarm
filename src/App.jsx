@@ -1,18 +1,16 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { Route, Routes } from 'react-router-dom'
 import Login from './layout/Login'
 import DailyInformation from './page/DailyInformation'
 import WeeklyInformation from './page/WeeklyInformation'
-import EntityManagement from './page/EntityManagement'
 import Home from './page/Home'
 import RealTimeMonitoring from './page/RealTimeMonitoring'
 import TrendAnalysis from './page/TrendAnalysis'
 import EnvDashboard from './page/EnvDashboard'
 import ChickenManagement from './page/ChickenManagement'
 import Settings from './page/Settings'
+import CCTV from './page/CCTV'
+import Diary from './page/Diary'
 
 
 function App() {
@@ -29,6 +27,8 @@ function App() {
         <Route path='daily' element={<DailyInformation />} />
         <Route path='weekly' element={<WeeklyInformation />} />
         <Route path='chickenmanagement' element={<ChickenManagement />} />
+        <Route path='cctv' element={<CCTV />} />
+        <Route path='diary' element={<Diary />} />
       </Route>
 
     </Routes>

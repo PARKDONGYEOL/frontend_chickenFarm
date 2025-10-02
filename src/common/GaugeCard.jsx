@@ -27,7 +27,7 @@ const GaugeCard = ({ icon, label, value, max, min, optimalMax, unit, onClick }) 
         data: [value, Math.max(max - value, 0)],
         backgroundColor: ["#22c55e", "#e5e7eb"],
         borderWidth: 0,
-        cutout: "60%",
+        cutout: "50%",
         circumference: 180,
         rotation: 270,
       },
