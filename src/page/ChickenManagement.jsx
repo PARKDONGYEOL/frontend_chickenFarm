@@ -8,6 +8,7 @@ const ChickenManagement = () => {
   //축사 정보 저장
   const [farmName, setFarmName] = useState('')
 
+
   //배치 정보 저장
   const [batch, setBatch] = useState({
     'farmNum' : '',
