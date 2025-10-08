@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styles from './ChickenManagement.module.css'
 import Input from '../common/Input'
 import Button from '../common/Button'
@@ -8,13 +8,25 @@ const ChickenManagement = () => {
   //축사 정보 저장
   const [farmName, setFarmName] = useState('')
 
-
   //배치 정보 저장
   const [batch, setBatch] = useState({
     'farmNum' : '',
     'entryDate' : '',
     'initialCount' : ''
   })
+
+  //불러온 배치 정보 담을 변수
+  const [batchInfo, setBatchInfo] = useState([]);
+
+  //배치 정보 불러오기
+  useEffect(() => {
+    axios.get('/api/batch/info')
+    .then(res => {
+      console.log(res.data);
+      setBatchInfo(res.data);
+    })
+    .catch(e => console.log(e));
+  }, [])
 
   //양계장 등록
   const regFarmName = () => {
@@ -94,7 +106,7 @@ const ChickenManagement = () => {
           <table className={styles.table}>
             <thead>
               <tr>
-                <td>축사 번호</td>
+                <td>양계장 번호</td>
                 <td>배치 번호</td>
                 <td>입식일</td>
                 <td>초기 닭의 수</td>
@@ -102,6 +114,22 @@ const ChickenManagement = () => {
                 <td>출하 여부</td>
               </tr>
             </thead>
+            <tbody>
+              {
+                batchInfo.map((batch, i) => {
+                  return (
+                    <tr key={i}>
+                      <td>{batch.farmNum}</td>
+                      <td>{batch.batchId}</td>
+                      <td>{batch.entryDate}</td>
+                      <td>{batch.initialCount}</td>
+                      <td>{batch.currentCount}</td>
+                      <td>{batch.shipmentStatus ? "출하 완료" : "출하 전"}</td>
+                    </tr>
+                  )
+                })
+              }
+            </tbody>
           </table>
         </div>
       </div>

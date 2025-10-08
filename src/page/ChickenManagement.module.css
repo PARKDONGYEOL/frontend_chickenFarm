@@ -1,5 +1,6 @@
 .container > div{
   margin: 30px auto;
+  padding: 24px;
 }
 
 .table{
