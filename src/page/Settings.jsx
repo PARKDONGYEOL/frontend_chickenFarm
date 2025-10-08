@@ -42,7 +42,7 @@ const Settings = () => {
     }
 
     // 스프링 서버로 비밀번호 변경 요청
-    axios.put('http://localhost:8080/api/member/password', {
+    axios.put('/api/member/password', {
       memId: loginInfo.memId,
       currentPassword: currentPassword,
       newPassword: newPassword
@@ -73,7 +73,7 @@ const Settings = () => {
     }
 
     // 스프링 서버로 아이디(이름) 변경 요청
-    axios.put('http://localhost:8080/api/member/name', {
+    axios.put('/api/member/name', {
       memId: loginInfo.memId,
       newName: newUsername
     })
