@@ -3,8 +3,12 @@ import styles from './ChickenManagement.module.css'
 import Input from '../common/Input'
 import Button from '../common/Button'
 import axios from 'axios'
+import ChickenList from './ChickenList'
 
 const ChickenManagement = () => {
+  //배치 번호 넘기기
+  const [selectedBatchId, setSelectedBatchId] = useState('')
+  
   //축사 정보 저장
   const [farmName, setFarmName] = useState('')
 
@@ -64,45 +68,76 @@ const ChickenManagement = () => {
     })
   }
 
+  
+
   return (
     <div className={styles.container}>
-      <h2>닭 관리</h2>
+      <h2>개체 관리</h2>
       <div>
         <h3>양계장 등록</h3>
-        <div>
+        <div className={styles.farm_reg}>
           <span>양계장 이름</span>
-          <Input value={farmName} onChange={(e) => {setFarmName(e.target.value)}}/>
-          <Button title='등록' onClick={() => regFarmName()}/>
+          <Input 
+            value={farmName} 
+            onChange={(e) => setFarmName(e.target.value)}
+            size='120px'
+            height='30px'
+          />
+          <Button 
+            size='80px'
+            height='30px'
+            color='green'
+            title='등록'
+            onClick={() => regFarmName()}
+          />
         </div>
       </div>
       <div>
         <h3>배치 등록</h3>
-        <div>
-          <span>양계장 번호</span>
-          <Input 
-            name='farmNum'
-            value={batch.farmNum}
-            onChange={(e) => handleBatch(e)}
+        <div className={styles.batch_reg}>
+          <div className={styles.input_group}>
+            <span>양계장 번호</span>
+            <Input 
+              size='120px'
+              height='30px'
+              name='farmNum'
+              value={batch.farmNum}
+              onChange={(e) => handleBatch(e)}
+            />
+          </div>
+          <div className={styles.input_group}>
+            <span>입식일</span>
+            <Input 
+              size='120px'
+              height='30px'
+              type='date'
+              name='entryDate'
+              value={batch.entryDate}
+              onChange={(e) => handleBatch(e)}
+            />
+          </div>
+          <div className={styles.input_group}>
+            <span>닭의 수</span>
+            <Input 
+              size='120px'
+              height='30px'
+              name='initialCount'
+              value={batch.initialCount}
+              onChange={(e) => handleBatch(e)}
+            />
+          </div>
+          <Button 
+            size='80px'
+            height='30px'
+            color='green'
+            title='등록' 
+            onClick={() => regBatchAndChickens()}
           />
-          <span>입식일</span>
-          <Input 
-            type='date'
-            name='entryDate'
-            value={batch.entryDate}
-            onChange={(e) => handleBatch(e)}
-          />
-          <span>닭의 수</span>
-          <Input 
-            name='initialCount'
-            value={batch.initialCount}
-            onChange={(e) => handleBatch(e)}
-          />
-          <Button title='등록' onClick={() => regBatchAndChickens()}/>
         </div>
       </div>
       <div>
-        <h3>배치 표</h3>
-        <div>
+        <h3>배치 목록</h3>
+        <div className={styles.batch_list}>
           <table className={styles.table}>
             <thead>
               <tr>
@@ -111,31 +146,37 @@ const ChickenManagement = () => {
                 <td>입식일</td>
                 <td>초기 닭의 수</td>
                 <td>현재 닭의 수</td>
-                <td>출하 여부</td>
+                <td>출하</td>
               </tr>
             </thead>
             <tbody>
               {
                 batchInfo.map((batch, i) => {
                   return (
-                    <tr key={i}>
+                    <tr key={i} onClick={() => setSelectedBatchId(batch.batchId)}>
                       <td>{batch.farmNum}</td>
                       <td>{batch.batchId}</td>
                       <td>{batch.entryDate}</td>
                       <td>{batch.initialCount}</td>
                       <td>{batch.currentCount}</td>
-                      <td>{batch.shipmentStatus ? "출하 완료" : "출하 전"}</td>
+                      <td><input type='checkbox'/></td>
                     </tr>
                   )
                 })
               }
             </tbody>
           </table>
+          <Button 
+            size='80px'
+            height='30px'
+            color='green'
+            title='출하' 
+          />
         </div>
       </div>
-      <div>
-        <h3>수정</h3>
-      </div>
+      {
+        selectedBatchId && <ChickenList batchId={selectedBatchId}/>
+      }
     </div>
   )
 }
