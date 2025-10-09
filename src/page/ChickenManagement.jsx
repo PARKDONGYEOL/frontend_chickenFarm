@@ -6,6 +6,12 @@ import axios from 'axios'
 import ChickenList from './ChickenList'
 
 const ChickenManagement = () => {
+  //화면 다시 그리기
+  const [reload, setReload] = useState(0)
+
+  //출하를 위한 체크박스
+  const [checkedBatches, setCheckedBatches] = useState([]);
+
   //배치 번호 넘기기
   const [selectedBatchId, setSelectedBatchId] = useState('')
   
@@ -22,6 +28,35 @@ const ChickenManagement = () => {
   //불러온 배치 정보 담을 변수
   const [batchInfo, setBatchInfo] = useState([]);
 
+  // 체크박스 선택/해제 처리
+  const handleCheckbox = (batchId) => {
+    if (checkedBatches.includes(batchId)) {
+      // 이미 체크된 경우 제거
+      setCheckedBatches(checkedBatches.filter(id => id !== batchId));
+    } else {
+      // 체크 추가
+      setCheckedBatches([...checkedBatches, batchId]);
+    }
+  }
+
+  const handleShipment = () => {
+  if (checkedBatches.length === 0) {
+    alert('출하할 배치를 선택해주세요');
+    return;
+  }
+
+  axios.put('/api/batch/shipment', { batchIdList: checkedBatches })
+    .then(res => {
+      alert('출하 완료');
+      setCheckedBatches([]);  // 체크박스 초기화
+      setReload(reload + 1)
+    })
+    .catch(e => {
+      console.log(e);
+      alert('출하 처리 중 오류가 발생했습니다');
+    });
+}
+
   //배치 정보 불러오기
   useEffect(() => {
     axios.get('/api/batch/info')
@@ -30,7 +65,7 @@ const ChickenManagement = () => {
       setBatchInfo(res.data);
     })
     .catch(e => console.log(e));
-  }, [])
+  }, [reload])
 
   //양계장 등록
   const regFarmName = () => {
@@ -68,7 +103,7 @@ const ChickenManagement = () => {
     })
   }
 
-  
+    
 
   return (
     <div className={styles.container}>
@@ -159,7 +194,14 @@ const ChickenManagement = () => {
                       <td>{batch.entryDate}</td>
                       <td>{batch.initialCount}</td>
                       <td>{batch.currentCount}</td>
-                      <td><input type='checkbox'/></td>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <input 
+                          type='checkbox'
+                          value={batch.batchId}
+                          checked={checkedBatches.includes(batch.batchId)}
+                          onChange={() => handleCheckbox(batch.batchId)}
+                        />
+                      </td>
                     </tr>
                   )
                 })
@@ -171,6 +213,7 @@ const ChickenManagement = () => {
             height='30px'
             color='green'
             title='출하' 
+            onClick={handleShipment}
           />
         </div>
       </div>
