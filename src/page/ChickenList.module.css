@@ -79,11 +79,19 @@
   text-align: center;
 }
 
+.chicken_count > div:nth-of-type(3){
+  background: hsl(0, 60%, 98%);
+}
+
 .chicken_count > div > div {
   font-size: 2rem;
   font-weight: 700;
   color: #059669;
   margin-bottom: 0.5rem;
+}
+
+.chicken_count > div:nth-of-type(3) > div{
+  color: #dd0b0b;
 }
 
 .chicken_count > div > span {
