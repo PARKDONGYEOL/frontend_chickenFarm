@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import styles from './ChickenManagement.module.css'
 import Input from '../common/Input'
 import Button from '../common/Button'
@@ -6,6 +6,9 @@ import axios from 'axios'
 import ChickenList from './ChickenList'
 
 const ChickenManagement = () => {
+  //양계장 번호 조회
+  const [farmNumList, setFarmNumList] = useState([])
+
   //화면 다시 그리기
   const [reload, setReload] = useState(0)
 
@@ -29,13 +32,13 @@ const ChickenManagement = () => {
   const [batchInfo, setBatchInfo] = useState([]);
 
   // 체크박스 선택/해제 처리
-  const handleCheckbox = (batchId) => {
-    if (checkedBatches.includes(batchId)) {
-      // 이미 체크된 경우 제거
-      setCheckedBatches(checkedBatches.filter(id => id !== batchId));
-    } else {
+  const handleCheckbox = (e) => {
+    if (e.target.checked) {
       // 체크 추가
-      setCheckedBatches([...checkedBatches, batchId]);
+      setCheckedBatches([...checkedBatches, e.target.value]);
+    } else {
+      // 이미 체크된 경우 제거
+      setCheckedBatches(checkedBatches.filter(batchId => batchId !== e.target.value));
     }
   }
 
@@ -57,6 +60,13 @@ const ChickenManagement = () => {
     });
 }
 
+  //양계장 번호 조회
+  useEffect(() => {
+    axios.get('/api/farm/num-list')
+    .then(res => setFarmNumList(res.data))
+    .catch(e => console.log(e));
+  }, [])
+
   //배치 정보 불러오기
   useEffect(() => {
     axios.get('/api/batch/info')
@@ -73,6 +83,7 @@ const ChickenManagement = () => {
     .then(res => {
       alert('등록 완료');
       setFarmName('');
+      changeReload();
     })
     .catch(e => {
       console.log(e)
@@ -88,7 +99,8 @@ const ChickenManagement = () => {
         'farmNum' : '',
         'entryDate' : '',
         'initialCount' : ''
-      })
+      });
+      changeReload();
     })
     .catch(e => {
       console.log(e)
@@ -103,7 +115,9 @@ const ChickenManagement = () => {
     })
   }
 
-    
+  const changeReload = () => {
+    setReload(reload + 1);
+  }
 
   return (
     <div className={styles.container}>
@@ -131,14 +145,21 @@ const ChickenManagement = () => {
         <h3>배치 등록</h3>
         <div className={styles.batch_reg}>
           <div className={styles.input_group}>
-            <span>양계장 번호</span>
-            <Input 
-              size='120px'
-              height='30px'
+            <span>양계장</span>
+            <select
               name='farmNum'
               value={batch.farmNum}
               onChange={(e) => handleBatch(e)}
-            />
+            >
+              <option value=''>선택하세요</option>
+              {
+                farmNumList.map((farm, i) => {
+                  return (
+                    <option key={i} value={farm.farmNum}>{farm.farmNum} - {farm.farmName}</option>
+                  )
+                })
+              }
+            </select>
           </div>
           <div className={styles.input_group}>
             <span>입식일</span>
@@ -152,7 +173,7 @@ const ChickenManagement = () => {
             />
           </div>
           <div className={styles.input_group}>
-            <span>닭의 수</span>
+            <span>닭 개체 수</span>
             <Input 
               size='120px'
               height='30px'
@@ -199,7 +220,7 @@ const ChickenManagement = () => {
                           type='checkbox'
                           value={batch.batchId}
                           checked={checkedBatches.includes(batch.batchId)}
-                          onChange={() => handleCheckbox(batch.batchId)}
+                          onChange={(e) => handleCheckbox(e)}
                         />
                       </td>
                     </tr>
@@ -218,7 +239,7 @@ const ChickenManagement = () => {
         </div>
       </div>
       {
-        selectedBatchId && <ChickenList batchId={selectedBatchId}/>
+        selectedBatchId && <ChickenList batchId={selectedBatchId} changeReload={changeReload} reload={reload}/>
       }
     </div>
   )

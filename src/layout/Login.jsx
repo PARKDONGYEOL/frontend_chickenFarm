@@ -64,6 +64,9 @@ const Login = () => {
             value={loginDate.memId}
             onChange={e => handleLoginData(e)}
             className={styles.input}
+            onKeyDown={e => {
+              if(e.key === 'Enter') login()
+            }}
           />
           {
             loginDate.memId && (
@@ -91,6 +94,9 @@ const Login = () => {
             onChange={e => handleLoginData(e)}
             className={styles.input}
             type='password'
+            onKeyDown={e => {
+              if(e.key === 'Enter') login()
+            }}
           />
           {
             loginDate.memPw && (
