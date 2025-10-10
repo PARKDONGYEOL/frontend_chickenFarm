@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:8080/api'
+// 개발 환경에서는 프록시를 사용하고, 프로덕션에서는 실제 백엔드 주소 사용
+const API_BASE_URL = import.meta.env.DEV ? '/api' : 'http://localhost:8080/api'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -14,6 +15,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     console.log(`API 요청: ${config.method?.toUpperCase()} ${config.url}`)
+    console.log(`기본 URL: ${config.baseURL}`)
     return config
   },
   (error) => {

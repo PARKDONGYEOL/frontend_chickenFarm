@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import styles from "./Header.module.css";
 
-const Header = ({ onGuideClick }) => {
+const Header = ({ onGuideClick, currentPath }) => {
   const nav = useNavigate();
   const [loginInfo, setLoginInfo] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -18,6 +18,18 @@ const Header = ({ onGuideClick }) => {
     sessionStorage.removeItem("loginInfo");
     setLoginInfo(null);
     nav("/");
+  };
+
+  // 현재 경로가 해당 메뉴와 일치하는지 확인
+  const isActive = (path) => {
+    return currentPath?.startsWith(path);
+  };
+
+  // 통합관리 하위 메뉴인지 확인
+  const isIntegratedActive = () => {
+    return currentPath?.startsWith("/home/cctv") || 
+           currentPath?.startsWith("/home/diary") || 
+           currentPath?.startsWith("/home/inoculation");
   };
 
   return (
@@ -38,10 +50,20 @@ const Header = ({ onGuideClick }) => {
       {loginInfo ? (
         <div className={styles.userMenuWrapper}>
           <div className={styles.head_list}>
-            <div onClick={() => nav("/home/env")}>통계</div>
-            <div onClick={() => nav("/home/real")}>실시간</div>
+            <div 
+              onClick={() => nav("/home/env")}
+              className={isActive("/home/env") ? styles.active : ""}
+            >
+              통계
+            </div>
+            <div 
+              onClick={() => nav("/home/real")}
+              className={isActive("/home/real") ? styles.active : ""}
+            >
+              실시간
+            </div>
             <div
-              className={styles.integratedMenu}
+              className={`${styles.integratedMenu} ${isIntegratedActive() ? styles.active : ""}`}
               onMouseEnter={() => setIntegratedMenuOpen(true)}
               onMouseLeave={() => setIntegratedMenuOpen(false)}
             >
@@ -54,7 +76,12 @@ const Header = ({ onGuideClick }) => {
                 </div>
               )}
             </div>
-            <div onClick={() => nav("/home/chickenmanagement")}>개체관리</div>
+            <div 
+              onClick={() => nav("/home/chickenmanagement")}
+              className={isActive("/home/chickenmanagement") ? styles.active : ""}
+            >
+              개체관리
+            </div>
             <div onClick={onGuideClick} className={styles.guideMenu}>가이드</div>
           </div>
           <div

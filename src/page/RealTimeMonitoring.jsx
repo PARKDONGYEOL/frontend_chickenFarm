@@ -4,46 +4,45 @@ import GaugeCard from "../common/GaugeCard";
 import LineTrendChart from "../common/LineTrendChart";
 import ModalFloat from "../common/ModalFloat";
 
-// 아이콘 컴포넌트
 const ThermoIcon = () => (
-  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-    <img width="40" height="40" src="/free-icon-temperature-2652881.png" alt="temperature"/>
+  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <img width="40" height="40" src="/free-icon-temperature-2652881.png" alt="temperature" />
   </div>
 );
 
 const HumidityIcon = () => (
-  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-    <img width="40" height="40" src="https://img.icons8.com/office/40/hygrometer.png" alt="hygrometer"/>
+  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <img width="40" height="40" src="https://img.icons8.com/office/40/hygrometer.png" alt="hygrometer" />
   </div>
 );
 
 const LightIcon = () => (
-  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-    <img width="40" height="40" src="/free-icon-lightbulb-2684825.png" alt="light"/>
+  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <img width="40" height="40" src="/free-icon-lightbulb-2684825.png" alt="light" />
   </div>
 );
 
 const AmmoniaIcon = () => (
-  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-    <img width="40" height="40" src="/ammonia.png" alt="ammonia"/>
+  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <img width="40" height="40" src="/ammonia.png" alt="ammonia" />
   </div>
 );
 
 const CO2Icon = () => (
-  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-    <img width="40" height="40" src="https://img.icons8.com/ios-filled/50/co2.png" alt="co2"/>
+  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <img width="40" height="40" src="https://img.icons8.com/ios-filled/50/co2.png" alt="co2" />
   </div>
 );
 
 const NO2Icon = () => (
-  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
     ⚠️
   </div>
 );
 
 const COIcon = () => (
-  <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-    <img width="40" height="40" src="/free-icon-carbon-monoxide-958528.png" alt="carbon monoxide"/>
+  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <img width="40" height="40" src="/free-icon-carbon-monoxide-958528.png" alt="carbon monoxide" />
   </div>
 );
 
@@ -75,11 +74,11 @@ const RealTimeMonitoring = () => {
     points: [],
   });
 
-  // ✅ 날씨 데이터 가져오기
+  // 날씨 데이터 가져오기
   useEffect(() => {
     const fetchWeather = async () => {
       const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
-      const city = "Ulsan"; // 원하는 도시명으로 변경 가능
+      const city = "Ulsan";
 
       try {
         const response = await fetch(
@@ -102,12 +101,11 @@ const RealTimeMonitoring = () => {
     };
 
     fetchWeather();
-    // 10분마다 날씨 업데이트
     const weatherInterval = setInterval(fetchWeather, 10 * 60 * 1000);
     return () => clearInterval(weatherInterval);
   }, []);
 
-  // ✅ 라즈베리파이에서 실시간 데이터 가져오기 (1초마다)
+  // 센서 데이터 가져오기
   useEffect(() => {
     const fetchSensorData = async () => {
       try {
@@ -118,7 +116,6 @@ const RealTimeMonitoring = () => {
         }
 
         const result = await response.json();
-        console.log('라즈베리파이 응답:', result); // 디버깅용
 
         if (result.success && result.data) {
           setData({
@@ -133,25 +130,15 @@ const RealTimeMonitoring = () => {
         }
       } catch (error) {
         console.error("센서 데이터 가져오기 실패:", error);
-        // 연결 실패 시 더미 데이터로 테스트
-        setData({
-          temp: 20 + Math.random() * 10,
-          hum: 50 + Math.random() * 30,
-          nh3: 10 + Math.random() * 20,
-          lux: Math.floor(200 + Math.random() * 600),
-          co2: 400 + Math.random() * 600,
-          no2: 50 + Math.random() * 100,
-          co: 20 + Math.random() * 80,
-        });
       }
     };
 
     fetchSensorData();
-    const interval = setInterval(fetchSensorData, 1000); // 1초마다 업데이트
+    const interval = setInterval(fetchSensorData, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  // ✅ 24시간 시계열 데이터 생성
+  // 24시간 시계열 데이터 생성
   const generateTimeSeries = (points = 96, fn) => {
     const now = Date.now();
     const step = (24 * 60 * 60 * 1000) / points;
@@ -167,7 +154,7 @@ const RealTimeMonitoring = () => {
     setTrendOpen(true);
   };
 
-  // ✅ 더미 데이터 함수
+  // 더미 데이터 함수
   const genTemp = (i) => 22 + Math.sin(i / 6) * 3 + Math.random();
   const genHum = () => 60 + Math.random() * 25;
   const genLux = (i) => 300 + Math.sin(i / 4) * 150 + Math.random() * 30;
@@ -178,13 +165,12 @@ const RealTimeMonitoring = () => {
 
   const activeSensors = 7;
   const totalSensors = 7;
-  const alerts = data.temp > 30 || data.hum > 80 || data.nh3 > 25 ? 1 : 0;
+  const alertCount = data.temp > 30 || data.hum > 80 || data.nh3 > 25 ? 1 : 0;
 
   return (
     <>
       <div className={styles.container}>
         <div className={styles.mainGrid}>
-          {/* 왼쪽: 센서 카드들 + 시스템 상태 */}
           <div className={styles.leftSection}>
             <GaugeCard
               icon={<ThermoIcon />}
@@ -257,7 +243,6 @@ const RealTimeMonitoring = () => {
               onClick={() => openTrend("일산화탄소 (최근 24시간)", "ppm", genCO)}
             />
 
-            {/* 시스템 상태 패널 */}
             <div className={styles.statusPanel}>
               <h3 className={styles.statusTitle}>시스템 상태</h3>
               <div className={styles.statusItem}>
@@ -266,23 +251,22 @@ const RealTimeMonitoring = () => {
               </div>
               <div className={styles.statusItem}>
                 <span className={styles.statusLabel}>알림</span>
-                <span className={`${styles.statusValue} ${alerts > 0 ? styles.alertActive : ''}`}>{alerts}</span>
+                <span className={`${styles.statusValue} ${alertCount > 0 ? styles.alertActive : ''}`}>{alertCount}</span>
               </div>
             </div>
           </div>
 
-          {/* 오른쪽: 날씨 정보 패널 */}
           <div className={styles.rightSection}>
             <div className={styles.weatherPanel}>
               <h3 className={styles.statusTitle}>
-              {weather.icon && (
-                <img
-                  src={`https://openweathermap.org/img/wn/${weather.icon}.png`}
-                  alt={weather.description}
-                  className={styles.titleWeatherIcon}
-                />
-              )}
-              날씨 정보 (울산)
+                {weather.icon && (
+                  <img
+                    src={`https://openweathermap.org/img/wn/${weather.icon}.png`}
+                    alt={weather.description}
+                    className={styles.titleWeatherIcon}
+                  />
+                )}
+                날씨 정보 (울산)
               </h3>
               <div className={styles.weatherContent}>
                 <div className={styles.weatherTop}>
@@ -330,7 +314,6 @@ const RealTimeMonitoring = () => {
         </div>
       </div>
 
-      {/* ✅ 클릭 시 모달 */}
       <ModalFloat
         isOpen={trendOpen}
         onClose={() => setTrendOpen(false)}
