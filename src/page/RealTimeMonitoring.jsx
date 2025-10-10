@@ -220,9 +220,9 @@ const RealTimeMonitoring = () => {
               icon={<AmmoniaIcon />}
               label="암모니아"
               value={data.nh3}
-              max={60}
+              max={100}
               min={0}
-              optimalMax={25}
+              optimalMax={50}
               unit="ppm"
               onClick={() => openTrend("암모니아 (최근 24시간)", "ppm", genNH3)}
             />
@@ -230,9 +230,9 @@ const RealTimeMonitoring = () => {
               icon={<CO2Icon />}
               label="이산화탄소"
               value={data.co2}
-              max={6000}
-              min={1000}
-              optimalMax={5000}
+              max={400}
+              min={0}
+              optimalMax={250}
               unit="ppm"
               onClick={() => openTrend("이산화탄소 (최근 24시간)", "ppm", genCO2)}
             />
@@ -240,9 +240,9 @@ const RealTimeMonitoring = () => {
               icon={<NO2Icon />}
               label="이산화질소"
               value={data.no2}
-              max={200}
+              max={20}
               min={0}
-              optimalMax={50}
+              optimalMax={10}
               unit="ppb"
               onClick={() => openTrend("이산화질소 (최근 24시간)", "ppb", genNO2)}
             />
@@ -250,7 +250,7 @@ const RealTimeMonitoring = () => {
               icon={<COIcon />}
               label="일산화탄소"
               value={data.co}
-              max={150}
+              max={100}
               min={0}
               optimalMax={50}
               unit="ppm"

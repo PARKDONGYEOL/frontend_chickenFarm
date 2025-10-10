@@ -1,0 +1,13 @@
+.input{
+  outline: 1px solid #bbbbbb;
+  padding: 3px 4px;
+  border-radius: 4px;
+  border: none;
+   /* outline이 border랑 겹쳐짐 */
+  outline-offset: -1px;
+  height: inherit;
+}
+
+.input:focus{
+  outline: 1.5px solid #777777;
+}

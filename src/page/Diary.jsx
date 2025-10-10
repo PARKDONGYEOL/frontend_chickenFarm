@@ -1,74 +1,80 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Diary.module.css";
+import * as noteApi from "../api/noteApi";
 
 const Diary = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [entries, setEntries] = useState([
-    {
-      id: 1,
-      date: "2025-10-02",
-      time: "09:30",
-      observer: "김담당",
-      category: "건강",
-      content: "전체적으로 양호한 상태. 활동량이 정상적임.",
-      temperature: 24.5,
-      humidity: 62,
-    },
-    {
-      id: 2,
-      date: "2025-10-02",
-      time: "14:20",
-      observer: "이관리",
-      category: "사료",
-      content: "사료 급여 완료. 잔여량 확인.",
-      temperature: 25.1,
-      humidity: 58,
-    },
-    {
-      id: 3,
-      date: "2025-10-01",
-      time: "10:15",
-      observer: "김담당",
-      category: "청소",
-      content: "사육장 청소 및 소독 완료.",
-      temperature: 23.8,
-      humidity: 65,
-    },
-  ]);
+  const [entries, setEntries] = useState([]);
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [newEntry, setNewEntry] = useState({
-    time: new Date().toTimeString().slice(0, 5),
-    observer: "",
-    category: "건강",
     content: "",
   });
 
-  const handleAddEntry = () => {
+  // 로그인된 사용자 ID (임시로 하드코딩, 실제로는 로그인 정보에서 가져와야 함)
+  const memId = sessionStorage.getItem('loginInfo')
+    ? JSON.parse(sessionStorage.getItem('loginInfo')).memId
+    : 'admin';
+
+  // 날짜 변경 시 해당 날짜의 일지 조회
+  useEffect(() => {
+    fetchNotesByDate();
+  }, [selectedDate]);
+
+  // 특정 날짜의 일지 조회
+  const fetchNotesByDate = async () => {
+    try {
+      const data = await noteApi.getNotesByDate(memId, selectedDate);
+      setEntries(data);
+    } catch (error) {
+      console.error('일지 조회 실패:', error);
+      setEntries([]);
+    }
+  };
+
+  const handleAddEntry = async () => {
     if (editingId) {
       // 수정 모드
-      setEntries(entries.map(entry =>
-        entry.id === editingId
-          ? { ...entry, ...newEntry }
-          : entry
-      ));
-      setEditingId(null);
+      try {
+        const noteData = {
+          noteNum: editingId,
+          content: newEntry.content,
+        };
+        const result = await noteApi.updateNote(noteData);
+
+        if (result.success) {
+          alert(result.message);
+          fetchNotesByDate(); // 목록 새로고침
+          setEditingId(null);
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        alert('일지 수정에 실패했습니다.');
+        console.error(error);
+      }
     } else {
       // 추가 모드
-      const entry = {
-        id: Date.now(),
-        date: selectedDate,
-        ...newEntry,
-        temperature: 24.5,
-        humidity: 60,
-      };
-      setEntries([entry, ...entries]);
+      try {
+        const noteData = {
+          memId: memId,
+          content: newEntry.content,
+        };
+        const result = await noteApi.insertNote(noteData);
+
+        if (result.success) {
+          alert(result.message);
+          fetchNotesByDate(); // 목록 새로고침
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        alert('일지 추가에 실패했습니다.');
+        console.error(error);
+      }
     }
     setNewEntry({
-      time: new Date().toTimeString().slice(0, 5),
-      observer: "",
-      category: "건강",
       content: "",
     });
     setShowForm(false);
@@ -76,18 +82,27 @@ const Diary = () => {
 
   const handleEdit = (entry) => {
     setNewEntry({
-      time: entry.time,
-      observer: entry.observer,
-      category: entry.category,
       content: entry.content,
     });
-    setEditingId(entry.id);
+    setEditingId(entry.noteNum);
     setShowForm(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (noteNum) => {
     if (window.confirm("이 기록을 삭제하시겠습니까?")) {
-      setEntries(entries.filter(entry => entry.id !== id));
+      try {
+        const result = await noteApi.deleteNote(noteNum);
+
+        if (result.success) {
+          alert(result.message);
+          fetchNotesByDate(); // 목록 새로고침
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        alert('일지 삭제에 실패했습니다.');
+        console.error(error);
+      }
     }
   };
 
@@ -95,14 +110,11 @@ const Diary = () => {
     setShowForm(false);
     setEditingId(null);
     setNewEntry({
-      time: new Date().toTimeString().slice(0, 5),
-      observer: "",
-      category: "건강",
       content: "",
     });
   };
 
-  const filteredEntries = entries.filter(entry => entry.date === selectedDate);
+  const filteredEntries = entries;
 
   return (
     <div className={styles.container}>
@@ -130,40 +142,6 @@ const Diary = () => {
       {showForm && (
         <div className={styles.formCard}>
           <h3 className={styles.formTitle}>{editingId ? "관찰 기록 수정" : "새 관찰 기록"}</h3>
-          <div className={styles.formGrid}>
-            <div className={styles.formGroup}>
-              <label>시간</label>
-              <input
-                type="time"
-                value={newEntry.time}
-                onChange={(e) => setNewEntry({ ...newEntry, time: e.target.value })}
-                className={styles.input}
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label>관찰자</label>
-              <input
-                type="text"
-                value={newEntry.observer}
-                onChange={(e) => setNewEntry({ ...newEntry, observer: e.target.value })}
-                placeholder="이름 입력"
-                className={styles.input}
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label>카테고리</label>
-              <select
-                value={newEntry.category}
-                onChange={(e) => setNewEntry({ ...newEntry, category: e.target.value })}
-                className={styles.select}
-              >
-                <option value="건강">건강</option>
-                <option value="사료">사료</option>
-                <option value="청소">청소</option>
-                <option value="기타">기타</option>
-              </select>
-            </div>
-          </div>
           <div className={styles.formGroup}>
             <label>관찰 내용</label>
             <textarea
@@ -199,23 +177,13 @@ const Diary = () => {
         ) : (
           <div className={styles.entriesList}>
             {filteredEntries.map((entry) => (
-              <div key={entry.id} className={styles.entryCard}>
-                <div className={styles.entryHeader}>
-                  <div className={styles.entryTime}>
-                    {entry.time}
-                  </div>
-                  <div className={styles.entryMeta}>
-                    <span className={styles.categoryBadge}>{entry.category}</span>
-                    <span className={styles.observer}>{entry.observer}</span>
-                  </div>
-                </div>
+              <div key={entry.noteNum} className={styles.entryCard}>
                 <div className={styles.entryContent}>
                   {entry.content}
                 </div>
                 <div className={styles.entryFooter}>
                   <div className={styles.entryFooterLeft}>
-                    <span>🌡️ {entry.temperature}°C</span>
-                    <span>💧 {entry.humidity}%</span>
+                    <span>📅 {new Date(entry.recTime).toLocaleString('ko-KR')}</span>
                   </div>
                   <div className={styles.entryActions}>
                     <button
@@ -226,7 +194,7 @@ const Diary = () => {
                     </button>
                     <button
                       className={styles.deleteButton}
-                      onClick={() => handleDelete(entry.id)}
+                      onClick={() => handleDelete(entry.noteNum)}
                     >
                       삭제
                     </button>

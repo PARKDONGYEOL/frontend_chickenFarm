@@ -1,0 +1,156 @@
+.btn {
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ───────── 🔵 블루 계열 ───────── */
+/* 기본 블루 */
+.blue {
+  background-color: #0d6efd;
+}
+.blue:hover {
+  background-color: #0c5dec;
+}
+
+/* 은은한 블루 */
+.softBlue {
+  background-color: #bfdbfe;
+  color: #1e3a8a;
+}
+.softBlue:hover {
+  background-color: #93c5fd;
+}
+
+/* 파스텔 블루 */
+.pastelBlue {
+  background-color: #60a5fa;
+  color: black;
+}
+.pastelBlue:hover {
+  background-color: #3b82f6;
+}
+
+/* 따뜻하고 세련된 블루 */
+.navyGlow {
+  background-color: #1e40af;
+}
+.navyGlow:hover {
+  background-color: #1e3a8a;
+}
+
+/* ───────── 🟢 그린 계열 ───────── */
+/* 기본 그린 */
+.green {
+  background-color: #188452;
+}
+.green:hover {
+  background-color: #077341;
+}
+
+/* 은은한 그린 */
+.softGreen {
+  background-color: #bbf7d0;
+  color: #14532d;
+}
+.softGreen:hover {
+  background-color: #86efac;
+}
+
+/* 파스텔 그린 */
+.pastelGreen {
+  background-color: #4ade80;
+  color: #14532d;
+}
+.pastelGreen:hover {
+  background-color: #22c55e;
+}
+
+/* 따뜻하고 세련된 그린 */
+.emerald {
+  background-color: #15803d;
+}
+.emerald:hover {
+  background-color: #166534;
+}
+
+/* ───────── 🔴 레드 계열 ───────── */
+/* 기본 레드 */
+.red {
+  background-color: #dc2626;
+}
+.red:hover {
+  background-color: #b91c1c;
+}
+
+/* 은은한 레드 */
+.softRed {
+  background-color: #fecaca;
+  color: #7f1d1d;
+}
+.softRed:hover {
+  background-color: #f4a8a8;
+}
+
+/* 파스텔 레드 */
+.pastelRed {
+  background-color: #f87171;
+}
+.pastelRed:hover {
+  background-color: #ef4444;
+}
+
+/* 따뜻하고 세련된 레드 */
+.warmRed {
+  background-color: #b91c1c;
+}
+.warmRed:hover {
+  background-color: #991b1b;
+}
+
+/* ───────── ⚪ 그레이 계열 ───────── */
+/* 기본 그레이 */
+.gray {
+  background-color: #7a838b;
+}
+.gray:hover {
+  background-color: #69727a;
+}
+
+/* 은은한 그레이 */
+.softGray {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+.softGray:hover {
+  background-color: #d1d5db;
+}
+
+/* 파스텔 그레이 */
+.pastelGray {
+  background-color: #9ca3af;
+}
+.pastelGray:hover {
+  background-color: #6b7280;
+}
+
+/* 따뜻하고 세련된 그레이 */
+.slate {
+  background-color: #4b5563;
+}
+.slate:hover {
+  background-color: #374151;
+}
+
+/* ───────── ⚠️ 비활성화 상태 ───────── */
+.disabled {
+  opacity: 0.5;
+  cursor: default !important;
+  pointer-events: none;
+}

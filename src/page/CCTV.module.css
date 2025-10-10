@@ -1,6 +1,7 @@
 .container {
   padding: 16px;
   background: #f9fafb;
+  width: 1024px;
   min-height: 100vh;
 }
 
@@ -10,6 +11,9 @@
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .title {
@@ -29,10 +33,13 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+  justify-items: center; /* 카드들을 가운데 정렬 */
+  max-width: 1400px; /* 전체 그리드 최대 너비 */
+  margin: 0 auto; /* 그리드를 중앙 정렬 */
 }
 
 .videoCard {
-  background: white;
+  width: 640px;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   overflow: hidden;
@@ -61,7 +68,8 @@
 
 .videoWrapper {
   position: relative;
-  width: 100%;
+  width: 640px;
+  height: 480px;
   padding-top: 56.25%; /* 16:9 Aspect Ratio */
   background: #000;
 }

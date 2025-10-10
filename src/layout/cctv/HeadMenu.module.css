@@ -1,0 +1,37 @@
+.head_div {
+  width: 100%;
+  max-width: 1000px;
+  margin: 5px auto;
+  display: flex;
+  border: 1px solid #5db3ff;
+  background-color: #f0f8ff;
+  border-radius: 8px;
+  padding: 3px;
+  font-weight: 600;
+}
+
+.menu_item {
+  flex: 1;
+  margin: 1px;
+  padding: 12px 0;
+  border-radius: 5px;
+  color: #0056b3;
+  text-align: center;
+  text-decoration: none;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu_item:hover {
+  background-color: #d6ecff;
+  color: #1a73e8;
+}
+
+.active {
+  background-color: #b3d8ff;
+  color: #0b4f91;
+  font-weight: 700;
+  color: darkblue;
+}

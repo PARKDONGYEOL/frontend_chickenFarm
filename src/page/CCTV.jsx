@@ -6,7 +6,6 @@ const CCTV = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <h2 className={styles.title}>CCTV 모니터링</h2>
-        <p className={styles.subtitle}>실시간 영상 감시</p>
       </div>
 
       <div className={styles.videoGrid}>
@@ -18,7 +17,7 @@ const CCTV = () => {
           </div>
           <div className={styles.videoWrapper}>
             <iframe
-              src="http://192.168.30.71:5090"
+              src="http://192.168.30.71:5000/video_feed"
               className={styles.videoFrame}
               title="CCTV Camera 1"
             />

@@ -1,0 +1,16 @@
+.container{
+  width: 1024px;
+  margin: 0 auto; 
+  height: 768px;
+  overflow: hidden;
+}
+
+.header_div{
+  height: 10%;
+}
+
+.body_div {
+  height: 90%;       
+  overflow-y: auto;    
+  overflow-x: hidden;  
+}

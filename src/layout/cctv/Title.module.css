@@ -1,0 +1,39 @@
+.title_div{
+  width: 100%;
+  height: 100%;
+  background-image: url('/CCTV.jpg');
+  background-size: cover;   
+  background-repeat: no-repeat;
+  background-position: center; 
+  background-color: black;
+  border-radius: 10px;
+  opacity: 0.7;
+  position: relative; 
+
+}
+
+.title_div > p{
+  width: 100%;
+  position: absolute;
+  top: -5%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  font-size: 5rem;
+  font-weight: bold;
+  text-align: center;
+  color: rgb(72, 32, 216);
+  text-shadow:
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000;
+
+  opacity: 0;                
+  transition: opacity 1s;      
+
+}
+
+.show {
+  opacity: 1 !important;
+}
