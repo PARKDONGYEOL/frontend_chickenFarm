@@ -1,42 +1,146 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './ChickenInoculationList.module.css'
+import { inoculationAPI } from '../services/api'
 
 const ChickenInoculationList = () => {
   const navigate = useNavigate()
 
-  const [batches] = useState([
-    { id: 1, name: '2024-01차', startDate: '2024-01-15', chickenCount: 3 },
-    { id: 2, name: '2024-02차', startDate: '2024-02-01', chickenCount: 3 },
-    { id: 3, name: '2024-03차', startDate: '2024-02-15', chickenCount: 2 },
-  ])
-
-  const [selectedBatch, setSelectedBatch] = useState(1)
-
-  const [allChickens] = useState([
-    { id: 1, batchId: 1, tag: 'C-001', age: 15, weight: 1.2, ND: true, HPAI: false, IBD: true, IB: false },
-    { id: 2, batchId: 1, tag: 'C-002', age: 15, weight: 1.3, ND: false, HPAI: false, IBD: true, IB: false },
-    { id: 3, batchId: 1, tag: 'C-003', age: 15, weight: 1.1, ND: true, HPAI: true, IBD: true, IB: false },
-    { id: 4, batchId: 2, tag: 'C-004', age: 30, weight: 1.5, ND: true, HPAI: false, IBD: false, IB: false },
-    { id: 5, batchId: 2, tag: 'C-005', age: 30, weight: 1.4, ND: true, HPAI: true, IBD: true, IB: true },
-    { id: 6, batchId: 2, tag: 'C-006', age: 30, weight: 1.6, ND: false, HPAI: false, IBD: false, IB: false },
-    { id: 7, batchId: 3, tag: 'C-007', age: 45, weight: 1.5, ND: true, HPAI: false, IBD: true, IB: false },
-    { id: 8, batchId: 3, tag: 'C-008', age: 45, weight: 1.8, ND: true, HPAI: true, IBD: true, IB: true },
-  ])
-
-  const chickens = allChickens.filter(c => c.batchId === selectedBatch)
+  const [batches, setBatches] = useState([])
+  const [selectedBatch, setSelectedBatch] = useState('')
+  const [chickens, setChickens] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   const vaccineColumns = [
-    { key: 'ND', label: 'ND', fullName: '뉴캣슬병' },
-    { key: 'HPAI', label: 'HPAI', fullName: '조류인플루엔자' },
-    { key: 'IBD', label: 'IBD', fullName: '감보로병' },
-    { key: 'IB', label: 'IB', fullName: '전염성 기관지염' },
+    { key: 'nd', label: 'ND', fullName: '뉴캣슬병' },
+    { key: 'hpai', label: 'HPAI', fullName: '조류인플루엔자' },
+    { key: 'ibd', label: 'IBD', fullName: '감보로병' },
+    { key: 'ib', label: 'IB', fullName: '전염성 기관지염' },
   ]
+
+  // 컴포넌트 마운트 시 배치 목록 로드
+  useEffect(() => {
+    // 실제 백엔드 연결 시도
+    loadBatches()
+    // 개발용 더미 데이터는 백엔드 연결 실패 시 자동으로 로드됨
+  }, [])
+
+  // 배치 선택 시 닭 목록 로드
+  useEffect(() => {
+    if (selectedBatch) {
+      // 실제 백엔드 연결 시도
+      loadChickensByBatch(selectedBatch)
+      // 개발용 더미 데이터는 백엔드 연결 실패 시 자동으로 로드됨
+    }
+  }, [selectedBatch])
+
+  // 배치 목록 로드
+  const loadBatches = async () => {
+    try {
+      setLoading(true)
+      const batchesData = await inoculationAPI.getBatchesByFarm(1) // 임시로 농장 번호 1 사용
+      setBatches(batchesData)
+      if (batchesData.length > 0) {
+        setSelectedBatch(batchesData[0].batchId)
+      }
+    } catch (err) {
+      console.error('배치 로드 오류:', err)
+      console.log('백엔드 연결 실패, 더미 데이터를 사용합니다.')
+      // 모든 오류에 대해 더미 데이터 사용
+      loadDummyData()
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 배치별 닭 목록 로드
+  const loadChickensByBatch = async (batchId) => {
+    try {
+      setLoading(true)
+      const chickensData = await inoculationAPI.getChickensByBatch(batchId)
+      setChickens(chickensData)
+    } catch (err) {
+      console.error('닭 목록 로드 오류:', err)
+      console.log('백엔드 연결 실패, 더미 데이터를 사용합니다.')
+      // 모든 오류에 대해 더미 데이터 사용
+      loadDummyChickensByBatch(batchId)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 개발용 더미 데이터 로드
+  const loadDummyData = () => {
+    const dummyBatches = [
+      {
+        batchId: '2025-001',
+        entryDate: '2024-12-01T00:00:00',
+        initialCount: 100,
+        currentCount: 98,
+        shipmentStatus: false,
+        farmNum: 1
+      },
+      {
+        batchId: '2025-002',
+        entryDate: '2024-12-15T00:00:00',
+        initialCount: 80,
+        currentCount: 80,
+        shipmentStatus: false,
+        farmNum: 1
+      },
+      {
+        batchId: '2025-003',
+        entryDate: '2025-01-01T00:00:00',
+        initialCount: 120,
+        currentCount: 120,
+        shipmentStatus: false,
+        farmNum: 2
+      }
+    ]
+    
+    setBatches(dummyBatches)
+    setSelectedBatch('2025-001')
+  }
+
+  // 더미 데이터에서 배치별 닭 목록 로드
+  const loadDummyChickensByBatch = (batchId) => {
+    const dummyChickens = [
+      { chickenId: 1, batchId: '2025-001', age: 45, weight: 1.8, growthStage: 'FINISHER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: true },
+      { chickenId: 2, batchId: '2025-001', age: 45, weight: 1.9, growthStage: 'FINISHER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: false },
+      { chickenId: 3, batchId: '2025-001', age: 45, weight: 1.7, growthStage: 'FINISHER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: true },
+      { chickenId: 4, batchId: '2025-002', age: 30, weight: 1.4, growthStage: 'GROWER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: false },
+      { chickenId: 5, batchId: '2025-002', age: 30, weight: 1.5, growthStage: 'GROWER', healthStatus: 'HEALTHY', nd: true, hpai: false, ibd: true, ib: false },
+      { chickenId: 6, batchId: '2025-003', age: 15, weight: 1.0, growthStage: 'CHICK', healthStatus: 'HEALTHY', nd: true, hpai: false, ibd: true, ib: false },
+      { chickenId: 7, batchId: '2025-003', age: 15, weight: 1.1, growthStage: 'CHICK', healthStatus: 'HEALTHY', nd: true, hpai: false, ibd: false, ib: false },
+      { chickenId: 8, batchId: '2025-003', age: 15, weight: 0.9, growthStage: 'CHICK', healthStatus: 'HEALTHY', nd: false, hpai: false, ibd: true, ib: false }
+    ]
+    
+    const filteredChickens = dummyChickens.filter(chicken => chicken.batchId === batchId)
+    setChickens(filteredChickens)
+  }
 
   const getCompletionRate = (vaccineKey) => {
     const total = chickens.length
     const completed = chickens.filter(c => c[vaccineKey]).length
-    return Math.round((completed / total) * 100)
+    return total > 0 ? Math.round((completed / total) * 100) : 0
+  }
+
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>로딩 중...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.error}>{error}</div>
+        <button onClick={() => window.location.reload()}>다시 시도</button>
+      </div>
+    )
   }
 
   return (
@@ -56,11 +160,11 @@ const ChickenInoculationList = () => {
         <select
           className={styles.batchSelect}
           value={selectedBatch}
-          onChange={(e) => setSelectedBatch(Number(e.target.value))}
+          onChange={(e) => setSelectedBatch(e.target.value)}
         >
           {batches.map(batch => (
-            <option key={batch.id} value={batch.id}>
-              {batch.name} (시작일: {batch.startDate}, {batch.chickenCount}마리)
+            <option key={batch.batchId} value={batch.batchId}>
+              {batch.batchId} (입식일: {new Date(batch.entryDate).toLocaleDateString()}, {batch.currentCount}마리)
             </option>
           ))}
         </select>
@@ -106,11 +210,11 @@ const ChickenInoculationList = () => {
             {chickens.map(chicken => {
               const totalVaccines = vaccineColumns.length
               const completedVaccines = vaccineColumns.filter(v => chicken[v.key]).length
-              const completionRate = Math.round((completedVaccines / totalVaccines) * 100)
+              const completionRate = totalVaccines > 0 ? Math.round((completedVaccines / totalVaccines) * 100) : 0
 
               return (
-                <tr key={chicken.id}>
-                  <td className={styles.tag}>{chicken.tag}</td>
+                <tr key={chicken.chickenId}>
+                  <td className={styles.tag}>C-{chicken.chickenId.toString().padStart(3, '0')}</td>
                   <td>{chicken.age}일</td>
                   <td>{chicken.weight}</td>
                   {vaccineColumns.map(vaccine => (

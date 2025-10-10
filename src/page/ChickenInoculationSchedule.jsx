@@ -1,20 +1,18 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './ChickenInoculationSchedule.module.css'
+import { inoculationAPI } from '../services/api'
 
-const ChickenInoculationSchedule = () => {
+const ChickenInoculationSchedule = () => {      
   const navigate = useNavigate()
 
-  const [batches] = useState([
-    { id: 1, name: '2024-01차', startDate: '2024-01-15', currentDay: 15 },
-    { id: 2, name: '2024-02차', startDate: '2024-02-01', currentDay: 30 },
-    { id: 3, name: '2024-03차', startDate: '2024-02-15', currentDay: 45 },
-  ])
+  const [batches, setBatches] = useState([])
+  const [selectedBatch, setSelectedBatch] = useState('')
+  const [scheduleData, setScheduleData] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  const [selectedBatch, setSelectedBatch] = useState(1)
-  const selectedBatchInfo = batches.find(b => b.id === selectedBatch)
-
-  const scheduleData = [
+  const defaultScheduleData = [
     // 뉴캣슬병 (ND)
     { vaccine: 'ND', name: '뉴캣슬병', day: 1, method: '점안/점비', color: '#3b82f6' },
     { vaccine: 'ND', name: '뉴캣슬병', day: 7, method: '음수 투여', color: '#3b82f6' },
@@ -46,6 +44,97 @@ const ChickenInoculationSchedule = () => {
 
   const [selectedVaccine, setSelectedVaccine] = useState('ALL')
 
+  // 컴포넌트 마운트 시 배치 목록 로드
+  useEffect(() => {
+    // 실제 백엔드 연결 시도
+    loadBatches()
+    // 개발용 더미 데이터는 백엔드 연결 실패 시 자동으로 로드됨
+  }, [])
+
+  // 배치 선택 시 스케줄 로드
+  useEffect(() => {
+    if (selectedBatch) {
+      // 실제 백엔드 연결 시도
+      loadSchedule(selectedBatch)
+      // 개발용 더미 데이터는 백엔드 연결 실패 시 자동으로 로드됨
+    }
+  }, [selectedBatch])
+
+  // 배치 목록 로드
+  const loadBatches = async () => {
+    try {
+      setLoading(true)
+      const batchesData = await inoculationAPI.getBatchesByFarm(1) // 임시로 농장 번호 1 사용
+      setBatches(batchesData)
+      if (batchesData.length > 0) {
+        setSelectedBatch(batchesData[0].batchId)
+      }
+    } catch (err) {
+      console.error('배치 로드 오류:', err)
+      console.log('백엔드 연결 실패, 더미 데이터를 사용합니다.')
+      // 모든 오류에 대해 더미 데이터 사용
+      loadDummyData()
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 스케줄 로드
+  const loadSchedule = async (batchId) => {
+    try {
+      setLoading(true)
+      const scheduleDataFromAPI = await inoculationAPI.getInoculationSchedule(batchId)
+      setScheduleData(scheduleDataFromAPI)
+    } catch (err) {
+      console.error('스케줄 로드 오류:', err)
+      console.log('백엔드 연결 실패, 더미 데이터를 사용합니다.')
+      // 모든 오류에 대해 더미 데이터 사용
+      loadDummySchedule(batchId)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 개발용 더미 데이터 로드
+  const loadDummyData = () => {
+    const dummyBatches = [
+      {
+        batchId: '2025-001',
+        entryDate: '2024-12-01T00:00:00',
+        initialCount: 100,
+        currentCount: 98,
+        shipmentStatus: false,
+        farmNum: 1
+      },
+      {
+        batchId: '2025-002',
+        entryDate: '2024-12-15T00:00:00',
+        initialCount: 80,
+        currentCount: 80,
+        shipmentStatus: false,
+        farmNum: 1
+      },
+      {
+        batchId: '2025-003',
+        entryDate: '2025-01-01T00:00:00',
+        initialCount: 120,
+        currentCount: 120,
+        shipmentStatus: false,
+        farmNum: 2
+      }
+    ]
+    
+    setBatches(dummyBatches)
+    setSelectedBatch('2025-001')
+  }
+
+  // 더미 스케줄 로드
+  const loadDummySchedule = (batchId) => {
+    setScheduleData(defaultScheduleData)
+  }
+
+  const selectedBatchInfo = batches.find(b => b.batchId === selectedBatch)
+
   const vaccineFilters = [
     { value: 'ALL', label: '전체', color: '#6b7280' },
     { value: 'ND', label: 'ND (뉴캣슬병)', color: '#3b82f6' },
@@ -56,7 +145,7 @@ const ChickenInoculationSchedule = () => {
 
   const filteredSchedule = selectedVaccine === 'ALL'
     ? scheduleData
-    : scheduleData.filter(item => item.vaccine === selectedVaccine)
+    : scheduleData.filter(item => item.vaccineType === selectedVaccine)
 
   // 일령별로 그룹화
   const groupedByDay = filteredSchedule.reduce((acc, item) => {
@@ -71,6 +160,23 @@ const ChickenInoculationSchedule = () => {
 
   // 주령으로 변환
   const getWeek = (day) => Math.floor(day / 7)
+
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>로딩 중...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.error}>{error}</div>
+        <button onClick={() => window.location.reload()}>다시 시도</button>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.container}>
@@ -89,17 +195,19 @@ const ChickenInoculationSchedule = () => {
         <select
           className={styles.batchSelect}
           value={selectedBatch}
-          onChange={(e) => setSelectedBatch(Number(e.target.value))}
+          onChange={(e) => setSelectedBatch(e.target.value)}
         >
           {batches.map(batch => (
-            <option key={batch.id} value={batch.id}>
-              {batch.name} (현재 {batch.currentDay}일령)
+            <option key={batch.batchId} value={batch.batchId}>
+              {batch.batchId} (입식일: {new Date(batch.entryDate).toLocaleDateString()})
             </option>
           ))}
         </select>
-        <div className={styles.batchInfo}>
-          📌 현재 일령: <strong>{selectedBatchInfo.currentDay}일</strong> (시작일: {selectedBatchInfo.startDate})
-        </div>
+        {selectedBatchInfo && (
+          <div className={styles.batchInfo}>
+            📌 입식일: <strong>{new Date(selectedBatchInfo.entryDate).toLocaleDateString()}</strong>
+          </div>
+        )}
       </div>
 
       <div className={styles.filterSection}>
@@ -128,9 +236,13 @@ const ChickenInoculationSchedule = () => {
       <div className={styles.timeline}>
         {sortedDays.map(day => {
           const dayNum = Number(day)
-          const isPast = dayNum < selectedBatchInfo.currentDay
-          const isCurrent = dayNum === selectedBatchInfo.currentDay
-          const isSoon = dayNum > selectedBatchInfo.currentDay && dayNum <= selectedBatchInfo.currentDay + 7
+          const currentDate = new Date()
+          const entryDate = selectedBatchInfo ? new Date(selectedBatchInfo.entryDate) : new Date()
+          const daysSinceEntry = Math.floor((currentDate - entryDate) / (1000 * 60 * 60 * 24))
+          
+          const isPast = dayNum < daysSinceEntry
+          const isCurrent = dayNum === daysSinceEntry
+          const isSoon = dayNum > daysSinceEntry && dayNum <= daysSinceEntry + 7
 
           return (
             <div
@@ -157,12 +269,13 @@ const ChickenInoculationSchedule = () => {
                         className={styles.vaccineBadge}
                         style={{ background: `${item.color}20`, color: item.color }}
                       >
-                        {item.vaccine}
+                        {item.vaccineType || item.vaccine}
                       </span>
-                      <span className={styles.vaccineName}>{item.name}</span>
+                      <span className={styles.vaccineName}>{item.vaccineName || item.name}</span>
                     </div>
                     <div className={styles.vaccineMethod}>
-                      💉 {item.method}
+                      💉 {item.vaccinationMethod || item.method}
+                      {item.isCompleted && <span className={styles.completedBadge}>✓ 완료</span>}
                     </div>
                   </div>
                 ))}

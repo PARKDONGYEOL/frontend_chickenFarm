@@ -1,36 +1,123 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './ChickenInoculation.module.css'
+import { inoculationAPI } from '../services/api'
 
 const ChickenInoculation = () => {
   const navigate = useNavigate()
 
-  const [batches] = useState([
-    { id: 1, name: '2024-01차', startDate: '2024-01-15', chickenCount: 3 },
-    { id: 2, name: '2024-02차', startDate: '2024-02-01', chickenCount: 3 },
-    { id: 3, name: '2024-03차', startDate: '2024-02-15', chickenCount: 2 },
-  ])
-
-  const [selectedBatch, setSelectedBatch] = useState(1)
-
-  const [allChickens] = useState([
-    { id: 1, batchId: 1, tag: 'C-001', age: 15, weight: 1.2, ND: true, HPAI: false, IBD: true, IB: false },
-    { id: 2, batchId: 1, tag: 'C-002', age: 15, weight: 1.3, ND: false, HPAI: false, IBD: true, IB: false },
-    { id: 3, batchId: 1, tag: 'C-003', age: 15, weight: 1.1, ND: true, HPAI: true, IBD: true, IB: false },
-    { id: 4, batchId: 2, tag: 'C-004', age: 30, weight: 1.5, ND: true, HPAI: false, IBD: false, IB: false },
-    { id: 5, batchId: 2, tag: 'C-005', age: 30, weight: 1.4, ND: true, HPAI: true, IBD: true, IB: true },
-    { id: 6, batchId: 2, tag: 'C-006', age: 30, weight: 1.6, ND: false, HPAI: false, IBD: false, IB: false },
-    { id: 7, batchId: 3, tag: 'C-007', age: 45, weight: 1.5, ND: true, HPAI: false, IBD: true, IB: false },
-    { id: 8, batchId: 3, tag: 'C-008', age: 45, weight: 1.8, ND: true, HPAI: true, IBD: true, IB: true },
-  ])
-
-  const [chickens, setChickens] = useState(allChickens)
+  const [batches, setBatches] = useState([])
+  const [selectedBatch, setSelectedBatch] = useState('')
+  const [chickens, setChickens] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   const [selectedVaccine, setSelectedVaccine] = useState('ND')
   const [selectedIds, setSelectedIds] = useState([])
 
-  // 배치 변경 시 필터링된 닭 목록 업데이트
-  const filteredChickens = chickens.filter(c => c.batchId === selectedBatch)
+  // 컴포넌트 마운트 시 배치 목록 로드
+  useEffect(() => {
+    loadBatches()
+    console.log('실제 데이터베이스 연결을 시도합니다...')
+  }, [])
+
+  // 배치 선택 시 닭 목록 로드
+  useEffect(() => {
+    if (selectedBatch) {
+      loadChickensByBatch(selectedBatch)
+      console.log(`배치 ${selectedBatch}의 실제 데이터를 로드합니다...`)
+    }
+  }, [selectedBatch])
+
+  // 배치 목록 로드
+  const loadBatches = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const batchesData = await inoculationAPI.getBatchesByFarm(1)
+      setBatches(batchesData)
+      if (batchesData.length > 0) {
+        setSelectedBatch(batchesData[0].batchId)
+      }
+    } catch (err) {
+      console.error('배치 로드 오류:', err)
+      console.log('백엔드 연결 실패, 더미 데이터를 사용합니다.')
+      loadDummyData()
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 개발용 더미 데이터 로드
+  const loadDummyData = () => {
+    console.log('더미 데이터를 로드합니다...')
+    const dummyBatches = [
+      {
+        batchId: '2025-001',
+        entryDate: '2024-12-01T00:00:00',
+        initialCount: 100,
+        currentCount: 98,
+        shipmentStatus: false,
+        farmNum: 1
+      },
+      {
+        batchId: '2025-002',
+        entryDate: '2024-12-15T00:00:00',
+        initialCount: 80,
+        currentCount: 80,
+        shipmentStatus: false,
+        farmNum: 1
+      },
+      {
+        batchId: '2025-003',
+        entryDate: '2025-01-01T00:00:00',
+        initialCount: 120,
+        currentCount: 120,
+        shipmentStatus: false,
+        farmNum: 2
+      }
+    ]
+    
+    setBatches(dummyBatches)
+    setSelectedBatch('2025-001')
+    loadDummyChickensByBatch('2025-001')
+    console.log('더미 데이터 로드 완료:', { batches: dummyBatches.length })
+  }
+
+  // 더미 데이터에서 배치별 닭 목록 로드
+  const loadDummyChickensByBatch = (batchId) => {
+    console.log(`배치 ${batchId}의 더미 닭 데이터를 로드합니다...`)
+    const dummyChickens = [
+      { chickenId: 1, batchId: '2025-001', age: 45, rawWeight: 1.8, growthStage: 'FINISHER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: true },
+      { chickenId: 2, batchId: '2025-001', age: 45, rawWeight: 1.9, growthStage: 'FINISHER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: false },
+      { chickenId: 3, batchId: '2025-001', age: 45, rawWeight: 1.7, growthStage: 'FINISHER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: true },
+      { chickenId: 4, batchId: '2025-002', age: 30, rawWeight: 1.4, growthStage: 'GROWER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: false },
+      { chickenId: 5, batchId: '2025-002', age: 30, rawWeight: 1.5, growthStage: 'GROWER', healthStatus: 'HEALTHY', nd: true, hpai: false, ibd: true, ib: false },
+      { chickenId: 6, batchId: '2025-003', age: 15, rawWeight: 1.0, growthStage: 'CHICK', healthStatus: 'HEALTHY', nd: true, hpai: false, ibd: true, ib: false },
+      { chickenId: 7, batchId: '2025-003', age: 15, rawWeight: 1.1, growthStage: 'CHICK', healthStatus: 'HEALTHY', nd: true, hpai: false, ibd: false, ib: false },
+      { chickenId: 8, batchId: '2025-003', age: 15, rawWeight: 0.9, growthStage: 'CHICK', healthStatus: 'HEALTHY', nd: false, hpai: false, ibd: true, ib: false }
+    ]
+    
+    const filteredChickens = dummyChickens.filter(chicken => chicken.batchId === batchId)
+    setChickens(filteredChickens)
+    console.log(`배치 ${batchId}의 닭 데이터 로드 완료:`, filteredChickens.length, '마리')
+    console.log('로드된 닭 데이터:', filteredChickens)
+  }
+
+  // 배치별 닭 목록 로드
+  const loadChickensByBatch = async (batchId) => {
+    try {
+      setLoading(true)
+      const chickensData = await inoculationAPI.getChickensByBatch(batchId)
+      setChickens(chickensData)
+    } catch (err) {
+      console.error('닭 목록 로드 오류:', err)
+      console.log('백엔드 연결 실패, 더미 데이터를 사용합니다.')
+      loadDummyChickensByBatch(batchId)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const vaccineOptions = [
     { value: 'ND', label: '뉴캣슬병 (ND)', schedule: '1일령, 7-10일령, 21-28일령, 60-70일령' },
@@ -39,44 +126,128 @@ const ChickenInoculation = () => {
     { value: 'IB', label: '전염성 기관지염 (IB)', schedule: '1일령, 14-21일령, 35-42일령' },
   ]
 
-  const completedChickens = filteredChickens.filter(c => c[selectedVaccine])
-  const pendingChickens = filteredChickens.filter(c => !c[selectedVaccine])
+  const completedChickens = chickens.filter(c => c[selectedVaccine.toLowerCase()])
+  const pendingChickens = chickens.filter(c => !c[selectedVaccine.toLowerCase()])
 
+  // 전체 선택/해제 (수정됨: chickenId 사용)
   const handleSelectAll = (e, isPending) => {
     const targetChickens = isPending ? pendingChickens : completedChickens
     if (e.target.checked) {
-      const newIds = [...selectedIds, ...targetChickens.map(c => c.id)]
+      const newIds = [...selectedIds, ...targetChickens.map(c => c.chickenId)]
       setSelectedIds([...new Set(newIds)])
+      console.log('전체 선택:', newIds)
     } else {
-      const targetIds = targetChickens.map(c => c.id)
+      const targetIds = targetChickens.map(c => c.chickenId)
       setSelectedIds(selectedIds.filter(id => !targetIds.includes(id)))
+      console.log('전체 해제')
     }
   }
 
-  const handleSelectOne = (id) => {
-    if (selectedIds.includes(id)) {
-      setSelectedIds(selectedIds.filter(i => i !== id))
+  // 개별 선택/해제 (수정됨: chickenId 사용)
+  const handleSelectOne = (chickenId) => {
+    if (selectedIds.includes(chickenId)) {
+      const newIds = selectedIds.filter(id => id !== chickenId)
+      setSelectedIds(newIds)
+      console.log('선택 해제:', chickenId, '현재 선택:', newIds)
     } else {
-      setSelectedIds([...selectedIds, id])
+      const newIds = [...selectedIds, chickenId]
+      setSelectedIds(newIds)
+      console.log('선택 추가:', chickenId, '현재 선택:', newIds)
     }
   }
 
-  const handleMarkCompleted = () => {
-    setChickens(chickens.map(c =>
-      selectedIds.includes(c.id) ? { ...c, [selectedVaccine]: true } : c
-    ))
-    setSelectedIds([])
+  const handleMarkCompleted = async () => {
+    if (selectedIds.length === 0) {
+      alert('접종할 개체를 선택해주세요.')
+      return
+    }
+
+    console.log('접종 완료 처리 시작:', selectedIds)
+
+    try {
+      setLoading(true)
+      
+      // 실제 백엔드 연결 시도
+      const inoculationData = {
+        chickenIds: selectedIds,
+        vaccineType: selectedVaccine,
+        vaccinationMethod: '음수 투여',
+        vaccinatedBy: '관리자',
+        notes: `${selectedVaccine} 백신 접종 완료`,
+        vaccinationDate: new Date().toISOString()
+      }
+      
+      console.log('백엔드 전송 데이터:', inoculationData)
+      
+      await inoculationAPI.performBatchInoculation(inoculationData)
+      await loadChickensByBatch(selectedBatch)
+      setSelectedIds([])
+      alert('예방접종이 성공적으로 완료되었습니다.')
+      
+    } catch (err) {
+      console.error('백엔드 연결 실패, 더미 데이터로 처리:', err)
+      // 백엔드 연결 실패 시 더미 데이터로 처리
+      const updatedChickens = chickens.map(c =>
+        selectedIds.includes(c.chickenId) ? { ...c, [selectedVaccine.toLowerCase()]: true } : c
+      )
+      console.log('업데이트된 닭 데이터:', updatedChickens)
+      setChickens(updatedChickens)
+      setSelectedIds([])
+      alert('예방접종이 성공적으로 완료되었습니다. (더미 데이터)')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleMarkPending = () => {
-    setChickens(chickens.map(c =>
-      selectedIds.includes(c.id) ? { ...c, [selectedVaccine]: false } : c
-    ))
-    setSelectedIds([])
+  const handleMarkPending = async () => {
+    if (selectedIds.length === 0) {
+      alert('미완료 처리할 개체를 선택해주세요.')
+      return
+    }
+
+    console.log('미완료 처리 시작:', selectedIds)
+
+    try {
+      setLoading(true)
+      
+      // 백엔드 API 호출
+      const deleteData = {
+        chickenIds: selectedIds,
+        vaccineType: selectedVaccine
+      }
+      
+      console.log('백엔드 전송 데이터:', deleteData)
+      
+      await inoculationAPI.deleteInoculation(deleteData)
+      await loadChickensByBatch(selectedBatch)
+      setSelectedIds([])
+      alert('예방접종 상태가 미완료로 변경되었습니다.')
+      
+    } catch (err) {
+      console.error('백엔드 연결 실패, 더미 데이터로 처리:', err)
+      // 백엔드 연결 실패 시 더미 데이터로 처리
+      const updatedChickens = chickens.map(c =>
+        selectedIds.includes(c.chickenId) ? { ...c, [selectedVaccine.toLowerCase()]: false } : c
+      )
+      console.log('업데이트된 닭 데이터:', updatedChickens)
+      setChickens(updatedChickens)
+      setSelectedIds([])
+      alert('예방접종 상태가 미완료로 변경되었습니다. (더미 데이터)')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const selectedVaccineInfo = vaccineOptions.find(v => v.value === selectedVaccine)
-  const selectedBatchInfo = batches.find(b => b.id === selectedBatch)
+  const selectedBatchInfo = batches.find(b => b.batchId === selectedBatch)
+
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>로딩 중...</div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.container}>
@@ -97,13 +268,13 @@ const ChickenInoculation = () => {
             className={styles.batchSelect}
             value={selectedBatch}
             onChange={(e) => {
-              setSelectedBatch(Number(e.target.value))
+              setSelectedBatch(e.target.value)
               setSelectedIds([])
             }}
           >
             {batches.map(batch => (
-              <option key={batch.id} value={batch.id}>
-                {batch.name} (시작일: {batch.startDate}, {batch.chickenCount}마리)
+              <option key={batch.batchId} value={batch.batchId}>
+                {batch.batchId} (입식일: {new Date(batch.entryDate).toLocaleDateString()}, {batch.currentCount}마리)
               </option>
             ))}
           </select>
@@ -131,7 +302,7 @@ const ChickenInoculation = () => {
         <div className={styles.statsCards}>
           <div className={styles.statCard}>
             <div className={styles.statLabel}>배치 전체</div>
-            <div className={styles.statValue}>{filteredChickens.length}마리</div>
+            <div className={styles.statValue}>{chickens.length}마리</div>
           </div>
           <div className={`${styles.statCard} ${styles.pending}`}>
             <div className={styles.statLabel}>접종 예정</div>
@@ -183,7 +354,7 @@ const ChickenInoculation = () => {
             <h3 className={styles.sectionTitle}>⏱ 접종 예정 ({pendingChickens.length}마리)</h3>
             <input
               type="checkbox"
-              checked={pendingChickens.length > 0 && pendingChickens.every(c => selectedIds.includes(c.id))}
+              checked={pendingChickens.length > 0 && pendingChickens.every(c => selectedIds.includes(c.chickenId))}
               onChange={(e) => handleSelectAll(e, true)}
               className={styles.checkboxLarge}
             />
@@ -201,19 +372,19 @@ const ChickenInoculation = () => {
               <tbody>
                 {pendingChickens.map(chicken => (
                   <tr
-                    key={chicken.id}
-                    className={selectedIds.includes(chicken.id) ? styles.selected : ''}
+                    key={chicken.chickenId}
+                    className={selectedIds.includes(chicken.chickenId) ? styles.selected : ''}
                   >
                     <td>
                       <input
                         type="checkbox"
-                        checked={selectedIds.includes(chicken.id)}
-                        onChange={() => handleSelectOne(chicken.id)}
+                        checked={selectedIds.includes(chicken.chickenId)}
+                        onChange={() => handleSelectOne(chicken.chickenId)}
                       />
                     </td>
-                    <td className={styles.tag}>{chicken.tag}</td>
+                    <td className={styles.tag}>C-{chicken.chickenId.toString().padStart(3, '0')}</td>
                     <td>{chicken.age}일</td>
-                    <td>{chicken.weight}</td>
+                    <td>{chicken.rawWeight ? chicken.rawWeight.toFixed(2) : '0.00'}</td>
                   </tr>
                 ))}
                 {pendingChickens.length === 0 && (
@@ -234,7 +405,7 @@ const ChickenInoculation = () => {
             <h3 className={styles.sectionTitle}>✓ 접종 완료 ({completedChickens.length}마리)</h3>
             <input
               type="checkbox"
-              checked={completedChickens.length > 0 && completedChickens.every(c => selectedIds.includes(c.id))}
+              checked={completedChickens.length > 0 && completedChickens.every(c => selectedIds.includes(c.chickenId))}
               onChange={(e) => handleSelectAll(e, false)}
               className={styles.checkboxLarge}
             />
@@ -252,19 +423,19 @@ const ChickenInoculation = () => {
               <tbody>
                 {completedChickens.map(chicken => (
                   <tr
-                    key={chicken.id}
-                    className={selectedIds.includes(chicken.id) ? styles.selected : ''}
+                    key={chicken.chickenId}
+                    className={selectedIds.includes(chicken.chickenId) ? styles.selected : ''}
                   >
                     <td>
                       <input
                         type="checkbox"
-                        checked={selectedIds.includes(chicken.id)}
-                        onChange={() => handleSelectOne(chicken.id)}
+                        checked={selectedIds.includes(chicken.chickenId)}
+                        onChange={() => handleSelectOne(chicken.chickenId)}
                       />
                     </td>
-                    <td className={styles.tag}>{chicken.tag}</td>
+                    <td className={styles.tag}>C-{chicken.chickenId.toString().padStart(3, '0')}</td>
                     <td>{chicken.age}일</td>
-                    <td>{chicken.weight}</td>
+                    <td>{chicken.rawWeight ? chicken.rawWeight.toFixed(2) : '0.00'}</td>
                   </tr>
                 ))}
                 {completedChickens.length === 0 && (
