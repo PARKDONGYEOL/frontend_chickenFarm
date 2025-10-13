@@ -7,10 +7,10 @@ import ChickenList from './ChickenList'
 
 const ChickenManagement = () => {
   //양계장 번호 조회
-  const [farmNumList, setFarmNumList] = useState([])
+  const [farmNumList, setFarmNumList] = useState([]);
 
   //화면 다시 그리기
-  const [reload, setReload] = useState(0)
+  const [reload, setReload] = useState(0);
 
   //출하를 위한 체크박스
   const [checkedBatches, setCheckedBatches] = useState([]);
@@ -19,17 +19,20 @@ const ChickenManagement = () => {
   const [isAllChecked, setIsAllChecked] = useState(false);
 
   //배치 번호 넘기기
-  const [selectedBatchId, setSelectedBatchId] = useState('')
+  const [selectedBatchId, setSelectedBatchId] = useState('');
+
+  //폐사 처리된 배치 보기 여부
+  const [showDeadBatches, setShowDeadBatches] = useState(false);
   
   //축사 정보 저장
-  const [farmName, setFarmName] = useState('')
+  const [farmName, setFarmName] = useState('');
 
   //배치 정보 저장
   const [batch, setBatch] = useState({
     'farmNum' : '',
     'entryDate' : '',
     'initialCount' : ''
-  })
+  });
 
   //불러온 배치 정보 담을 변수
   const [batchInfo, setBatchInfo] = useState([]);
@@ -43,6 +46,14 @@ const ChickenManagement = () => {
 
   const regex = /^[0-9]+$/; //정수 정규식
 
+  //화면에 띄울 배치
+  const displayBatchInfo = 
+  showDeadBatches 
+  ? 
+  batchInfo.filter(batch => batch.currentCount === 0) //폐사 처리된 배치
+  :
+  batchInfo.filter(batch => batch.currentCount > 0); //살아 있는 배치
+
   // 체크박스 선택/해제
   const handleCheckbox = (e) => {
     if (e.target.checked) {
@@ -55,10 +66,10 @@ const ChickenManagement = () => {
     }
   }
 
-  //전체 체크박스 선택/해제
+  //전체 체크박스 선택/해제 (살아있는 배치 중에서)
   const handleCheckedAll = (e) => {
     if(e.target.checked){
-      const allBatchIds = batchInfo.map(batch => String(batch.batchId));
+      const allBatchIds = displayBatchInfo.map(batch => String(batch.batchId));
       setCheckedBatches(allBatchIds);
       setIsAllChecked(true)
     }
@@ -90,6 +101,12 @@ const ChickenManagement = () => {
       alert('출하 처리 중 오류가 발생했습니다.');
     });
 }
+
+  //배치 정보 변경 시 체크박스 초기화
+  useEffect(() => {
+    setCheckedBatches([]);
+    setIsAllChecked(false);
+  }, [showDeadBatches])
 
   //양계장 번호 조회
   useEffect(() => {
@@ -298,7 +315,7 @@ const ChickenManagement = () => {
             /> 전체 선택
           </span>
           {
-            batchInfo.length === 0 
+            displayBatchInfo.length === 0 
             ?
             <table className={styles.table}>
               <thead>
@@ -331,7 +348,7 @@ const ChickenManagement = () => {
             </thead>
             <tbody>
               {
-                batchInfo.map((batch, i) => {
+                displayBatchInfo.map((batch, i) => {
                   return (
                     <tr key={i} onClick={() => setSelectedBatchId(batch.batchId)}>
                       <td>{batch.farmNum}</td>
@@ -343,8 +360,9 @@ const ChickenManagement = () => {
                         <input 
                           type='checkbox'
                           value={batch.batchId}
-                          checked={checkedBatches.includes(batch.batchId)}
+                          checked={checkedBatches.includes(String(batch.batchId))}
                           onChange={(e) => handleCheckbox(e)}
+                          disabled={showDeadBatches}
                         />
                       </td>
                     </tr>
@@ -354,14 +372,22 @@ const ChickenManagement = () => {
             </tbody>
           </table>
           }
-          
-          <Button 
-            size='80px'
-            height='30px'
-            color='green'
-            title='출하' 
-            onClick={handleShipment}
-          />
+          <div className={styles.btn_div}>
+            <Button 
+              size='120px'
+              height='30px'
+              color='gray'
+              title={showDeadBatches ? '돌아가기' : '폐사 처리된 배치'}
+              onClick={() => setShowDeadBatches(!showDeadBatches)}
+            />
+            <Button 
+              size='80px'
+              height='30px'
+              color='green'
+              title='출하' 
+              onClick={handleShipment}
+            />
+          </div>
         </div>
       </div>
       {

@@ -121,10 +121,13 @@
   flex-direction: column;
 }
 
-.batch_list > button{
-  margin-top: 20px;
+.btn_div{
+  display: flex;
+  gap: 10px;
   margin-left: auto;
+  margin-top: 20px;
 }
+
 
 .error{
   color: red;
