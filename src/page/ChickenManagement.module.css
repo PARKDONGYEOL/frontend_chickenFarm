@@ -109,7 +109,7 @@
   background-color: #dbeafe;
 }
 
-.table input[type="checkbox"] {
+.table input, .batch_list input[type="checkbox"] {
   width: 18px;
   height: 18px;
   accent-color: #059669;
@@ -135,5 +135,16 @@
 
 .valid{
   position: relative;
+}
+
+.batch_list > span > input{
+  vertical-align: middle;
+}
+
+.batch_list > span{
+  font-size: 1.03rem;
+  margin-bottom: 10px;
+  margin-left: auto;
+  
 }
 

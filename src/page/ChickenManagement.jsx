@@ -15,6 +15,9 @@ const ChickenManagement = () => {
   //출하를 위한 체크박스
   const [checkedBatches, setCheckedBatches] = useState([]);
 
+  //전체 체크박스
+  const [isAllChecked, setIsAllChecked] = useState(false);
+
   //배치 번호 넘기기
   const [selectedBatchId, setSelectedBatchId] = useState('')
   
@@ -40,7 +43,7 @@ const ChickenManagement = () => {
 
   const regex = /^[0-9]+$/; //정수 정규식
 
-  // 체크박스 선택/해제 처리
+  // 체크박스 선택/해제
   const handleCheckbox = (e) => {
     if (e.target.checked) {
       // 체크 추가
@@ -48,6 +51,20 @@ const ChickenManagement = () => {
     } else {
       // 이미 체크된 경우 제거
       setCheckedBatches(checkedBatches.filter(batchId => batchId !== e.target.value));
+      setIsAllChecked(false);
+    }
+  }
+
+  //전체 체크박스 선택/해제
+  const handleCheckedAll = (e) => {
+    if(e.target.checked){
+      const allBatchIds = batchInfo.map(batch => String(batch.batchId));
+      setCheckedBatches(allBatchIds);
+      setIsAllChecked(true)
+    }
+    else {
+      setCheckedBatches([]);
+      setIsAllChecked(false);
     }
   }
 
@@ -57,10 +74,15 @@ const ChickenManagement = () => {
     return;
   }
 
+  if(!confirm(`선택한 ${checkedBatches.length}개 배치를 출하 처리하시겠습니까?`)){
+    return ;
+  }
+
   axios.put('/api/batch/shipment', { batchIdList: checkedBatches })
     .then(res => {
       alert('출하가 완료되었습니다.');
       setCheckedBatches([]);  // 체크박스 초기화
+      setIsAllChecked(false);
       setReload(reload + 1)
     })
     .catch(e => {
@@ -199,7 +221,7 @@ const ChickenManagement = () => {
                   setErrorMsg({
                   ...errorMsg,
                   'farmNumError' : e.target.value === '' ? '양계장을 선택해주세요.' : ''
-                })
+                  })
                 }}
               >
                 <option value=''>선택</option>
@@ -229,8 +251,7 @@ const ChickenManagement = () => {
                   ...errorMsg,
                   'entryDateError' 
                   : e.target.value === '' ? '입식일을 선택해주세요.' : ''
-                    
-                })
+                  })
                 }}
               />
               <p className={styles.error}>{errorMsg.entryDateError}</p>
@@ -269,7 +290,35 @@ const ChickenManagement = () => {
       <div>
         <h3>배치 목록</h3>
         <div className={styles.batch_list}>
-          <table className={styles.table}>
+          <span>
+            <input 
+              type="checkbox" 
+              checked={isAllChecked}
+              onChange={e => handleCheckedAll(e)}
+            /> 전체 선택
+          </span>
+          {
+            batchInfo.length === 0 
+            ?
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <td>양계장 번호</td>
+                  <td>배치 번호</td>
+                  <td>입식일</td>
+                  <td>초기 닭의 수</td>
+                  <td>현재 닭의 수</td>
+                  <td>출하</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colSpan={6} style={{backgroundColor : 'white'}}>배치가 존재하지 않습니다.</td>
+                </tr>
+              </tbody>
+            </table>
+            :
+            <table className={styles.table}>
             <thead>
               <tr>
                 <td>양계장 번호</td>
@@ -304,6 +353,8 @@ const ChickenManagement = () => {
               }
             </tbody>
           </table>
+          }
+          
           <Button 
             size='80px'
             height='30px'
