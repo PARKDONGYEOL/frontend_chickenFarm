@@ -56,7 +56,7 @@
   border-bottom: none;
 }
 
-.table input[type="checkbox"] {
+.table input, .check_and_button input[type="checkbox"] {
   width: 18px;
   height: 18px;
   accent-color: #059669;
@@ -107,7 +107,7 @@
 
 .btn_div{
   margin-left: auto;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   display: flex;
 }
 
@@ -135,3 +135,16 @@
   background-color: #f8ecec !important;
 }
 
+.check_and_button{
+  display: flex;
+  align-items:  center;
+}
+
+.check_and_button input{
+  vertical-align: middle;
+}
+
+.check_and_button > span{
+  font-size: 1.02rem;
+  margin-left: 10px;
+}

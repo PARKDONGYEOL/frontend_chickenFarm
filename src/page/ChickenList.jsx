@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styles from './ChickenList.module.css'
 import axios from 'axios'
 import Button from '../common/Button';
@@ -10,27 +10,100 @@ const ChickenList = ({batchId, changeReload, reload}) => {
   //폐사 개체 선택을 위한 체크박스
   const [checkedChickenId, setCheckedChickenId] = useState([]);
 
+  //전체, HEALTHY, SICK 체크박스
+  const [isAllChecked, setIsAllChecked] = useState(false);
+  const [isHealthyChecked, setIsHealthyChecked] = useState(false);
+  const [isSickChecked, setIsSickChecked] = useState(false);
+
+  const chickenIds = useRef([]); //모든 개체 아이디 저장
+
   //닭 개체 정보 조회
   useEffect(() => {
     if(batchId){
       setCheckedChickenId([]);
+      setIsAllChecked(false);
+      setIsHealthyChecked(false);
+      setIsSickChecked(false);
+
       axios.get(`/api/chicken/${batchId}`)
       .then(res => {
         setChickenInfo(res.data);
+
+        //살아있는 모든 개체 아이디 저장
+        chickenIds.current = [];
+        for(const chicken of res.data){
+          if(chicken.healthStatus !== 'DEAD'){
+            chickenIds.current.push(chicken.chickenId)
+          }
+        }
       })
       .catch(e => console.log(e));
     }
   }, [batchId, reload])
 
-   //체크박스 선택/해제 처리
+  //체크박스 선택/해제
   const handleCheckbox = (e) => {
+    const chickenId = parseInt(e.target.value);
+
     if (e.target.checked) {
       //체크 추가
-      setCheckedChickenId([...checkedChickenId, parseInt(e.target.value)]);
+      setCheckedChickenId([...checkedChickenId, chickenId]);
     } else {
       //이미 체크된 경우 제거
-      setCheckedChickenId(checkedChickenId.filter(chickenId => chickenId !== e.target.value));
+      setCheckedChickenId(checkedChickenId.filter(id => id !== chickenId));
+      setIsAllChecked(false);
+      setIsHealthyChecked(false);
+      setIsSickChecked(false);
     }
+  }
+
+  //전체 체크박스 선택/해제
+  const handleCheckedAll = (e) => {
+    if(e.target.checked){
+      setCheckedChickenId(chickenIds.current);
+      setIsAllChecked(true);
+    }
+    else {
+      setCheckedChickenId([]);
+      setIsAllChecked(false);
+      
+    }
+    setIsHealthyChecked(false);
+    setIsSickChecked(false);
+  }
+
+  //HEALTHY 체크박스 선택/해제
+  const handleCheckedHealthy = (e) => {
+    if(e.target.checked){
+      const healthyIds = chickenInfo
+                        .filter(chicken => chicken.healthStatus === 'HEALTHY')
+                        .map(chicken => chicken.chickenId);
+      setCheckedChickenId(healthyIds);
+      setIsHealthyChecked(true);
+    }
+    else {
+      setCheckedChickenId([]);
+      setIsHealthyChecked(false);
+    }
+    setIsAllChecked(false);
+    setIsSickChecked(false);
+  }
+
+  //SICK 체크박스 선택/해제
+  const handleCheckedSick = (e) => {
+    if(e.target.checked){
+      const sickIds = chickenInfo
+                      .filter(chicken => chicken.healthStatus === 'SICK')
+                      .map(chicken => chicken.chickenId);
+      setCheckedChickenId(sickIds);
+      setIsSickChecked(true);
+    }
+    else{
+      setCheckedChickenId([]);
+      setIsSickChecked(false);
+    }
+    setIsAllChecked(false);
+    setIsHealthyChecked(false);
   }
 
   //선택된 개체 폐사 처리
@@ -113,22 +186,46 @@ const ChickenList = ({batchId, changeReload, reload}) => {
         </div>
         <h3>배치 {batchId} 개체 목록</h3>
         <div className={styles.chicken_list}>
-          <div className={styles.btn_div}>
-            <Button 
-              title='폐사 처리'
-              size='110px'
-              height='40px'
-              color='red'
-              onClick={() => handleDeathProcess()}
-            />
-            <Button 
-              title='건강 상태 수정 HEALTHY ←→ SICK'
-              size='150px'
-              height='40px'
-              color='green'
-              onClick={() => handleHealthStatus()}
-            />
+          <div className={styles.check_and_button}>
+            <span>
+              <input 
+                type='checkbox'
+                checked={isAllChecked}
+                onChange={e => handleCheckedAll(e)}
+              /> 전체선택
+            </span>
+            <span>
+              <input 
+                type='checkbox'
+                checked={isHealthyChecked}
+                onChange={e => handleCheckedHealthy(e)}
+              /> HEALTHY
+            </span>
+            <span>
+              <input 
+                type='checkbox'
+                checked={isSickChecked}
+                onChange={e => handleCheckedSick(e)}
+              /> SICK
+            </span>
+            <div className={styles.btn_div}>
+              <Button 
+                title='폐사 처리'
+                size='110px'
+                height='40px'
+                color='red'
+                onClick={() => handleDeathProcess()}
+                />
+              <Button 
+                title='건강 상태 수정 HEALTHY ←→ SICK'
+                size='150px'
+                height='40px'
+                color='green'
+                onClick={() => handleHealthStatus()}
+                />
+            </div>
           </div>
+         
           <table className={styles.table}>
             <thead>
               <tr>
