@@ -46,7 +46,7 @@
   gap : 15px;
 }
 
-.input_group > input[type='date']{
+.input_group input[type='date']{
   text-align: center;
 }
 
