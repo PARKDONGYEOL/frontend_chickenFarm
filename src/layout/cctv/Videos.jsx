@@ -181,9 +181,9 @@ const Videos = () => {
             onClick={handleDbCleanup}
             disabled={!hasDeletedFiles}
           />
-          <p className={styles.file_info}>
-            파일명 : {selectedVideo ? selectedVideo.filename : "파일 선택 안됨"}
-          </p>
+          <div className={styles.file_info}>
+            {selectedVideo ? `📁 ${selectedVideo.filename}` : "📂 영상을 선택해주세요"}
+          </div>
         </div>
         <div className={styles.details}>
           {selectedVideo ? (

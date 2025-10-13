@@ -2,9 +2,16 @@
   color: white;
   border: none;
   padding: 4px 12px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 0.8rem;
-  transition: all 0.3s;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover:not(.disabled){
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 .blue{
@@ -26,16 +33,103 @@
 }
 
 .green{
-  background-color: #188452;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
 }
 
 .green:hover{
   cursor: pointer;
-  background-color: #077341;
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+}
+
+/* 부드러운 녹색 계열 */
+.softGreen{
+  background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+}
+
+.softGreen:hover{
+  cursor: pointer;
+  background: linear-gradient(135deg, #4caf50 0%, #43a047 100%);
+}
+
+.pastelGreen{
+  background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
+}
+
+.pastelGreen:hover{
+  cursor: pointer;
+  background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+}
+
+/* 빨간색 계열 */
+.warmRed{
+  background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+}
+
+.warmRed:hover{
+  cursor: pointer;
+  background: linear-gradient(135deg, #e53935 0%, #d32f2f 100%);
+}
+
+.softRed{
+  background: linear-gradient(135deg, #ef5350 0%, #e57373 100%);
+}
+
+.softRed:hover{
+  cursor: pointer;
+  background: linear-gradient(135deg, #e53935 0%, #ef5350 100%);
+}
+
+.pastelRed{
+  background: linear-gradient(135deg, #e57373 0%, #ef5350 100%);
+}
+
+.pastelRed:hover{
+  cursor: pointer;
+  background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+}
+
+/* 파란색 계열 */
+.softBlue{
+  background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+}
+
+.softBlue:hover{
+  cursor: pointer;
+  background: linear-gradient(135deg, #1e88e5 0%, #1976d2 100%);
+}
+
+.pastelBlue{
+  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+}
+
+.pastelBlue:hover{
+  cursor: pointer;
+  background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+}
+
+/* 회색 계열 */
+.softGray{
+  background: linear-gradient(135deg, #78909c 0%, #607d8b 100%);
+}
+
+.softGray:hover{
+  cursor: pointer;
+  background: linear-gradient(135deg, #607d8b 0%, #546e7a 100%);
+}
+
+.pastelGray{
+  background: linear-gradient(135deg, #90a4ae 0%, #78909c 100%);
+}
+
+.pastelGray:hover{
+  cursor: pointer;
+  background: linear-gradient(135deg, #78909c 0%, #607d8b 100%);
 }
 
 .disabled{
   opacity: 0.5;
   cursor: default !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 

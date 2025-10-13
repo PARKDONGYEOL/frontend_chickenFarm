@@ -97,6 +97,7 @@ const AlarmList = () => {
           title="최신알람"
           color="pastelGreen"
           size="100px"
+          height="36px"
           onClick={() => {
             fetchDangerousObjects();
             fetchAlarms();
@@ -113,7 +114,7 @@ const AlarmList = () => {
               <span>
                 {getAlarmMessage(a.OBJECT_LABEL)} - {new Date(a.DETECTED_AT).toLocaleString()}
               </span>
-              <Button title="삭제" color="softGreen" onClick={() => deleteAlarm(a.ALARM_ID)} />
+              <Button title="삭제" color="softGreen" size="60px" height="28px" onClick={() => deleteAlarm(a.ALARM_ID)} />
             </li>
           ))}
         </ul>
@@ -156,7 +157,7 @@ const DangerousObjects = () => {
     <div className={styles.warning_div}>
       <div className={styles.title_div}>
         <PageTitle title="위험 관리" size="70%" color="red" />
-        <Button title="DB적용" onClick={fetchDangerousObjects} color="softRed" />
+        <Button title="DB적용" onClick={fetchDangerousObjects} color="softRed" size="90px" height="36px" />
       </div>
 
       {objects.length === 0 ? (
@@ -166,7 +167,7 @@ const DangerousObjects = () => {
           {objects.map((obj) => (
             <li key={obj.ITEM_ID} className={styles.alarmItem}>
               <span>{obj.OBJECT_NAME_KR} ({obj.OBJECT_CODE})</span>
-              <Button title="삭제" color="pastelRed" onClick={() => updateDangerous(obj.ITEM_ID, false)} />
+              <Button title="삭제" color="pastelRed" size="70px" height="32px" onClick={() => updateDangerous(obj.ITEM_ID, false)} />
             </li>
           ))}
         </ul>
@@ -297,8 +298,8 @@ const onSave = async () => {
     <div className={styles.object}>
       <div className={styles.title_div}>
         <PageTitle title="관리 객체" size="40%" color="skyblue"/>
-        <Button title="추가" color="softBlue" onClick={() => setAddOpen(true)} />
-        <Button title="DB적용" color="pastelBlue" onClick={fetchObjects}  />
+        <Button title="추가" color="softBlue" size="70px" height="36px" onClick={() => setAddOpen(true)} />
+        <Button title="DB적용" color="pastelBlue" size="90px" height="36px" onClick={fetchObjects}  />
       </div>
 
       {/* 리스트 */}
@@ -367,8 +368,8 @@ const onSave = async () => {
           </label>
         </div>
         <div className={styles.btnRow}>
-          <Button title="저장" color="softGray" onClick={onAddSave} />
-          <Button title="닫기" color="pastelGray" onClick={() => setAddOpen(false)} />
+          <Button title="저장" color="softGray" size="80px" height="36px" onClick={onAddSave} />
+          <Button title="닫기" color="pastelGray" size="80px" height="36px" onClick={() => setAddOpen(false)} />
         </div>
       </Modal>
 
@@ -411,13 +412,13 @@ const onSave = async () => {
             <div className={styles.btnRow}>
               {mode === "edit" ? (
                 <>
-                  <Button title="저장" color="softGray" onClick={onSave} />
-                  <Button title="취소" color="pastelGray" onClick={() => setMode("view")} />
+                  <Button title="저장" color="softGray" size="80px" height="36px" onClick={onSave} />
+                  <Button title="취소" color="pastelGray" size="80px" height="36px" onClick={() => setMode("view")} />
                 </>
               ) : (
                 <>
-                  <Button title="수정" color="softGray" onClick={onEdit} />
-                  <Button title="삭제" color="pastelGray" onClick={onDelete} />
+                  <Button title="수정" color="softGray" size="80px" height="36px" onClick={onEdit} />
+                  <Button title="삭제" color="pastelGray" size="80px" height="36px" onClick={onDelete} />
                 </>
               )}
             </div>
