@@ -125,3 +125,15 @@
   margin-top: 20px;
   margin-left: auto;
 }
+
+.error{
+  color: red;
+  font-size: 0.75rem;
+  position: absolute;
+  margin-top: 5px;
+}
+
+.valid{
+  position: relative;
+}
+

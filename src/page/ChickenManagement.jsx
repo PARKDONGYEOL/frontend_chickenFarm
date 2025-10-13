@@ -31,6 +31,15 @@ const ChickenManagement = () => {
   //불러온 배치 정보 담을 변수
   const [batchInfo, setBatchInfo] = useState([]);
 
+  const [errorMsg, setErrorMsg] = useState({
+    'farmNameError' : '',
+    'farmNumError' : '',
+    'entryDateError' : '',
+    'initialCountError' : ''
+  });
+
+  const regex = /^[0-9]+$/; //정수 정규식
+
   // 체크박스 선택/해제 처리
   const handleCheckbox = (e) => {
     if (e.target.checked) {
@@ -44,19 +53,19 @@ const ChickenManagement = () => {
 
   const handleShipment = () => {
   if (checkedBatches.length === 0) {
-    alert('출하할 배치를 선택해주세요');
+    alert('출하할 배치를 선택해주세요.');
     return;
   }
 
   axios.put('/api/batch/shipment', { batchIdList: checkedBatches })
     .then(res => {
-      alert('출하 완료');
+      alert('출하가 완료되었습니다.');
       setCheckedBatches([]);  // 체크박스 초기화
       setReload(reload + 1)
     })
     .catch(e => {
       console.log(e);
-      alert('출하 처리 중 오류가 발생했습니다');
+      alert('출하 처리 중 오류가 발생했습니다.');
     });
 }
 
@@ -71,7 +80,6 @@ const ChickenManagement = () => {
   useEffect(() => {
     axios.get('/api/batch/info')
     .then(res => {
-      console.log(res.data);
       setBatchInfo(res.data);
     })
     .catch(e => console.log(e));
@@ -79,9 +87,16 @@ const ChickenManagement = () => {
 
   //양계장 등록
   const regFarmName = () => {
+    if(farmName === ''){
+      setErrorMsg({
+        ...errorMsg,
+        'farmNameError' : '양계장 이름을 입력해주세요.'
+      })
+      return ;
+    }
     axios.post(`/api/farm`, {farmName : farmName})
     .then(res => {
-      alert('등록 완료');
+      alert('양계장 등록이 완료되었습니다.');
       setFarmName('');
       changeReload();
     })
@@ -92,9 +107,26 @@ const ChickenManagement = () => {
 
   //배치 & 개체 동시 등록
   const regBatchAndChickens = () => {
+    const newErrors = {
+      farmNumError: batch.farmNum === '' ? '양계장을 선택해주세요.' : '',
+      entryDateError: batch.entryDate === '' ? '입식일을 선택해주세요.' : '',
+      initialCountError: batch.initialCount === '' ? '닭 개체 수를 입력해주세요.' :
+                        !regex.test(batch.initialCount) ? '숫자를 입력해주세요.' : ''
+    };
+
+    setErrorMsg({
+      ...errorMsg,
+      ...newErrors
+    });
+
+    //에러가 하나라도 있으면 등록 중단
+    if(Object.values(newErrors).some(error => error !== '')){
+      return ;
+    }
+
     axios.post('/api/batch', batch)
     .then(res => {
-      alert('등록 완료');
+      alert('배치 등록이 완료되었습니다.');
       setBatch({
         'farmNum' : '',
         'entryDate' : '',
@@ -126,12 +158,24 @@ const ChickenManagement = () => {
         <h3>양계장 등록</h3>
         <div className={styles.farm_reg}>
           <span>양계장 이름</span>
-          <Input 
-            value={farmName} 
-            onChange={(e) => setFarmName(e.target.value)}
-            size='120px'
-            height='30px'
-          />
+          <div className={styles.valid}>
+            <Input 
+              value={farmName} 
+              onChange={(e) => {
+                setFarmName(e.target.value);
+                setErrorMsg({
+                  ...errorMsg,
+                  'farmNameError' : e.target.value === '' ? '양계장 이름을 입력해주세요.' : ''
+                })
+              }}
+              size='150px'
+              height='30px'
+              onKeyDown={e => {
+                if(e.key === 'Enter') regFarmName()
+              }}
+              />
+              <p className={styles.error}>{errorMsg.farmNameError}</p>
+          </div>
           <Button 
             size='80px'
             height='30px'
@@ -146,41 +190,72 @@ const ChickenManagement = () => {
         <div className={styles.batch_reg}>
           <div className={styles.input_group}>
             <span>양계장</span>
-            <select
-              name='farmNum'
-              value={batch.farmNum}
-              onChange={(e) => handleBatch(e)}
-            >
-              <option value=''>선택하세요</option>
-              {
-                farmNumList.map((farm, i) => {
-                  return (
-                    <option key={i} value={farm.farmNum}>{farm.farmNum} - {farm.farmName}</option>
-                  )
+            <div className={styles.valid}>
+              <select
+                name='farmNum'
+                value={batch.farmNum}
+                onChange={(e) => {
+                  handleBatch(e);
+                  setErrorMsg({
+                  ...errorMsg,
+                  'farmNumError' : e.target.value === '' ? '양계장을 선택해주세요.' : ''
                 })
-              }
-            </select>
+                }}
+              >
+                <option value=''>선택</option>
+                {
+                  farmNumList.map((farm, i) => {
+                    return (
+                      <option key={i} value={farm.farmNum}>{farm.farmNum} - {farm.farmName}</option>
+                    )
+                  })
+                }
+              </select>
+              <p className={styles.error}>{errorMsg.farmNumError}</p>
+            </div>
           </div>
           <div className={styles.input_group}>
             <span>입식일</span>
-            <Input 
-              size='120px'
-              height='30px'
-              type='date'
-              name='entryDate'
-              value={batch.entryDate}
-              onChange={(e) => handleBatch(e)}
-            />
+           <div className={styles.valid}>
+              <Input 
+                size='140px'
+                height='30px'
+                type='date'
+                name='entryDate'
+                value={batch.entryDate}
+                onChange={(e) => {
+                  handleBatch(e);
+                  setErrorMsg({
+                  ...errorMsg,
+                  'entryDateError' 
+                  : e.target.value === '' ? '입식일을 선택해주세요.' : ''
+                    
+                })
+                }}
+              />
+              <p className={styles.error}>{errorMsg.entryDateError}</p>
+           </div>
           </div>
           <div className={styles.input_group}>
             <span>닭 개체 수</span>
-            <Input 
-              size='120px'
-              height='30px'
-              name='initialCount'
-              value={batch.initialCount}
-              onChange={(e) => handleBatch(e)}
-            />
+            <div className={styles.valid}>
+              <Input 
+                size='140px'
+                height='30px'
+                name='initialCount'
+                value={batch.initialCount}
+                onChange={(e) => {
+                  handleBatch(e)
+                  setErrorMsg({
+                  ...errorMsg,
+                  'initialCountError' 
+                  : e.target.value === '' ? '닭 개체 수를 입력해주세요' :
+                    !regex.test(e.target.value) ? '숫자를 입력해주세요.' : ''
+                })
+                }}
+              />
+              <p className={styles.error}>{errorMsg.initialCountError}</p>
+            </div>
           </div>
           <Button 
             size='80px'
