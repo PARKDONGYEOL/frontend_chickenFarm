@@ -84,26 +84,26 @@ const EnvSettings = () => {
       
       if (result.success) {
         setMessage("설정이 성공적으로 저장되었습니다.");
-        // 파이썬 코드에 설정 반영 요청
+        
+        // 백엔드를 통해 라즈베리파이에 적용 요청
         try {
           await envSettingsAPI.applySettings();
-          setMessage("설정이 성공적으로 저장되고 라즈베리파이에 적용되었습니다.");
+          console.log("라즈베리파이에 설정 적용 완료");
           
           // 현재 파이썬 서버의 설정 확인
-          try {
-            const currentSettings = await envSettingsAPI.getCurrentSettings();
-            console.log("파이썬 서버의 현재 설정:", currentSettings);
-            if (currentSettings.success) {
-              const ledThreshold = currentSettings.data.manualLedThreshold;
-              const autoMode = currentSettings.data.autoLedMode;
-              setMessage(`설정 적용 완료! 현재 LED 기준값: ${ledThreshold} lux, 자동모드: ${autoMode}`);
-              console.log(`LED 설정 확인 - 기준값: ${ledThreshold}, 자동모드: ${autoMode}`);
-            }
-          } catch (checkError) {
-            console.log("현재 설정 확인 실패:", checkError.message);
+          const currentSettings = await envSettingsAPI.getCurrentSettings();
+          console.log("파이썬 서버의 현재 설정:", currentSettings);
+          
+          if (currentSettings.success) {
+            const ledThreshold = currentSettings.data.manualLedThreshold;
+            const autoMode = currentSettings.data.autoLedMode;
+            setMessage(`설정 적용 완료! 현재 LED 기준값: ${ledThreshold} lux, 자동모드: ${autoMode}`);
+            console.log(`LED 설정 확인 - 기준값: ${ledThreshold}, 자동모드: ${autoMode}`);
+          } else {
+            setMessage("설정이 저장되고 적용되었습니다.");
           }
         } catch (applyError) {
-          console.error("설정 적용 실패:", applyError);
+          console.error("라즈베리파이 적용 실패:", applyError);
           setMessage("설정은 저장되었지만 라즈베리파이 적용에 실패했습니다.");
         }
       } else {
@@ -176,7 +176,7 @@ const EnvSettings = () => {
       <h2>환경 설정</h2>
       
       {message && (
-        <div className={`${styles.message} ${message.includes('성공') ? styles.success : styles.error}`}>
+        <div className={`${styles.message} ${message.includes('성공') || message.includes('완료') || message.includes('적용') ? styles.success : styles.error}`}>
           {message}
         </div>
       )}

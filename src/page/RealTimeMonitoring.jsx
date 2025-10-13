@@ -57,6 +57,7 @@ const RealTimeMonitoring = () => {
     no2: 0,
     co: 0,
   });
+  
 
   const [weather, setWeather] = useState({
     temp: 0,
@@ -165,6 +166,7 @@ const RealTimeMonitoring = () => {
     const weatherInterval = setInterval(fetchWeather, 10 * 60 * 1000);
     return () => clearInterval(weatherInterval);
   }, []);
+
 
   // 센서 데이터 가져오기
   useEffect(() => {

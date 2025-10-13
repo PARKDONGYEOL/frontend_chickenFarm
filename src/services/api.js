@@ -156,14 +156,14 @@ export const chickenAPI = {
   }
 }
 
-// 센서 데이터 관련 API
-export const sensorAPI = {
-  // 실시간 센서 데이터 조회
-  getRealtimeData: async () => {
-    const response = await apiClient.get('/raspberry/realtime')
-    return response.data
+  // 센서 데이터 관련 API
+  export const sensorAPI = {
+    // 실시간 센서 데이터 조회
+    getRealtimeData: async () => {
+      const response = await apiClient.get('/raspberry/realtime')
+      return response.data
+    }
   }
-}
 
 // 환경 설정 관련 API
 export const envSettingsAPI = {
@@ -243,3 +243,4 @@ export const envSettingsAPI = {
 }
 
 export default apiClient
+export { apiClient }
