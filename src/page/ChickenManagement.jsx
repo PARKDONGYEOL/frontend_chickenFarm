@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styles from './ChickenManagement.module.css'
 import Input from '../common/Input'
 import Button from '../common/Button'
-import axios from 'axios'
+import { batchAPI, farmAPI } from '../services/api'
 import ChickenList from './ChickenList'
 
 const ChickenManagement = () => {
@@ -39,60 +39,70 @@ const ChickenManagement = () => {
     }
   }
 
-  const handleShipment = () => {
+  const handleShipment = async () => {
   if (checkedBatches.length === 0) {
     alert('출하할 배치를 선택해주세요');
     return;
   }
 
-  axios.put('/api/batch/shipment', { batchIdList: checkedBatches })
-    .then(res => {
-      alert('출하 완료');
-      setCheckedBatches([]);  // 체크박스 초기화
-      setReload(reload + 1)
-    })
-    .catch(e => {
-      console.log(e);
-      alert('출하 처리 중 오류가 발생했습니다');
-    });
+  try {
+    await batchAPI.updateShipment(checkedBatches);
+    alert('출하 완료');
+    setCheckedBatches([]);  // 체크박스 초기화
+    setReload(reload + 1);
+  } catch (e) {
+    console.log(e);
+    alert('출하 처리 중 오류가 발생했습니다');
+  }
 }
 
   //배치 정보 불러오기
   useEffect(() => {
-    axios.get('/api/batch/info')
-    .then(res => {
-      console.log(res.data);
-      setBatchInfo(res.data);
-    })
-    .catch(e => console.log(e));
+    const fetchBatchInfo = async () => {
+      try {
+        const res = await batchAPI.getBatchInfo();
+        console.log('배치 정보 응답:', res);
+        // API 응답이 {success: true, data: [...]} 형태인지 확인
+        if (res && res.success && Array.isArray(res.data)) {
+          setBatchInfo(res.data);
+        } else if (Array.isArray(res)) {
+          setBatchInfo(res);
+        } else {
+          console.log('배치 정보가 배열이 아닙니다:', res);
+          setBatchInfo([]);
+        }
+      } catch (e) {
+        console.log('배치 정보 로드 오류:', e);
+        setBatchInfo([]);
+      }
+    };
+    fetchBatchInfo();
   }, [reload])
 
   //양계장 등록
-  const regFarmName = () => {
-    axios.post(`/api/farm`, {farmName : farmName})
-    .then(res => {
+  const regFarmName = async () => {
+    try {
+      await farmAPI.createFarm({ farmName: farmName });
       alert('등록 완료');
       setFarmName('');
-    })
-    .catch(e => {
-      console.log(e)
-    });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   //배치 & 개체 동시 등록
-  const regBatchAndChickens = () => {
-    axios.post('/api/batch', batch)
-    .then(res => {
+  const regBatchAndChickens = async () => {
+    try {
+      await batchAPI.createBatch(batch);
       alert('등록 완료');
       setBatch({
-        'farmNum' : '',
-        'entryDate' : '',
-        'initialCount' : ''
-      })
-    })
-    .catch(e => {
-      console.log(e)
-    });
+        'farmNum': '',
+        'entryDate': '',
+        'initialCount': ''
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   //배치 인풋에 입력한 값으로 변경
@@ -186,25 +196,31 @@ const ChickenManagement = () => {
             </thead>
             <tbody>
               {
-                batchInfo.map((batch, i) => {
-                  return (
-                    <tr key={i} onClick={() => setSelectedBatchId(batch.batchId)}>
-                      <td>{batch.farmNum}</td>
-                      <td>{batch.batchId}</td>
-                      <td>{batch.entryDate}</td>
-                      <td>{batch.initialCount}</td>
-                      <td>{batch.currentCount}</td>
-                      <td onClick={(e) => e.stopPropagation()}>
-                        <input 
-                          type='checkbox'
-                          value={batch.batchId}
-                          checked={checkedBatches.includes(batch.batchId)}
-                          onChange={() => handleCheckbox(batch.batchId)}
-                        />
-                      </td>
-                    </tr>
-                  )
-                })
+                Array.isArray(batchInfo) && batchInfo.length > 0 
+                  ? batchInfo.map((batch, i) => (
+                      <tr key={i} onClick={() => setSelectedBatchId(batch.batchId)}>
+                        <td>{batch.farmNum}</td>
+                        <td>{batch.batchId}</td>
+                        <td>{batch.entryDate}</td>
+                        <td>{batch.initialCount}</td>
+                        <td>{batch.currentCount}</td>
+                        <td onClick={(e) => e.stopPropagation()}>
+                          <input 
+                            type='checkbox'
+                            value={batch.batchId}
+                            checked={checkedBatches.includes(batch.batchId)}
+                            onChange={() => handleCheckbox(batch.batchId)}
+                          />
+                        </td>
+                      </tr>
+                    ))
+                  : (
+                      <tr>
+                        <td colSpan="6" style={{textAlign: 'center', padding: '20px'}}>
+                          배치 데이터가 없습니다.
+                        </td>
+                      </tr>
+                    )
               }
             </tbody>
           </table>

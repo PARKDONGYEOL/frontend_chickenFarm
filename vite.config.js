@@ -8,7 +8,6 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
       },
       '/raspberry': {
         target: 'http://192.168.30.240:5000',

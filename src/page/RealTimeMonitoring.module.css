@@ -1,9 +1,16 @@
 .container {
-  padding: 16px;
+  padding: 2rem;
   height: 100vh;
   background: #f9fafb;
   overflow: auto;
 }
+
+.container h2 {
+  font-size: 2rem;
+  color: #1e293b;
+  text-align: left;
+}
+
 
 .mainGrid {
   display: flex;
@@ -152,6 +159,18 @@
 }
 
 .alertActive {
+  color: #ef4444;
+}
+
+.statusGood {
+  color: #10b981;
+}
+
+.statusFair {
+  color: #f59e0b;
+}
+
+.statusBad {
   color: #ef4444;
 }
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styles from './ChickenList.module.css'
-import axios from 'axios'
+import { chickenAPI } from '../services/api'
 
 const ChickenList = ({batchId}) => {
   //닭 개체 정보 
@@ -9,12 +9,16 @@ const ChickenList = ({batchId}) => {
   //닭 개체 정보 조회
   useEffect(() => {
     if(batchId){
-      axios.get(`/api/chicken/${batchId}`)
-      .then(res => {
-        console.log(res.data)
-        setChickenInfo(res.data)
-      })
-      .catch(e => console.log(e));
+      const fetchChickens = async () => {
+        try {
+          const res = await chickenAPI.getChickensByBatch(batchId);
+          console.log(res);
+          setChickenInfo(res);
+        } catch (e) {
+          console.log(e);
+        }
+      };
+      fetchChickens();
     }
   }, [batchId])
 

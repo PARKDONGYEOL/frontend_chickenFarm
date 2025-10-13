@@ -3,6 +3,7 @@ import styles from "./RealTimeMonitoring.module.css";
 import GaugeCard from "../common/GaugeCard";
 import LineTrendChart from "../common/LineTrendChart";
 import ModalFloat from "../common/ModalFloat";
+import { sensorAPI } from "../services/api";
 
 const ThermoIcon = () => (
   <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -74,6 +75,66 @@ const RealTimeMonitoring = () => {
     points: [],
   });
 
+  const [envStatus, setEnvStatus] = useState({
+    status: "양호",
+    score: 100,
+    issues: []
+  });
+
+  // 환경 상태 계산 함수
+  const calculateEnvStatus = (sensorData) => {
+    const issues = [];
+    let score = 100;
+
+    // 온도 체크 (18-28°C가 적정)
+    if (sensorData.temp < 18 || sensorData.temp > 28) {
+      issues.push("온도");
+      score -= 20;
+    }
+
+    // 습도 체크 (40-70%가 적정)
+    if (sensorData.hum < 40 || sensorData.hum > 70) {
+      issues.push("습도");
+      score -= 15;
+    }
+
+    // CO2 체크 (1000ppm 이하가 적정)
+    if (sensorData.co2 > 1000) {
+      issues.push("CO2");
+      score -= 25;
+    }
+
+    // 암모니아 체크 (25ppm 이하가 적정)
+    if (sensorData.nh3 > 25) {
+      issues.push("암모니아");
+      score -= 20;
+    }
+
+    // 일산화탄소 체크 (50ppm 이하가 적정)
+    if (sensorData.co > 50) {
+      issues.push("일산화탄소");
+      score -= 30;
+    }
+
+    // 조도 체크 (200-500lux가 적정)
+    if (sensorData.lux < 200 || sensorData.lux > 500) {
+      issues.push("조도");
+      score -= 10;
+    }
+
+    // 상태 결정
+    let status;
+    if (score >= 80) {
+      status = "양호";
+    } else if (score >= 60) {
+      status = "좋음";
+    } else {
+      status = "나쁨";
+    }
+
+    return { status, score: Math.max(0, score), issues };
+  };
+
   // 날씨 데이터 가져오기
   useEffect(() => {
     const fetchWeather = async () => {
@@ -109,16 +170,10 @@ const RealTimeMonitoring = () => {
   useEffect(() => {
     const fetchSensorData = async () => {
       try {
-        const response = await fetch('/raspberry/realtime');
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
+        const result = await sensorAPI.getRealtimeData();
 
         if (result.success && result.data) {
-          setData({
+          const newData = {
             temp: result.data.temperature || 0,
             hum: result.data.humidity || 0,
             nh3: result.data.nh3 || 0,
@@ -126,7 +181,12 @@ const RealTimeMonitoring = () => {
             co2: result.data.co2 || 0,
             no2: result.data.no2 || 0,
             co: result.data.co || 0,
-          });
+          };
+          setData(newData);
+          
+          // 환경 상태 계산
+          const envStatusResult = calculateEnvStatus(newData);
+          setEnvStatus(envStatusResult);
         }
       } catch (error) {
         console.error("센서 데이터 가져오기 실패:", error);
@@ -170,6 +230,9 @@ const RealTimeMonitoring = () => {
   return (
     <>
       <div className={styles.container}>
+        {/* 페이지 제목 */}
+        <h2>실시간 모니터링</h2>
+
         <div className={styles.mainGrid}>
           <div className={styles.leftSection}>
             <GaugeCard
@@ -244,15 +307,23 @@ const RealTimeMonitoring = () => {
             />
 
             <div className={styles.statusPanel}>
-              <h3 className={styles.statusTitle}>시스템 상태</h3>
+              <h3 className={styles.statusTitle}>환경 상태</h3>
               <div className={styles.statusItem}>
-                <span className={styles.statusLabel}>활성 센서</span>
-                <span className={styles.statusValue}>{activeSensors}/{totalSensors}</span>
+                <span className={styles.statusLabel}>전체 상태</span>
+                <span className={`${styles.statusValue} ${envStatus.status === '양호' ? styles.statusGood : envStatus.status === '좋음' ? styles.statusFair : styles.statusBad}`}>
+                  {envStatus.status}
+                </span>
               </div>
               <div className={styles.statusItem}>
-                <span className={styles.statusLabel}>알림</span>
-                <span className={`${styles.statusValue} ${alertCount > 0 ? styles.alertActive : ''}`}>{alertCount}</span>
+                <span className={styles.statusLabel}>환경 점수</span>
+                <span className={styles.statusValue}>{envStatus.score}/100점</span>
               </div>
+              {envStatus.issues.length > 0 && (
+                <div className={styles.statusItem}>
+                  <span className={styles.statusLabel}>주의 항목</span>
+                  <span className={styles.statusValue}>{envStatus.issues.join(', ')}</span>
+                </div>
+              )}
             </div>
           </div>
 

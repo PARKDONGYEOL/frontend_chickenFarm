@@ -34,11 +34,17 @@
 }
 
 .container {
-  padding: 24px;
-  max-width: 1400px;
+  padding: 2rem;
+  max-width: 1200px;
   margin: 0 auto;
   background: #f9fafb;
   min-height: 100vh;
+}
+
+.container h2 {
+  font-size: 2rem;
+  color: #1e293b;
+  text-align: left;
 }
 
 .header {

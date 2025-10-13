@@ -90,30 +90,62 @@
   top: 60px;
   right: 0;
   background: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  min-width: 140px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  min-width: 160px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   z-index: 10;
-  text-align: center;
-  padding: 12px;
+  padding: 8px;
   animation: fadeIn 0.2s ease-in-out;
+  overflow: hidden;
 }
 
 .userDropdown button {
-  background: #ef4444;
-  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   width: 100%;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+  text-align: left;
 }
 
-.userDropdown button:hover {
-  background: #dc2626;
+.userDropdown button:last-child {
+  margin-bottom: 0;
+}
+
+.buttonIcon {
+  font-size: 14px;
+  width: 16px;
+  height: 16px;
+}
+
+.settingsButton {
+  background: #f8fafc;
+  color: #475569;
+}
+
+.settingsButton:hover {
+  background: #e2e8f0;
+  color: #334155;
+  transform: translateX(2px);
+}
+
+.logoutButton {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.logoutButton:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+  transform: translateX(2px);
 }
 
 @keyframes fadeIn {

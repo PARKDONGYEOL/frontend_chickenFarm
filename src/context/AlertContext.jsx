@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from "react";
-import axios from "axios";
+import { sensorAPI, dangerNoticeAPI } from "../services/api";
 
 const AlertContext = createContext();
 
@@ -25,7 +25,7 @@ export const AlertProvider = ({ children }) => {
       // alerts가 비어있지 않은 경우에만 DB 저장
       if (alertList.length > 0) {
         for (const alert of alertList) {
-          await axios.post("api/danger/insert", {
+          await dangerNoticeAPI.saveDangerNotice({
             noticeContent: alert.message,
             noticeCategory: alert.category,
             farmNum: farmNum,
@@ -45,8 +45,7 @@ export const AlertProvider = ({ children }) => {
 
     const fetchAndCheckSensors = async () => {
       try {
-        const response = await axios.get("/raspberry/realtime");
-        const result = response.data;
+        const result = await sensorAPI.getRealtimeData();
 
         console.log("AlertContext - 센서 데이터:", result);
 
@@ -55,8 +54,9 @@ export const AlertProvider = ({ children }) => {
           const newAlerts = [];
 
           // 비정상 감지
-          if (data.lux > 30)
-            newAlerts.push({ message: `🌡️ 조도가 ${data.lux.toFixed(1)}lux로 너무 높습니다.`, category: "조명" });
+          // 조도 알림 비활성화 (임시)
+          // if (data.lux > 100)
+          //   newAlerts.push({ message: `🌡️ 조도가 ${data.lux.toFixed(1)}lux로 너무 높습니다.`, category: "조명" });
           if (data.temperature > 30)
             newAlerts.push({ message: `🌡️ 온도가 ${data.temperature.toFixed(1)}°C로 너무 높습니다.`, category: "온도" });
           if (data.temperature < 10)
@@ -85,6 +85,70 @@ export const AlertProvider = ({ children }) => {
   return (
     <AlertContext.Provider value={{ alerts, setAlerts }}>
       {children}
+      {/* 위험 알림 팝업 */}
+      {alerts.length > 0 && (
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          zIndex: 9999,
+          width: '350px',
+          backgroundColor: '#fff',
+          border: '2px solid #ef4444',
+          borderRadius: '8px',
+          padding: '16px',
+          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+        }}>
+          <div style={{
+            fontSize: '16px',
+            fontWeight: '700',
+            marginBottom: '12px',
+            color: '#ef4444'
+          }}>
+            ⚠️ 위험 알림
+          </div>
+          <div>
+            {alerts.map((alert, index) => {
+              // 수치 추출 및 강조를 위한 함수
+              const highlightNumbers = (text) => {
+                return text.replace(/(\d+\.?\d*)/g, '<strong style="font-size: 16px; color: #b91c1c; text-decoration: underline; text-underline-offset: 3px;">$1</strong>');
+              };
+              
+              return (
+                <div key={index} style={{
+                  padding: '12px',
+                  backgroundColor: '#fef2f2',
+                  borderRadius: '6px',
+                  marginBottom: '10px',
+                  fontSize: '15px',
+                  color: '#dc2626',
+                  borderLeft: '4px solid #ef4444',
+                  lineHeight: '1.4'
+                }}
+                dangerouslySetInnerHTML={{ __html: highlightNumbers(alert.message) }}
+                />
+              );
+            })}
+          </div>
+          <button
+            onClick={() => setAlerts([])}
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: '#ef4444',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              marginTop: '12px'
+            }}
+          >
+            확인
+          </button>
+        </div>
+      )}
     </AlertContext.Provider>
   );
 };

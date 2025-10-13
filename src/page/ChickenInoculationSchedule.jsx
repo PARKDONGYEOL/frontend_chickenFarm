@@ -189,11 +189,8 @@ const ChickenInoculationSchedule = () => {
 
   return (
     <div className={styles.container}>
+      <h2>예방 접종 스케줄</h2>
       <div className={styles.header}>
-        <div className={styles.titleSection}>
-          <h1 className={styles.title}>📅 예방 접종 스케줄</h1>
-          <p className={styles.subtitle}>일령별 권장 예방 접종 일정</p>
-        </div>
         <button className={styles.btnBack} onClick={() => navigate('/home/inoculation')}>
           ← 접종 관리로 돌아가기
         </button>

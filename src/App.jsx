@@ -14,6 +14,8 @@ import Diary from './page/Diary'
 import ChickenInoculation from './page/ChickenInoculation'
 import ChickenInoculationList from './page/ChickenInoculationList'
 import ChickenInoculationSchedule from './page/ChickenInoculationSchedule'
+import AlertHistory from './page/AlertHistory'
+import EnvSettings from './page/EnvSettings'
 import { AlertProvider } from './context/AlertContext'
 
 
@@ -37,6 +39,8 @@ function App() {
           <Route path='inoculation' element={<ChickenInoculation />} />
           <Route path='inoculation-list' element={<ChickenInoculationList />} />
           <Route path='inoculation-schedule' element={<ChickenInoculationSchedule />} />
+          <Route path='alert-history' element={<AlertHistory />} />
+          <Route path='env-settings' element={<EnvSettings />} />
         </Route>
       </Routes>
     </AlertProvider>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaBars } from "react-icons/fa";
+import { FaBars, FaCog, FaSignOutAlt } from "react-icons/fa";
 import styles from "./Header.module.css";
 
 const Header = ({ onGuideClick, currentPath }) => {
@@ -29,7 +29,9 @@ const Header = ({ onGuideClick, currentPath }) => {
   const isIntegratedActive = () => {
     return currentPath?.startsWith("/home/cctv") || 
            currentPath?.startsWith("/home/diary") || 
-           currentPath?.startsWith("/home/inoculation");
+           currentPath?.startsWith("/home/inoculation") ||
+           currentPath?.startsWith("/home/alert-history") ||
+           currentPath?.startsWith("/home/env-settings");
   };
 
   return (
@@ -73,6 +75,8 @@ const Header = ({ onGuideClick, currentPath }) => {
                   <div onClick={() => nav("/home/cctv")}>CCTV</div>
                   <div onClick={() => nav("/home/diary")}>관찰일지</div>
                   <div onClick={() => nav("/home/inoculation")}>예방접종</div>
+                  <div onClick={() => nav("/home/alert-history")}>알림기록</div>
+                  <div onClick={() => nav("/home/env-settings")}>환경설정</div>
                 </div>
               )}
             </div>
@@ -98,8 +102,14 @@ const Header = ({ onGuideClick, currentPath }) => {
           </div>
           {menuOpen && (
             <div className={styles.userDropdown}>
-              <button onClick={() => nav("/settings")}>설정</button>
-              <button onClick={handleLogout}>로그아웃</button>
+              <button className={styles.settingsButton} onClick={() => nav("/settings")}>
+                <FaCog className={styles.buttonIcon} />
+                설정
+              </button>
+              <button className={styles.logoutButton} onClick={handleLogout}>
+                <FaSignOutAlt className={styles.buttonIcon} />
+                로그아웃
+              </button>
             </div>
           )}
         </div>
