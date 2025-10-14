@@ -47,7 +47,6 @@ const ChickenManagement = () => {
   const regex = /^[0-9]+$/; //정수 정규식
 
   //화면에 띄울 배치
-  //ded
   const displayBatchInfo = 
   showDeadBatches 
   ? 
