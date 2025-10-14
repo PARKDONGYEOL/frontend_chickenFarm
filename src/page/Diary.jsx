@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./Diary.module.css";
-import * as noteApi from "../api/noteApi";
+import { getNotesByDate, insertNote, updateNote, deleteNote } from "../api/noteApi";
 
 const Diary = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -54,7 +54,7 @@ const Diary = () => {
       const { startDate, endDate } = getDateRange();
 
       if (viewMode === 'day') {
-        const data = await noteApi.getNotesByDate(memId, selectedDate);
+        const data = await getNotesByDate(memId, selectedDate);
         setEntries(data);
       } else {
         // 일주일/월간의 경우 범위 내 모든 데이터 조회
@@ -64,7 +64,7 @@ const Diary = () => {
 
         for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
           const dateStr = d.toISOString().split('T')[0];
-          const data = await noteApi.getNotesByDate(memId, dateStr);
+          const data = await getNotesByDate(memId, dateStr);
           allData.push(...data);
         }
 
@@ -84,7 +84,7 @@ const Diary = () => {
           noteNum: editingId,
           content: newEntry.content,
         };
-        const result = await noteApi.updateNote(noteData);
+        const result = await updateNote(noteData);
 
         if (result.success) {
           alert(result.message);
@@ -104,7 +104,7 @@ const Diary = () => {
           memId: memId,
           content: newEntry.content,
         };
-        const result = await noteApi.insertNote(noteData);
+        const result = await insertNote(noteData);
 
         if (result.success) {
           alert(result.message);
@@ -134,7 +134,7 @@ const Diary = () => {
   const handleDelete = async (noteNum) => {
     if (window.confirm("이 기록을 삭제하시겠습니까?")) {
       try {
-        const result = await noteApi.deleteNote(noteNum);
+        const result = await deleteNote(noteNum);
 
         if (result.success) {
           alert(result.message);
