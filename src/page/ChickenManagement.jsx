@@ -69,7 +69,9 @@ const ChickenManagement = () => {
   //전체 체크박스 선택/해제 (살아있는 배치 중에서)
   const handleCheckedAll = (e) => {
     if(e.target.checked){
-      const allBatchIds = displayBatchInfo.map(batch => String(batch.batchId));
+      const allBatchIds = displayBatchInfo
+                          .filter(batch => batch.currentCount !== 0)
+                          .map(batch => String(batch.batchId));
       setCheckedBatches(allBatchIds);
       setIsAllChecked(true)
     }
@@ -318,6 +320,14 @@ const ChickenManagement = () => {
             displayBatchInfo.length === 0 
             ?
             <table className={styles.table}>
+              <colgroup>
+                <col width='*%'/>
+                <col width='19%'/>
+                <col width='19%'/>
+                <col width='18%'/>
+                <col width='18%'/>
+                <col width='10%'/>
+              </colgroup>
               <thead>
                 <tr>
                   <td>양계장 번호</td>
@@ -330,12 +340,22 @@ const ChickenManagement = () => {
               </thead>
               <tbody>
                 <tr>
-                  <td colSpan={6} style={{backgroundColor : 'white'}}>배치가 존재하지 않습니다.</td>
+                  <td colSpan={6} style={{backgroundColor : 'white'}}>
+                    {showDeadBatches ? '폐사 처리된 배치가 없습니다.' : '배치가 존재하지 않습니다.'}
+                  </td>
                 </tr>
               </tbody>
             </table>
             :
             <table className={styles.table}>
+              <colgroup>
+                <col width='*%'/>
+                <col width='19%'/>
+                <col width='19%'/>
+                <col width='18%'/>
+                <col width='18%'/>
+                <col width='10%'/>
+              </colgroup>
             <thead>
               <tr>
                 <td>양계장 번호</td>
@@ -350,7 +370,11 @@ const ChickenManagement = () => {
               {
                 displayBatchInfo.map((batch, i) => {
                   return (
-                    <tr key={i} onClick={() => setSelectedBatchId(batch.batchId)}>
+                    <tr 
+                      key={i} 
+                      onClick={() => setSelectedBatchId(batch.batchId)}
+                      className={batch.currentCount === 0 ? styles.dead_color : ''}
+                    >
                       <td>{batch.farmNum}</td>
                       <td>{batch.batchId}</td>
                       <td>{batch.entryDate}</td>
