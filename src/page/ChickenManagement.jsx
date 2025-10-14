@@ -2,8 +2,8 @@ import React, { use, useEffect, useState } from 'react'
 import styles from './ChickenManagement.module.css'
 import Input from '../common/Input'
 import Button from '../common/Button'
-import { batchAPI, farmAPI } from '../services/api'
 import ChickenList from './ChickenList'
+import axios from 'axios'
 
 const ChickenManagement = () => {
   //양계장 번호 조회
@@ -47,6 +47,7 @@ const ChickenManagement = () => {
   const regex = /^[0-9]+$/; //정수 정규식
 
   //화면에 띄울 배치
+  //ded
   const displayBatchInfo = 
   showDeadBatches 
   ? 
