@@ -1,0 +1,11 @@
+.select{
+  padding: 3px 4px;
+  border-radius: 4px;
+  outline: 1px solid #bbbbbb;
+  border: none;
+  outline-offset: -1px;
+}
+
+.select:focus{
+  outline: 1.5px solid #777777;
+}

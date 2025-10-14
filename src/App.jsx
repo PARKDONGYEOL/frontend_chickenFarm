@@ -9,7 +9,9 @@ import TrendAnalysis from './page/TrendAnalysis'
 import EnvDashboard from './page/EnvDashboard'
 import ChickenManagement from './page/ChickenManagement'
 import Settings from './page/Settings'
-import CCTV from './page/CCTV'
+import Streaming from './layout/cctv/Streaming'
+import Alarms from './layout/cctv/Alarms'
+import Videos from './layout/cctv/Videos'
 import Diary from './page/Diary'
 import ChickenInoculation from './page/ChickenInoculation'
 import ChickenInoculationList from './page/ChickenInoculationList'
@@ -29,12 +31,15 @@ function App() {
 
         <Route path='home' element={<Home />} >
           <Route path='real' element={<RealTimeMonitoring />} />
-          <Route path='env' element={<EnvDashboard />} />
-          <Route path='trend' element={<TrendAnalysis />} />
+          <Route path='env' element={<EnvDashboard/>}/>
+          <Route path='trend' element={<TrendAnalysis/>}/>
           <Route path='daily' element={<DailyInformation />} />
           <Route path='weekly' element={<WeeklyInformation />} />
           <Route path='chickenmanagement' element={<ChickenManagement />} />
-          <Route path='cctv' element={<CCTV />} />
+          <Route path='cctv' element={<Streaming />} />
+          <Route path='streaming' element={<Streaming />} />
+          <Route path='videos' element={<Videos />} />
+          <Route path='alarms' element={<Alarms />} />
           <Route path='diary' element={<Diary />} />
           <Route path='inoculation' element={<ChickenInoculation />} />
           <Route path='inoculation-list' element={<ChickenInoculationList />} />
