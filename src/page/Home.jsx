@@ -5,10 +5,6 @@ import Header from "../layout/Header";
 import ModalFull from "../common/ModalFull";
 import TourGuide from "../common/TourGuide";
 import roosterImg from "../assets/rooster-285432_1280.jpg";
-import image1 from "../assets/image.png";
-import image2 from "../assets/image copy.png";
-import image3 from "../assets/image copy 2.png";
-import image4 from "../assets/image copy 3.png";
 
 
 const Home = () => {

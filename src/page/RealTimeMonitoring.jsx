@@ -3,6 +3,7 @@ import styles from "./RealTimeMonitoring.module.css";
 import GaugeCard from "../common/GaugeCard";
 import LineTrendChart from "../common/LineTrendChart";
 import ModalFloat from "../common/ModalFloat";
+import WaveChart from "../common/WaveChart";
 import { sensorAPI } from "../services/api";
 
 const ThermoIcon = () => (
@@ -57,6 +58,20 @@ const RealTimeMonitoring = () => {
     no2: 0,
     co: 0,
   });
+
+  // 센서 히스토리 관련 상태
+  const [sensorHistory, setSensorHistory] = useState({
+    temperature: [],
+    humidity: [],
+    lux: [],
+    co2: [],
+    no2: [],
+    co: [],
+    nh3: [],
+    timestamps: []
+  });
+  const [selectedSensor, setSelectedSensor] = useState(null);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   
 
   const [weather, setWeather] = useState({
@@ -81,6 +96,46 @@ const RealTimeMonitoring = () => {
     score: 100,
     issues: []
   });
+
+  // 센서 박스 클릭 핸들러
+  const handleSensorClick = async (sensorType) => {
+    try {
+      console.log(`🔍 ${sensorType} 센서 히스토리 조회 시작...`);
+      console.log(`📡 API 호출: /api/sensor-history/${sensorType}`);
+      
+      const response = await sensorAPI.getSensorHistory(sensorType);
+      
+      console.log(`📊 API 응답:`, response);
+      
+      if (response.success) {
+        console.log(`✅ ${sensorType} 히스토리 데이터 수신:`, response.data);
+        console.log(`📊 데이터 포인트 수: ${response.data.values?.length || 0}`);
+        console.log(`⏰ 타임스탬프 수: ${response.data.timestamps?.length || 0}`);
+        
+        if (response.data.values && response.data.values.length > 0) {
+          setSensorHistory(response.data);
+          setSelectedSensor(sensorType);
+          setIsHistoryModalOpen(true);
+          console.log(`🎯 모달 열기: ${sensorType}`);
+        } else {
+          console.warn(`⚠️ ${sensorType} 히스토리 데이터가 비어있습니다.`);
+          alert(`${sensorType} 센서의 최근 데이터가 없습니다. 잠시 후 다시 시도해주세요.`);
+        }
+      } else {
+        console.error(`❌ ${sensorType} 히스토리 조회 실패:`, response.message);
+        alert(`센서 히스토리 조회 실패: ${response.message}`);
+      }
+    } catch (error) {
+      console.error(`💥 ${sensorType} 히스토리 조회 오류:`, error);
+      alert(`센서 히스토리 조회 오류: ${error.message}`);
+    }
+  };
+
+  // 히스토리 모달 닫기
+  const closeHistoryModal = () => {
+    setIsHistoryModalOpen(false);
+    setSelectedSensor(null);
+  };
 
   // 환경 상태 계산 함수
   const calculateEnvStatus = (sensorData) => {
@@ -195,10 +250,33 @@ const RealTimeMonitoring = () => {
       }
     };
 
+    // 히스토리 데이터 업데이트 함수
+    const updateHistoryData = async () => {
+      if (isHistoryModalOpen && selectedSensor) {
+        try {
+          console.log(`🔄 히스토리 데이터 자동 업데이트: ${selectedSensor}`);
+          const response = await sensorAPI.getSensorHistory(selectedSensor);
+          
+          if (response.success && response.data.values && response.data.values.length > 0) {
+            setSensorHistory(response.data);
+            console.log(`✅ 히스토리 데이터 업데이트 완료: ${response.data.count}개 포인트`);
+          }
+        } catch (error) {
+          console.error(`❌ 히스토리 데이터 업데이트 실패: ${error.message}`);
+        }
+      }
+    };
+
     fetchSensorData();
-    const interval = setInterval(fetchSensorData, 1000);
+    updateHistoryData(); // 초기 히스토리 업데이트
+    
+    const interval = setInterval(() => {
+      fetchSensorData();
+      updateHistoryData(); // 매초마다 히스토리 업데이트
+    }, 1000);
+    
     return () => clearInterval(interval);
-  }, []);
+  }, [isHistoryModalOpen, selectedSensor]); // 의존성 배열에 모달 상태 추가
 
   // 24시간 시계열 데이터 생성
   const generateTimeSeries = (points = 96, fn) => {
@@ -245,7 +323,7 @@ const RealTimeMonitoring = () => {
               min={15}
               optimalMax={30}
               unit="°C"
-              onClick={() => openTrend("온도 (최근 24시간)", "°C", genTemp)}
+              onClick={() => handleSensorClick('temperature')}
             />
             <GaugeCard
               icon={<HumidityIcon />}
@@ -255,7 +333,7 @@ const RealTimeMonitoring = () => {
               min={40}
               optimalMax={80}
               unit="%"
-              onClick={() => openTrend("습도 (최근 24시간)", "%", genHum)}
+              onClick={() => handleSensorClick('humidity')}
             />
             <GaugeCard
               icon={<LightIcon />}
@@ -265,7 +343,7 @@ const RealTimeMonitoring = () => {
               min={1}
               optimalMax={50}
               unit="lux"
-              onClick={() => openTrend("조도 (최근 24시간)", "lux", genLux)}
+              onClick={() => handleSensorClick('lux')}
             />
             <GaugeCard
               icon={<AmmoniaIcon />}
@@ -275,7 +353,7 @@ const RealTimeMonitoring = () => {
               min={0}
               optimalMax={25}
               unit="ppm"
-              onClick={() => openTrend("암모니아 (최근 24시간)", "ppm", genNH3)}
+              onClick={() => handleSensorClick('nh3')}
             />
             <GaugeCard
               icon={<CO2Icon />}
@@ -285,7 +363,7 @@ const RealTimeMonitoring = () => {
               min={1000}
               optimalMax={5000}
               unit="ppm"
-              onClick={() => openTrend("이산화탄소 (최근 24시간)", "ppm", genCO2)}
+              onClick={() => handleSensorClick('co2')}
             />
             <GaugeCard
               icon={<NO2Icon />}
@@ -295,7 +373,7 @@ const RealTimeMonitoring = () => {
               min={0}
               optimalMax={50}
               unit="ppb"
-              onClick={() => openTrend("이산화질소 (최근 24시간)", "ppb", genNO2)}
+              onClick={() => handleSensorClick('no2')}
             />
             <GaugeCard
               icon={<COIcon />}
@@ -305,7 +383,7 @@ const RealTimeMonitoring = () => {
               min={0}
               optimalMax={50}
               unit="ppm"
-              onClick={() => openTrend("일산화탄소 (최근 24시간)", "ppm", genCO)}
+              onClick={() => handleSensorClick('co')}
             />
 
             <div className={styles.statusPanel}>
@@ -416,6 +494,46 @@ const RealTimeMonitoring = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      </ModalFloat>
+
+      {/* 센서 히스토리 모달 */}
+      <ModalFloat
+        isOpen={isHistoryModalOpen}
+        onClose={closeHistoryModal}
+        title={`${selectedSensor ? selectedSensor.toUpperCase() : ''} 센서 히스토리 (최근 30초)`}
+        width={900}
+        height={500}
+      >
+        <div className={styles.historyContainer}>
+          {selectedSensor && (
+            <WaveChart
+              data={sensorHistory.values || []}
+              timestamps={sensorHistory.timestamps || []}
+              sensorType={selectedSensor}
+              height={300}
+              showGrid={true}
+              showLabels={true}
+            />
+          )}
+          
+          {/* 데이터 정보 */}
+          <div className={styles.historyInfo}>
+            <p>데이터 포인트: {sensorHistory.count || 0}개</p>
+            <p>시간 범위: 최근 30초</p>
+            {sensorHistory.values && sensorHistory.values.length > 0 && (
+              <p>
+                현재 값: {sensorHistory.values[sensorHistory.values.length - 1]?.toFixed(2)}
+                {selectedSensor === 'temperature' ? '°C' : 
+                 selectedSensor === 'humidity' ? '%' :
+                 selectedSensor === 'lux' ? 'lux' :
+                 selectedSensor === 'co2' ? 'ppm' :
+                 selectedSensor === 'no2' ? 'ppb' :
+                 selectedSensor === 'co' ? 'ppm' :
+                 selectedSensor === 'nh3' ? 'ppm' : ''}
+              </p>
+            )}
           </div>
         </div>
       </ModalFloat>

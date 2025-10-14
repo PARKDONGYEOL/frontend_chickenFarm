@@ -40,9 +40,26 @@ export default defineConfig({
         changeOrigin: true,
       },
       '/raspberry': {
-        target: 'http://192.168.30.240:5000',
+        target: 'http://localhost:5000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/raspberry/, '/api')
+      },
+      // 파이썬 서버의 센서 API 프록시
+      '/api/realtime': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/api/sensor-history': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/api/settings': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/api/status': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
       }
     }
   }

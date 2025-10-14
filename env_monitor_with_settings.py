@@ -15,7 +15,7 @@ try:
     import RPi.GPIO as GPIO
     import mysql.connector
     import requests
-    from flask import Flask, jsonify
+    from flask import Flask, jsonify, request
     from flask_cors import CORS
     HARDWARE_AVAILABLE = True
 except ImportError as e:
@@ -33,6 +33,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Flask 로거 설정 (콘솔에서만 숨기기)
+werkzeug_logger = logging.getLogger('werkzeug')
+werkzeug_logger.setLevel(logging.WARNING)  # INFO 레벨 로그 숨김
+
+# 로그 파일 생성 확인
+logger.info("로그 파일 정상 생성 확인됨")
+
 # ========== Flask 서버 추가 ==========
 app = Flask(__name__)
 CORS(app)
@@ -47,16 +54,70 @@ latest_sensor_data = {
     'co': 0,
     'nh3': 0,
     'timestamp': None,
-    'is_warming': False
+    'is_warming': False  # 시작 시 정상 상태로 설정
 }
+
+# 최근 30초간의 센서 데이터 히스토리 저장 (2초마다 업데이트)
+sensor_history = {
+    'temperature': [],
+    'humidity': [],
+    'lux': [],
+    'co2': [],
+    'no2': [],
+    'co': [],
+    'nh3': [],
+    'timestamps': []
+}
+MAX_HISTORY_SIZE = 15  # 30초 ÷ 2초 = 15개 데이터 포인트
 
 # 전역 변수로 시스템 인스턴스 저장
 system_instance = None
+
+def update_sensor_history(sensor_data):
+    """센서 히스토리 업데이트 (최근 30초간 데이터 유지)"""
+    global sensor_history
+    
+    current_time = datetime.now().isoformat()
+    
+    logger.debug(f"히스토리 업데이트 시작 - 센서 데이터: {sensor_data}")
+    
+    # 각 센서 데이터 추가
+    for sensor_type in ['temperature', 'humidity', 'lux', 'co2', 'no2', 'co', 'nh3']:
+        if sensor_type in sensor_data:
+            old_size = len(sensor_history[sensor_type])
+            sensor_history[sensor_type].append(sensor_data[sensor_type])
+            
+            # 최대 크기 초과 시 오래된 데이터 제거
+            if len(sensor_history[sensor_type]) > MAX_HISTORY_SIZE:
+                sensor_history[sensor_type].pop(0)
+            
+            logger.debug(f"{sensor_type}: {old_size} -> {len(sensor_history[sensor_type])} (값: {sensor_data[sensor_type]})")
+    
+    # 타임스탬프 추가
+    old_timestamp_size = len(sensor_history['timestamps'])
+    sensor_history['timestamps'].append(current_time)
+    if len(sensor_history['timestamps']) > MAX_HISTORY_SIZE:
+        sensor_history['timestamps'].pop(0)
+    
+    logger.debug(f"타임스탬프: {old_timestamp_size} -> {len(sensor_history['timestamps'])}")
+    logger.debug(f"전체 히스토리 상태: 온도={len(sensor_history['temperature'])}, 타임스탬프={len(sensor_history['timestamps'])}")
 
 # Flask API 엔드포인트
 @app.route('/api/realtime')
 def get_realtime():
     """실시간 센서 데이터"""
+    # 예열 중일 때는 데이터 제공하지 않음
+    is_warming = latest_sensor_data.get('is_warming', False)
+    
+    if is_warming:
+        logger.debug(f"🚫 예열 중 - API 요청 차단: is_warming={is_warming}")
+        return jsonify({
+            'success': False,
+            'message': '센서 예열 중입니다. 잠시 후 다시 시도해주세요.',
+            'is_warming': True
+        })
+    
+    logger.debug(f"✅ 정상 모드 - API 요청 허용: is_warming={is_warming}")
     return jsonify({
         'success': True,
         'data': latest_sensor_data
@@ -70,6 +131,22 @@ def get_status():
         'message': '라즈베리파이 센서 시스템 작동 중',
         'is_warming': latest_sensor_data.get('is_warming', False),
         'timestamp': latest_sensor_data.get('timestamp')
+    })
+
+@app.route('/api/history-status')
+def get_history_status():
+    """히스토리 데이터 상태 확인"""
+    global sensor_history
+    return jsonify({
+        'success': True,
+        'data': {
+            'temperature_count': len(sensor_history.get('temperature', [])),
+            'humidity_count': len(sensor_history.get('humidity', [])),
+            'timestamps_count': len(sensor_history.get('timestamps', [])),
+            'max_history_size': MAX_HISTORY_SIZE,
+            'latest_temperature': sensor_history.get('temperature', [])[-1] if sensor_history.get('temperature') else None,
+            'latest_timestamp': sensor_history.get('timestamps', [])[-1] if sensor_history.get('timestamps') else None
+        }
     })
 
 @app.route('/api/settings/apply', methods=['POST'])
@@ -169,6 +246,53 @@ def get_current_settings():
             'message': f'설정 조회 실패: {str(e)}'
         }), 500
 
+@app.route('/api/sensor-history/<sensor_type>')
+def get_sensor_history(sensor_type):
+    """특정 센서의 최근 30초간 히스토리 데이터 조회"""
+    try:
+        global sensor_history
+        
+        logger.info(f"센서 히스토리 요청: {sensor_type}")
+        
+        # 유효한 센서 타입인지 확인
+        valid_sensors = ['temperature', 'humidity', 'lux', 'co2', 'no2', 'co', 'nh3']
+        if sensor_type not in valid_sensors:
+            logger.warning(f"유효하지 않은 센서 타입: {sensor_type}")
+            return jsonify({
+                'success': False,
+                'message': f'유효하지 않은 센서 타입: {sensor_type}'
+            }), 400
+        
+        # 센서 데이터와 타임스탬프 반환
+        sensor_data = sensor_history.get(sensor_type, [])
+        timestamps = sensor_history.get('timestamps', [])
+        
+        logger.info(f"센서 데이터 크기: {len(sensor_data)}, 타임스탬프 크기: {len(timestamps)}")
+        
+        # 데이터 포인트 수가 일치하도록 조정
+        min_length = min(len(sensor_data), len(timestamps))
+        sensor_data = sensor_data[-min_length:] if min_length > 0 else []
+        timestamps = timestamps[-min_length:] if min_length > 0 else []
+        
+        logger.info(f"조정된 데이터 크기: {len(sensor_data)}")
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'sensor_type': sensor_type,
+                'values': sensor_data,
+                'timestamps': timestamps,
+                'count': len(sensor_data)
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"센서 히스토리 조회 실패: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'센서 히스토리 조회 실패: {str(e)}'
+        }), 500
+
 # Flask 서버를 별도 쓰레드에서 실행
 def run_flask():
     if HARDWARE_AVAILABLE:
@@ -212,6 +336,9 @@ class EnvConfig:
         self.FARM_NUM = 1
         self.FREQ = 100
         self.WARMUP_DURATION = 1800  # 30분
+        
+        # 서보 모터 관련 설정
+        self.SERVO_THRESHOLD = 60  # 습도 기준값
 
 
 class EnvSettingsManager:
@@ -249,13 +376,42 @@ class EnvSettingsManager:
             'locationLng': 126.9780,
             'sleepStartHour': 22,
             'sleepEndHour': 6,
-            'sleepModeEnabled': True
+            'sleepModeEnabled': True,
+            'servoThreshold': 60,
+            'useSimpleSensorMode': False  # 고급 모드 사용 (센서 특성곡선 적용)
         }
     
+    def load_settings_from_backend(self):
+        """스프링 백엔드에서 설정을 가져옴"""
+        try:
+            response = requests.get('http://192.168.30.152:8080/api/env-settings', timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success'):
+                    settings_data = data.get('data', {})
+                    self.settings.update(settings_data)
+                    logger.debug(f"백엔드 설정 로드 성공")
+                    return True
+                else:
+                    logger.warning(f"백엔드 응답 실패: {data}")
+            else:
+                logger.warning(f"백엔드 연결 실패: {response.status_code}")
+        except Exception as e:
+            logger.error(f"백엔드 설정 로드 실패: {e}")
+        
+        return False
+
     def load_settings_from_db(self):
         """데이터베이스에서 설정 로드"""
-        logger.info("데이터베이스에서 환경 설정 로드 시도...")
+        logger.debug("데이터베이스에서 환경 설정 로드 시도...")
         
+        # 먼저 백엔드에서 설정 로드 시도
+        backend_success = self.load_settings_from_backend()
+        if backend_success:
+            return True
+        
+        # 백엔드 실패 시 데이터베이스에서 로드
         with self.db_manager.get_connection() as conn:
             if not conn:
                 logger.error("데이터베이스 연결 실패")
@@ -295,7 +451,9 @@ class EnvSettingsManager:
                         'LOCATION_LNG': 'locationLng',
                         'SLEEP_START_HOUR': 'sleepStartHour',
                         'SLEEP_END_HOUR': 'sleepEndHour',
-                        'SLEEP_MODE_ENABLED': 'sleepModeEnabled'
+                        'SLEEP_MODE_ENABLED': 'sleepModeEnabled',
+                        'SERVO_THRESHOLD': 'servoThreshold',
+                        'USE_SIMPLE_SENSOR_MODE': 'useSimpleSensorMode'
                     }
                     
                     # 결과를 딕셔너리로 변환
@@ -310,7 +468,7 @@ class EnvSettingsManager:
                             old_value = self.settings.get(setting_key)
                             
                             # 타입별 처리
-                            if db_col in ['AUTO_LED_MODE', 'SLEEP_MODE_ENABLED']:
+                            if db_col in ['AUTO_LED_MODE', 'SLEEP_MODE_ENABLED', 'USE_SIMPLE_SENSOR_MODE']:
                                 self.settings[setting_key] = bool(row_dict[db_col])
                             elif db_col in ['LOCATION_LAT', 'LOCATION_LNG']:
                                 self.settings[setting_key] = float(row_dict[db_col])
@@ -319,10 +477,10 @@ class EnvSettingsManager:
                             else:
                                 self.settings[setting_key] = float(row_dict[db_col])
                             
-                            logger.info(f"설정 업데이트: {setting_key} = {old_value} -> {self.settings[setting_key]}")
+                            logger.debug(f"설정 업데이트: {setting_key}")
                     
                     self.last_update = datetime.now()
-                    logger.info(f"환경 설정이 데이터베이스에서 로드되었습니다: {self.settings}")
+                    logger.debug(f"환경 설정이 데이터베이스에서 로드됨")
                     return True
                 else:
                     logger.warning("데이터베이스에서 환경 설정을 찾을 수 없습니다. 기본값을 사용합니다.")
@@ -844,6 +1002,41 @@ class EnvSensorReader:
         
         return sensor_data
     
+    def read_simple_gas_sensors(self):
+        """간단한 가스 센서 읽기 (env_monitor_simple.py 방식)"""
+        if not HARDWARE_AVAILABLE:
+            # 각 가스별로 적정 범위의 기본값 설정
+            return {
+                'nh3': 15,    # 15ppm 정도
+                'co2': 400,   # 400ppm 정도
+                'no2': 20,    # 20ppb 정도
+                'co': 5       # 5ppm 정도
+            }
+        
+        try:
+            # ADC 원시 값 읽기
+            nh3_raw = self.read_adc(1)  # NH3_CHANNEL
+            co2_raw = self.read_adc(2)  # CO2_CHANNEL
+            no2_raw = self.read_adc(3)  # NO2_CHANNEL
+            co_raw = self.read_adc(4)   # CO_CHANNEL
+            
+            # ADC 값을 실제 단위로 변환
+            sensors = {
+                'nh3': round((nh3_raw / 1023.0) * 50, 1),    # 0-50 ppm
+                'co2': round((co2_raw / 1023.0) * 2000, 1),  # 0-2000 ppm
+                'no2': round((no2_raw / 1023.0) * 200, 1),   # 0-200 ppb
+                'co': round((co_raw / 1023.0) * 100, 1)      # 0-100 ppm
+            }
+            return sensors
+        except Exception as e:
+            logger.error(f"간단한 가스 센서 읽기 실패: {e}")
+            return {
+                'nh3': 15,
+                'co2': 400,
+                'no2': 20,
+                'co': 5
+            }
+    
     def cleanup(self):
         """리소스 정리"""
         if self.spi:
@@ -857,6 +1050,10 @@ class DynamicDeviceController:
         self.config = config
         self.settings_manager = settings_manager
         self.servo_position = 90
+        self.led_status = "OFF"
+        self.fan_status = False
+        self.door_status = "닫힘"
+        self.window_status = "닫힘"
         self._setup_gpio()
         self._setup_pwm()
     
@@ -890,35 +1087,85 @@ class DynamicDeviceController:
     def control_led(self, lux):
         # 수면 시간 확인
         if self.settings_manager.is_sleep_time():
+            if self.led_status != "OFF (수면시간)":
+                old_status = self.led_status
+                self.led_status = "OFF (수면시간)"
+                print(f"LED {old_status} -> {self.led_status}")
             GPIO.output(self.config.LED_PIN, GPIO.LOW)
-            logger.info(f"수면 시간으로 LED 강제 끔: 조도 {lux} lux")
-            return "OFF (수면시간)"
+            return self.led_status
         
         # 자동/수동 모드에 따라 LED 기준값 계산
         threshold = self.settings_manager.get_led_threshold()
-        logger.info(f"LED 제어: 현재 조도={lux}, 기준값={threshold}")
         
         if lux <= threshold:
+            if self.led_status != "ON":
+                old_status = self.led_status
+                self.led_status = "ON"
+                print(f"LED {old_status} -> {self.led_status}")
             GPIO.output(self.config.LED_PIN, GPIO.HIGH)
-            logger.info(f"LED 켜짐: 조도 {lux} <= 기준값 {threshold}")
-            return "ON"
+            return self.led_status
         else:
+            if self.led_status != "OFF":
+                old_status = self.led_status
+                self.led_status = "OFF"
+                print(f"LED {old_status} -> {self.led_status}")
             GPIO.output(self.config.LED_PIN, GPIO.LOW)
-            logger.info(f"LED 꺼짐: 조도 {lux} > 기준값 {threshold}")
-            return "OFF"
+            return self.led_status
     
     def control_door(self, temp):
         open_temp = self.settings_manager.get_setting('doorOpenTemp', 25)
         close_temp = self.settings_manager.get_setting('doorCloseTemp', 15)
         
-        if temp >= open_temp and self.servo_position != 180:
-            self.set_servo_angle(180)
-            logger.info(f"문 열림 (온도: {temp:.1f}°C, 기준: {open_temp}°C)")
-        elif temp <= close_temp and self.servo_position != 0:
-            self.set_servo_angle(0)
-            logger.info(f"문 닫힘 (온도: {temp:.1f}°C, 기준: {close_temp}°C)")
+        # 히스테리시스 추가 (기준값 ±2°C)
+        hysteresis = 2.0
+        
+        # 문이 열려있는 상태에서 닫힘 기준 확인
+        if self.servo_position == 180:  # 문이 열려있을 때
+            if temp <= (open_temp - hysteresis):  # 열림 기준보다 2도 낮아야 닫기
+                self.set_servo_angle(0)
+                old_status = self.door_status
+                self.door_status = "닫힘"
+                print(f"문 {old_status} -> {self.door_status}")
+        else:  # 문이 닫혀있을 때
+            if temp >= (close_temp + hysteresis):  # 닫힘 기준보다 2도 높아야 열기
+                self.set_servo_angle(180)
+                old_status = self.door_status
+                self.door_status = "열림"
+                print(f"문 {old_status} -> {self.door_status}")
+    
+    def control_servo(self, humidity):
+        """서보 모터 제어 (창문) - 습도 기반"""
+        if not HARDWARE_AVAILABLE:
+            logger.info(f"서보 제어 (시뮬레이션): 습도 {humidity}%")
+            return
+        
+        try:
+            threshold = self.settings_manager.get_setting('servoThreshold', 60)
+            hysteresis = 5.0  # 습도 히스테리시스 ±5%
+            
+            # 창문이 열려있는 상태에서 닫힘 기준 확인
+            if self.servo_position == 90:  # 창문이 열려있을 때
+                if humidity <= (threshold - hysteresis):  # 기준보다 5% 낮아야 닫기
+                    self.set_servo_angle(0)
+                    old_status = self.window_status
+                    self.window_status = "닫힘"
+                    print(f"창문 {old_status} -> {self.window_status}")
+            else:  # 창문이 닫혀있을 때
+                if humidity >= (threshold + hysteresis):  # 기준보다 5% 높아야 열기
+                    self.set_servo_angle(90)
+                    old_status = self.window_status
+                    self.window_status = "열림"
+                    print(f"창문 {old_status} -> {self.window_status}")
+                
+        except Exception as e:
+            logger.error(f"서보 제어 실패: {e}")
     
     def control_fan(self, sensor_data):
+        """팬 제어"""
+        if not HARDWARE_AVAILABLE:
+            logger.info(f"팬 제어 (시뮬레이션): CO2 {sensor_data.get('co2', 0):.1f}ppm")
+            return False, "시뮬레이션"
+        
         fan_needed = False
         reasons = []
         
@@ -929,22 +1176,32 @@ class DynamicDeviceController:
         
         if sensor_data.get('humidity', 0) >= humidity_threshold:
             fan_needed = True
-            reasons.append(f"고습도 ({sensor_data['humidity']:.1f}% >= {humidity_threshold}%)")
+            reasons.append(f"고습도")
         
         if sensor_data.get('co2', 0) > co2_threshold:
             fan_needed = True
-            reasons.append(f"CO2 농도 높음 ({sensor_data['co2']:.1f}ppm > {co2_threshold}ppm)")
+            reasons.append(f"CO2높음")
         
         if sensor_data.get('co', 0) > co_threshold:
             fan_needed = True
-            reasons.append(f"CO 농도 높음 ({sensor_data['co']:.3f}ppm > {co_threshold}ppm)")
+            reasons.append(f"CO높음")
         
-        if fan_needed:
-            self.pwm_a.ChangeDutyCycle(fan_speed)
-            return True, ", ".join(reasons)
-        else:
-            self.pwm_a.ChangeDutyCycle(0)
-            return False, ""
+        try:
+            if fan_needed:
+                if not self.fan_status:
+                    self.fan_status = True
+                    print(f"팬 OFF -> ON")
+                self.pwm_a.ChangeDutyCycle(fan_speed)
+                return True, ", ".join(reasons)
+            else:
+                if self.fan_status:
+                    self.fan_status = False
+                    print(f"팬 ON -> OFF")
+                self.pwm_a.ChangeDutyCycle(0)
+                return False, ""
+        except Exception as e:
+            logger.error(f"팬 제어 실패: {e}")
+            return False, f"제어 실패: {e}"
     
     def cleanup(self):
         self.pwm_a.ChangeDutyCycle(0)
@@ -965,12 +1222,11 @@ class WarmupManager:
     
     def ask_warmup(self) -> bool:
         """예열 여부 선택"""
-        print("\n" + "="*60)
-        print("🔥 센서 예열 안내")
-        print("="*60)
-        print("센서를 처음 가동하거나 오랜 시간 사용하지 않았다면")
-        print("정확한 측정을 위해 30분간 예열하는 것을 권장합니다.")
-        print("="*60)
+        # 사용자 입력 전에 API 차단 상태로 설정
+        global latest_sensor_data
+        latest_sensor_data['is_warming'] = True
+        
+        print("\n🔥 센서 예열 안내: 정확한 측정을 위해 30분간 예열을 권장합니다.")
         
         while True:
             choice = input("\n예열을 진행하시겠습니까? (y/n): ").strip().lower()
@@ -978,6 +1234,8 @@ class WarmupManager:
                 return True
             elif choice in ['n', 'no', 'ㅜ']:
                 print("\n⚠️  예열을 건너뜁니다. 초기 측정값이 부정확할 수 있습니다.\n")
+                # 예열을 건너뛸 때도 정상 모드로 전환
+                latest_sensor_data['is_warming'] = False
                 return False
             else:
                 print("잘못된 입력입니다. 'y' 또는 'n'을 입력해주세요.")
@@ -986,6 +1244,10 @@ class WarmupManager:
         """예열 시작"""
         self.start_time = datetime.now()
         self.is_warming = True
+        
+        # 전역 변수 즉시 업데이트
+        global latest_sensor_data
+        latest_sensor_data['is_warming'] = True
         logger.info(f"센서 예열 시작 (예상 소요시간: {self.duration//60}분)")
     
     def get_progress(self) -> Tuple[int, int, bool]:
@@ -1005,38 +1267,27 @@ class WarmupManager:
         
         if is_complete:
             self.is_warming = False
-            print("\n" + "="*60)
-            print("✅ 센서 예열 완료!")
-            print("="*60)
+            print("\n✅ 예열완료")
             logger.info("센서 예열 완료 - 정상 모니터링 시작")
             return
         
         progress_percent = (elapsed / self.duration) * 100
-        bar_length = 40
-        filled = int(bar_length * progress_percent / 100)
-        bar = "█" * filled + "░" * (bar_length - filled)
-        
         elapsed_min = elapsed // 60
-        elapsed_sec = elapsed % 60
         remaining_min = remaining // 60
-        remaining_sec = remaining % 60
         
-        print(f"\r🔥 예열 중: [{bar}] {progress_percent:.1f}% | "
-              f"경과: {elapsed_min:02d}:{elapsed_sec:02d} | "
-              f"남은시간: {remaining_min:02d}:{remaining_sec:02d}", end="")
-        
-        # 센서 데이터가 있으면 간단히 표시
-        if sensor_data and elapsed % 10 == 0:  # 10초마다 한 번씩 줄바꿈하여 표시
-            print(f"\n   [현재 측정값] 온도: {sensor_data.get('temperature', 0):.1f}°C | "
-                  f"습도: {sensor_data.get('humidity', 0):.1f}% | "
-                  f"CO2: {sensor_data.get('co2', 0):.1f}ppm")
+        # 10초마다만 출력
+        if elapsed % 10 == 0:
+            print(f"🔥예열 {progress_percent:.0f}% ({elapsed_min}분/{remaining_min}분)")
     
     def complete_warmup(self):
         """예열 완료 처리"""
         self.is_warming = False
-        print("\n" + "="*60)
-        print("✅ 센서 예열 완료! 정상 모니터링을 시작합니다.")
-        print("="*60 + "\n")
+        
+        # 전역 변수 업데이트
+        global latest_sensor_data
+        latest_sensor_data['is_warming'] = False
+        
+        print("\n✅ 모니터링 시작\n")
 
 
 class DynamicEnvMonitorSystem:
@@ -1068,35 +1319,58 @@ class DynamicEnvMonitorSystem:
         
         logger.info("동적 환경 모니터링 시스템 초기화 완료")
     
-    def read_sensors(self) -> Optional[Dict[str, Any]]:
+    def read_sensors(self, use_simple_mode: bool = False) -> Optional[Dict[str, Any]]:
+        """센서 데이터 읽기 (고급 모드 또는 간단 모드 선택 가능)"""
+        logger.debug(f"센서 읽기 시작 - 간단 모드: {use_simple_mode}")
+        
         temp, hum = self.sensor_reader.read_dht_sensor()
+        logger.debug(f"DHT 센서 읽기 결과: temp={temp}, hum={hum}")
         
         if temp is None or hum is None:
             logger.warning("온습도 센서 오류")
             return None
         
         lux = self.sensor_reader.read_adc(self.config.LDR_CHANNEL)
+        logger.debug(f"LDR 센서 읽기 결과: lux={lux}")
         
-        mq_voltage = self.sensor_reader.read_voltage_average(self.config.MQ_CHANNEL)
-        co2 = self.sensor_reader.calculate_co2(mq_voltage, hum)
-        
-        mq_adc = self.sensor_reader.read_adc(self.config.MQ_CHANNEL)
-        no2 = self.sensor_reader.calculate_gas(mq_adc, "NO2")
-        co = self.sensor_reader.calculate_gas(mq_adc, "CO")
-        nh3 = self.sensor_reader.calculate_gas(mq_adc, "NH3")
-        
-        return {
-            'temperature': temp,
-            'humidity': hum,
-            'lux': lux,
-            'co2': co2,
-            'no2': no2,
-            'co': co,
-            'nh3': nh3
-        }
+        if use_simple_mode:
+            # 간단 모드: env_monitor_simple.py 방식
+            gas_data = self.sensor_reader.read_simple_gas_sensors()
+            return {
+                'temperature': temp,
+                'humidity': hum,
+                'lux': lux,
+                'co2': gas_data['co2'],
+                'no2': gas_data['no2'],
+                'co': gas_data['co'],
+                'nh3': gas_data['nh3']
+            }
+        else:
+            # 고급 모드: 기존 방식 (센서 특성곡선 사용)
+            mq_voltage = self.sensor_reader.read_voltage_average(self.config.MQ_CHANNEL)
+            co2 = self.sensor_reader.calculate_co2(mq_voltage, hum)
+            
+            mq_adc = self.sensor_reader.read_adc(self.config.MQ_CHANNEL)
+            no2 = self.sensor_reader.calculate_gas(mq_adc, "NO2")
+            co = self.sensor_reader.calculate_gas(mq_adc, "CO")
+            nh3 = self.sensor_reader.calculate_gas(mq_adc, "NH3")
+            
+            return {
+                'temperature': temp,
+                'humidity': hum,
+                'lux': lux,
+                'co2': co2,
+                'no2': no2,
+                'co': co,
+                'nh3': nh3
+            }
     
-    def check_dangers(self, sensor_data: Dict[str, Any]):
-        """동적 설정을 사용한 위험 알림 체크"""
+    def check_dangers(self, sensor_data: Dict[str, Any], is_warming: bool = False):
+        """동적 설정을 사용한 위험 알림 체크 (예열 중일 때는 저장하지 않음)"""
+        if is_warming:
+            logger.info("예열 중이므로 위험 알림을 저장하지 않습니다.")
+            return
+            
         temp = sensor_data.get('temperature')
         if temp:
             temp_high_alert = self.settings_manager.get_setting('tempHighAlert', 35)
@@ -1151,6 +1425,10 @@ class DynamicEnvMonitorSystem:
         if temp is not None:
             self.device_controller.control_door(temp)
         
+        humidity = sensor_data.get('humidity')
+        if humidity is not None:
+            self.device_controller.control_servo(humidity)
+        
         fan_active, fan_reason = self.device_controller.control_fan(sensor_data)
         if fan_active:
             logger.info(f"팬 가동: {fan_reason}")
@@ -1158,15 +1436,14 @@ class DynamicEnvMonitorSystem:
         return led_status, fan_active
     
     def print_status(self, sensor_data: Dict[str, Any]):
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-        print(f"\n[{timestamp}]")
-        print(f"  온도: {sensor_data['temperature']:.1f}°C | 습도: {sensor_data['humidity']:.1f}%")
-        print(f"  조도: {sensor_data['lux']}")
-        print(f"  CO2: {sensor_data['co2']:.1f}ppm")
-        print(f"  NO2: {sensor_data['no2']:.3f}ppm | CO: {sensor_data['co']:.3f}ppm | NH3: {sensor_data['nh3']:.3f}ppm")
+        timestamp = time.strftime("%H:%M")
+        print(f"[{timestamp}] {sensor_data['temperature']:.1f}°C {sensor_data['humidity']:.0f}% "
+              f"CO2:{sensor_data['co2']:.0f} CO:{sensor_data['co']:.1f} NH3:{sensor_data['nh3']:.1f}")
     
     def run(self):
         """메인 실행 루프 (설정 자동 리로드 포함)"""
+        global latest_sensor_data  # 전역 변수 선언을 함수 시작 부분에 한 번만
+        
         logger.info("="*60)
         logger.info("동적 환경 모니터링 시스템 시작")
         logger.info("="*60)
@@ -1185,14 +1462,55 @@ class DynamicEnvMonitorSystem:
                 if self.settings_manager.should_reload_settings():
                     self.settings_manager.load_settings_from_db()
                 
-                sensor_data = self.read_sensors()
+                # 예열 중인지 확인
+                if self.warmup_manager.is_warming:
+                    # 예열 중일 때는 전역 변수에 예열 상태만 업데이트
+                    latest_sensor_data['is_warming'] = True
+                    logger.debug(f"예열 중 - is_warming 설정: {latest_sensor_data['is_warming']}")
+                    
+                    # 예열 중에도 공기질 센서는 읽어야 함 (정확한 측정을 위해)
+                    temp, hum = self.sensor_reader.read_dht_sensor()
+                    if temp is not None and hum is not None:
+                        # 공기질 센서 읽기 (예열 중에도 필요)
+                        mq_voltage = self.sensor_reader.read_voltage_average(self.config.MQ_CHANNEL)
+                        co2 = self.sensor_reader.calculate_co2(mq_voltage, hum)
+                        
+                        mq_adc = self.sensor_reader.read_adc(self.config.MQ_CHANNEL)
+                        no2 = self.sensor_reader.calculate_gas(mq_adc, "NO2")
+                        co = self.sensor_reader.calculate_gas(mq_adc, "CO")
+                        nh3 = self.sensor_reader.calculate_gas(mq_adc, "NH3")
+                        
+                        simple_data = {
+                            'temperature': temp,
+                            'humidity': hum,
+                            'co2': co2,
+                            'no2': no2,
+                            'co': co,
+                            'nh3': nh3
+                        }
+                        self.warmup_manager.print_progress(simple_data)
+                    else:
+                        self.warmup_manager.print_progress()
+                    
+                    _, _, is_complete = self.warmup_manager.get_progress()
+                    if is_complete:
+                        self.warmup_manager.complete_warmup()
+                    
+                    time.sleep(1)
+                    continue
+                
+                # 센서 모드 설정 확인
+                use_simple_mode = self.settings_manager.get_setting('useSimpleSensorMode', False)
+                sensor_data = self.read_sensors(use_simple_mode)
                 
                 if sensor_data is None:
+                    logger.warning("센서 데이터 읽기 실패 - 재시도 중...")
                     time.sleep(2)
                     continue
                 
+                logger.debug(f"센서 데이터 읽기 성공: {sensor_data}")
+                
                 # 전역 변수 업데이트
-                global latest_sensor_data
                 latest_sensor_data = {
                     'temperature': round(sensor_data['temperature'], 1),
                     'humidity': round(sensor_data['humidity'], 1),
@@ -1202,28 +1520,23 @@ class DynamicEnvMonitorSystem:
                     'co': round(sensor_data['co'], 3),
                     'nh3': round(sensor_data['nh3'], 3),
                     'timestamp': datetime.now().isoformat(),
-                    'is_warming': self.warmup_manager.is_warming
+                    'is_warming': False
                 }
                 
-                # 예열 중인지 확인
-                if self.warmup_manager.is_warming:
-                    self.warmup_manager.print_progress(sensor_data)
-                    
-                    _, _, is_complete = self.warmup_manager.get_progress()
-                    if is_complete:
-                        self.warmup_manager.complete_warmup()
-                    
-                    time.sleep(1)
-                    continue
+                # 센서 히스토리 업데이트 (2초마다)
+                if loop_count % 2 == 0:  # 2초마다 히스토리 업데이트
+                    update_sensor_history(latest_sensor_data)
+                    logger.debug(f"센서 히스토리 업데이트됨 - 온도: {latest_sensor_data['temperature']}, 히스토리 크기: {len(sensor_history['temperature'])}")
                 
                 # 정상 모니터링 모드
-                self.check_dangers(sensor_data)
+                self.check_dangers(sensor_data, is_warming=False)
                 self.control_devices(sensor_data)
                 
-                if loop_count % 2 == 0:
+                if loop_count % 10 == 0:  # 10초마다 상태 출력
+                    logger.debug(f"상태 출력 시도 - 센서 데이터: {sensor_data}")
                     self.print_status(sensor_data)
                 
-                # 5분마다 DB 저장
+                # 5분마다 DB 저장 (예열 중이 아닐 때만)
                 if loop_count % 300 == 0 and loop_count > 0:
                     db_data = {
                         'temperature': round(sensor_data['temperature'], 1),

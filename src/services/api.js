@@ -156,14 +156,27 @@ export const chickenAPI = {
   }
 }
 
-  // 센서 데이터 관련 API
-  export const sensorAPI = {
-    // 실시간 센서 데이터 조회
-    getRealtimeData: async () => {
-      const response = await apiClient.get('/raspberry/realtime')
+// 센서 데이터 관련 API
+export const sensorAPI = {
+  // 실시간 센서 데이터 조회
+  getRealtimeData: async () => {
+    const response = await apiClient.get('/api/realtime')
+    return response.data
+  },
+
+  // 특정 센서의 최근 30초간 히스토리 데이터 조회
+  getSensorHistory: async (sensorType) => {
+    try {
+      const response = await apiClient.get(`/api/sensor-history/${sensorType}`, {
+        timeout: 10000 // 10초 타임아웃
+      })
       return response.data
+    } catch (error) {
+      console.error(`센서 히스토리 조회 오류 (${sensorType}):`, error.message)
+      throw error
     }
   }
+}
 
 // 환경 설정 관련 API
 export const envSettingsAPI = {

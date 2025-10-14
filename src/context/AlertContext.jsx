@@ -1,10 +1,19 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from "react";
-import { sensorAPI, dangerNoticeAPI } from "../services/api";
+import { sensorAPI, dangerNoticeAPI, envSettingsAPI } from "../services/api";
 
 const AlertContext = createContext();
 
 export const AlertProvider = ({ children }) => {
   const [alerts, setAlerts] = useState([]);
+  const [alertSettings, setAlertSettings] = useState({
+    tempHighAlert: 35,
+    tempLowAlert: 10,
+    humidityHighAlert: 85,
+    humidityLowAlert: 30,
+    co2Alert: 2000,
+    coAlert: 50,
+    nh3Alert: 25
+  });
   const lastSavedAlertsRef = useRef([]); // useRef를 사용하여 불필요한 리렌더링 없이 이전 상태를 기억
 
   // DB에 위험 알림 저장
@@ -39,6 +48,31 @@ export const AlertProvider = ({ children }) => {
     }
   };
 
+  // 설정값 로드
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const result = await envSettingsAPI.getSettings();
+        if (result.success && result.data) {
+          setAlertSettings({
+            tempHighAlert: result.data.tempHighAlert || 35,
+            tempLowAlert: result.data.tempLowAlert || 10,
+            humidityHighAlert: result.data.humidityHighAlert || 85,
+            humidityLowAlert: result.data.humidityLowAlert || 30,
+            co2Alert: result.data.co2Alert || 2000,
+            coAlert: result.data.coAlert || 50,
+            nh3Alert: result.data.nh3Alert || 25
+          });
+          console.log("알림 설정 로드 완료:", result.data);
+        }
+      } catch (error) {
+        console.error("알림 설정 로드 실패:", error);
+      }
+    };
+    
+    loadSettings();
+  }, []);
+
   // ✅ 전역에서 센서 데이터 계속 받기
   useEffect(() => {
     let intervalId; // setInterval ID를 저장할 변수
@@ -53,18 +87,21 @@ export const AlertProvider = ({ children }) => {
           const data = result.data;
           const newAlerts = [];
 
-          // 비정상 감지
-          // 조도 알림 비활성화 (임시)
-          // if (data.lux > 100)
-          //   newAlerts.push({ message: `🌡️ 조도가 ${data.lux.toFixed(1)}lux로 너무 높습니다.`, category: "조명" });
-          if (data.temperature > 30)
+          // 비정상 감지 (백엔드 설정값 사용)
+          if (data.temperature > alertSettings.tempHighAlert)
             newAlerts.push({ message: `🌡️ 온도가 ${data.temperature.toFixed(1)}°C로 너무 높습니다.`, category: "온도" });
-          if (data.temperature < 10)
+          if (data.temperature < alertSettings.tempLowAlert)
             newAlerts.push({ message: `❄️ 온도가 ${data.temperature.toFixed(1)}°C로 너무 낮습니다.`, category: "온도" });
-          if (data.humidity > 80)
+          if (data.humidity > alertSettings.humidityHighAlert)
             newAlerts.push({ message: `💧 습도가 ${data.humidity.toFixed(1)}%로 너무 높습니다.`, category: "습도" });
-          if (data.co2 > 1000)
+          if (data.humidity < alertSettings.humidityLowAlert)
+            newAlerts.push({ message: `💧 습도가 ${data.humidity.toFixed(1)}%로 너무 낮습니다.`, category: "습도" });
+          if (data.co2 > alertSettings.co2Alert)
             newAlerts.push({ message: `⚠️ CO2 농도가 ${data.co2.toFixed(1)}ppm으로 너무 높습니다.`, category: "CO2" });
+          if (data.co > alertSettings.coAlert)
+            newAlerts.push({ message: `⚠️ CO 농도가 ${data.co.toFixed(3)}ppm으로 위험합니다.`, category: "CO" });
+          if (data.nh3 > alertSettings.nh3Alert)
+            newAlerts.push({ message: `⚠️ 암모니아 농도가 ${data.nh3.toFixed(3)}ppm으로 높습니다.`, category: "NH3" });
 
           setAlerts(newAlerts); // 알림 목록 업데이트
           saveDangerNotice(newAlerts); // 업데이트된 새 알림 목록으로 DB 저장 함수 호출
@@ -80,7 +117,7 @@ export const AlertProvider = ({ children }) => {
     return () => {
       clearInterval(intervalId); // 컴포넌트 언마운트 시 인터벌 정리
     };
-  }, []); // 의존성 배열을 비워 최초 1회만 등록되도록 함
+  }, [alertSettings]); // alertSettings가 변경될 때마다 재실행
 
   return (
     <AlertContext.Provider value={{ alerts, setAlerts }}>
