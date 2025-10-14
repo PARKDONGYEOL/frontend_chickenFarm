@@ -41,6 +41,37 @@
   gap: 12px;
 }
 
+.viewModeButtons {
+  display: flex;
+  gap: 4px;
+  background: #f3f4f6;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.viewModeButton {
+  padding: 6px 16px;
+  background: transparent;
+  color: #666;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.viewModeButton:hover {
+  background: #e5e7eb;
+  color: #333;
+}
+
+.viewModeButton.active {
+  background: white;
+  color: #4caf50;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
 .datePicker {
   padding: 8px 12px;
   border: 1px solid #e5e7eb;

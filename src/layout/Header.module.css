@@ -185,11 +185,13 @@
 .integratedDropdown {
   position: absolute;
   top: 100%;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   background: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  min-width: 140px;
+  min-width: fit-content;
+  width: max-content;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   margin-top: 0px;

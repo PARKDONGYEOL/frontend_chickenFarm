@@ -1,15 +1,16 @@
 .title_div{
   width: 100%;
   height: 100%;
-  background-image: url('/CCTV.jpg');
-  background-size: cover;   
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(69, 160, 73, 0.1) 100%),
+              url('/CCTV.jpg');
+  background-size: cover;
   background-repeat: no-repeat;
-  background-position: center; 
-  background-color: black;
-  border-radius: 10px;
-  opacity: 0.7;
-  position: relative; 
-
+  background-position: center;
+  border-radius: 12px;
+  opacity: 0.9;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
 }
 
 .title_div > p{
@@ -22,16 +23,15 @@
   font-size: 5rem;
   font-weight: bold;
   text-align: center;
-  color: rgb(72, 32, 216);
-  text-shadow:
-    -1px -1px 0 #000,
-     1px -1px 0 #000,
-    -1px  1px 0 #000,
-     1px  1px 0 #000;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
 
-  opacity: 0;                
-  transition: opacity 1s;      
-
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
 }
 
 .show {

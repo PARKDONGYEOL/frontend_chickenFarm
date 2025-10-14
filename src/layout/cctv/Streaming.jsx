@@ -1,5 +1,6 @@
 // 맨 위 import 라인 유지
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Streaming.module.css";
 import Button from "../../common/Button";
 import axios from "axios";
@@ -13,6 +14,7 @@ const NO_SIGNAL_NOISE = "/no_signal_noise.gif";
 const DEFAULT_DURATION = 300000; // 기본 5분 (10분 600,000ms)
 
 export default function Streaming() {
+  const navigate = useNavigate();
   const [alarms, setAlarms] = useState([]);
   const [selectedCamera, setSelectedCamera] = useState(1);
   const [isAlarmOn, setIsAlarmOn] = useState(false);
@@ -433,18 +435,21 @@ const handleRecordToggle = async () => {
           <div className={styles.play_div}>
             <Button
               size="95px"
+              height="40px"
               title={isAlarmOn && selectedCamera === 1 ? "알람ON" : "알람OFF"}
               color={isAlarmOn && selectedCamera === 1 ? "green" : "gray"}
               onClick={handleAlarmToggle}
             />
             <Button
               size="95px"
+              height="40px"
               title={isRecordOn && selectedCamera === 1 ? "녹화ON" : "녹화OFF"}
               color={isRecordOn && selectedCamera === 1 ? "green" : "gray"}
               onClick={handleRecordToggle}
             />
             <Button
               size="95px"
+              height="40px"
               title={isCaptureOn && selectedCamera === 1 ? "캡쳐ON" : "캡쳐OFF"}
               color={isCaptureOn && selectedCamera === 1 ? "green" : "gray"}
               onClick={handleCaptureToggle}
@@ -454,10 +459,15 @@ const handleRecordToggle = async () => {
       </div>
 
       <div className={styles.button_div}>
-        <Button title="1번 카메라" size="22%" color={selectedCamera === 1 ? "blue" : "gray"} onClick={() => setSelectedCamera(1)} />
-        <Button title="2번 카메라" size="22%" color={selectedCamera === 2 ? "blue" : "gray"} onClick={() => setSelectedCamera(2)} />
-        <Button title="3번 카메라" size="22%" color={selectedCamera === 3 ? "blue" : "gray"} onClick={() => setSelectedCamera(3)} />
-        <Button title="4번 카메라" size="22%" color={selectedCamera === 4 ? "blue" : "gray"} onClick={() => setSelectedCamera(4)} />
+        <Button title="1번 카메라" size="22%" height="48px" color={selectedCamera === 1 ? "blue" : "gray"} onClick={() => setSelectedCamera(1)} />
+        <Button title="2번 카메라" size="22%" height="48px" color={selectedCamera === 2 ? "blue" : "gray"} onClick={() => setSelectedCamera(2)} />
+        <Button title="3번 카메라" size="22%" height="48px" color={selectedCamera === 3 ? "blue" : "gray"} onClick={() => setSelectedCamera(3)} />
+        <Button title="4번 카메라" size="22%" height="48px" color={selectedCamera === 4 ? "blue" : "gray"} onClick={() => setSelectedCamera(4)} />
+      </div>
+
+      <div className={styles.navigation_div}>
+        <Button title="알림 페이지로 이동" size="48%" height="48px" color="green" onClick={() => navigate('/home/alarms')} />
+        <Button title="녹화 페이지로 이동" size="48%" height="48px" color="green" onClick={() => navigate('/home/videos')} />
       </div>
 
       <Modal size="640px" title={capturedImageUrl ? "캡처 이미지" : "알림"} isOpen={modalOpen} onClose={handleModalClose}>

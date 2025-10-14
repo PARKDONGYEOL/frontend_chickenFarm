@@ -5,6 +5,7 @@ import * as noteApi from "../api/noteApi";
 const Diary = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [entries, setEntries] = useState([]);
+  const [viewMode, setViewMode] = useState('day'); // 'day', 'week', 'month'
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -17,16 +18,58 @@ const Diary = () => {
     ? JSON.parse(sessionStorage.getItem('loginInfo')).memId
     : 'admin';
 
-  // 날짜 변경 시 해당 날짜의 일지 조회
+  // 날짜 변경 시 또는 뷰모드 변경 시 일지 조회
   useEffect(() => {
-    fetchNotesByDate();
-  }, [selectedDate]);
+    fetchNotesByDateRange();
+  }, [selectedDate, viewMode]);
 
-  // 특정 날짜의 일지 조회
-  const fetchNotesByDate = async () => {
+  // 날짜 범위 계산
+  const getDateRange = () => {
+    const today = new Date(selectedDate);
+    let startDate, endDate;
+
+    if (viewMode === 'day') {
+      startDate = selectedDate;
+      endDate = selectedDate;
+    } else if (viewMode === 'week') {
+      // 오늘 기준 최근 7일
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - 6);
+      startDate = weekStart.toISOString().split('T')[0];
+      endDate = selectedDate;
+    } else if (viewMode === 'month') {
+      // 오늘 기준 최근 30일
+      const monthStart = new Date(today);
+      monthStart.setDate(today.getDate() - 29);
+      startDate = monthStart.toISOString().split('T')[0];
+      endDate = selectedDate;
+    }
+
+    return { startDate, endDate };
+  };
+
+  // 날짜 범위에 따른 일지 조회
+  const fetchNotesByDateRange = async () => {
     try {
-      const data = await noteApi.getNotesByDate(memId, selectedDate);
-      setEntries(data);
+      const { startDate, endDate } = getDateRange();
+
+      if (viewMode === 'day') {
+        const data = await noteApi.getNotesByDate(memId, selectedDate);
+        setEntries(data);
+      } else {
+        // 일주일/월간의 경우 범위 내 모든 데이터 조회
+        const allData = [];
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          const dateStr = d.toISOString().split('T')[0];
+          const data = await noteApi.getNotesByDate(memId, dateStr);
+          allData.push(...data);
+        }
+
+        setEntries(allData);
+      }
     } catch (error) {
       console.error('일지 조회 실패:', error);
       setEntries([]);
@@ -45,7 +88,7 @@ const Diary = () => {
 
         if (result.success) {
           alert(result.message);
-          fetchNotesByDate(); // 목록 새로고침
+          fetchNotesByDateRange(); // 목록 새로고침
           setEditingId(null);
         } else {
           alert(result.message);
@@ -65,7 +108,7 @@ const Diary = () => {
 
         if (result.success) {
           alert(result.message);
-          fetchNotesByDate(); // 목록 새로고침
+          fetchNotesByDateRange(); // 목록 새로고침
         } else {
           alert(result.message);
         }
@@ -95,7 +138,7 @@ const Diary = () => {
 
         if (result.success) {
           alert(result.message);
-          fetchNotesByDate(); // 목록 새로고침
+          fetchNotesByDateRange(); // 목록 새로고침
         } else {
           alert(result.message);
         }
@@ -116,6 +159,17 @@ const Diary = () => {
 
   const filteredEntries = entries;
 
+  const getViewModeLabel = () => {
+    const { startDate, endDate } = getDateRange();
+    if (viewMode === 'day') {
+      return `${selectedDate} 기록`;
+    } else if (viewMode === 'week') {
+      return `${startDate} ~ ${endDate} (최근 7일)`;
+    } else {
+      return `${startDate} ~ ${endDate} (최근 30일)`;
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -124,6 +178,26 @@ const Diary = () => {
           <p className={styles.subtitle}>일일 사육 기록</p>
         </div>
         <div className={styles.headerRight}>
+          <div className={styles.viewModeButtons}>
+            <button
+              className={`${styles.viewModeButton} ${viewMode === 'day' ? styles.active : ''}`}
+              onClick={() => setViewMode('day')}
+            >
+              일간
+            </button>
+            <button
+              className={`${styles.viewModeButton} ${viewMode === 'week' ? styles.active : ''}`}
+              onClick={() => setViewMode('week')}
+            >
+              주간
+            </button>
+            <button
+              className={`${styles.viewModeButton} ${viewMode === 'month' ? styles.active : ''}`}
+              onClick={() => setViewMode('month')}
+            >
+              월간
+            </button>
+          </div>
           <input
             type="date"
             value={selectedDate}
@@ -166,7 +240,7 @@ const Diary = () => {
       <div className={styles.entriesContainer}>
         <div className={styles.entriesHeader}>
           <h3 className={styles.entriesTitle}>
-            {selectedDate} 기록 ({filteredEntries.length}건)
+            {getViewModeLabel()} ({filteredEntries.length}건)
           </h3>
         </div>
 
