@@ -1,5 +1,3 @@
-/* ChickenList.module.css */
-
 /* 개체 목록 섹션 - 배치 표와 동일한 구조 */
 .container {
   background: white;
@@ -58,7 +56,7 @@
   border-bottom: none;
 }
 
-.table input[type="checkbox"] {
+.table input, .check_and_button input[type="checkbox"] {
   width: 18px;
   height: 18px;
   accent-color: #059669;
@@ -81,6 +79,10 @@
   text-align: center;
 }
 
+.chicken_count > div:nth-of-type(3){
+  background: hsl(0, 60%, 98%);
+}
+
 .chicken_count > div > div {
   font-size: 2rem;
   font-weight: 700;
@@ -88,8 +90,61 @@
   margin-bottom: 0.5rem;
 }
 
+.chicken_count > div:nth-of-type(3) > div{
+  color: #dd0b0b;
+}
+
 .chicken_count > div > span {
   display: block;
   color: #64748b;
   font-size: 0.875rem;
+}
+
+.chicken_list{
+  display: flex;
+  flex-direction: column;
+}
+
+.btn_div{
+  margin-left: auto;
+  margin-bottom: 15px;
+  display: flex;
+}
+
+.btn_div > button{
+  margin-left: 15px;
+}
+
+.btn_div > button:last-child{
+  font-size: 0.75rem;
+}
+
+.dead_color{
+  background-color: #f7f7f7;
+}
+
+.dead_color:hover{
+  background-color: #f7f7f7 !important;
+}
+
+.sick_color{
+  background-color: #fff5f5;
+}
+
+.sick_color:hover{
+  background-color: #f8ecec !important;
+}
+
+.check_and_button{
+  display: flex;
+  align-items:  center;
+}
+
+.check_and_button input{
+  vertical-align: middle;
+}
+
+.check_and_button > span{
+  font-size: 1.02rem;
+  margin-right: 10px;
 }

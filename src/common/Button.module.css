@@ -34,6 +34,15 @@
   background-color: #077341;
 }
 
+.red{
+  background-color: #dc143c;
+}
+
+.red:hover{
+  cursor: pointer;
+  background-color: #c41e3f;
+}
+
 .disabled{
   opacity: 0.5;
   cursor: default !important;

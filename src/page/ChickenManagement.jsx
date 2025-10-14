@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import styles from './ChickenManagement.module.css'
 import Input from '../common/Input'
 import Button from '../common/Button'
@@ -6,103 +6,178 @@ import { batchAPI, farmAPI } from '../services/api'
 import ChickenList from './ChickenList'
 
 const ChickenManagement = () => {
+  //양계장 번호 조회
+  const [farmNumList, setFarmNumList] = useState([]);
+
   //화면 다시 그리기
-  const [reload, setReload] = useState(0)
+  const [reload, setReload] = useState(0);
 
   //출하를 위한 체크박스
   const [checkedBatches, setCheckedBatches] = useState([]);
 
+  //전체 체크박스
+  const [isAllChecked, setIsAllChecked] = useState(false);
+
   //배치 번호 넘기기
-  const [selectedBatchId, setSelectedBatchId] = useState('')
+  const [selectedBatchId, setSelectedBatchId] = useState('');
+
+  //폐사 처리된 배치 보기 여부
+  const [showDeadBatches, setShowDeadBatches] = useState(false);
   
   //축사 정보 저장
-  const [farmName, setFarmName] = useState('')
+  const [farmName, setFarmName] = useState('');
 
   //배치 정보 저장
   const [batch, setBatch] = useState({
     'farmNum' : '',
     'entryDate' : '',
     'initialCount' : ''
-  })
+  });
 
   //불러온 배치 정보 담을 변수
   const [batchInfo, setBatchInfo] = useState([]);
 
-  // 체크박스 선택/해제 처리
-  const handleCheckbox = (batchId) => {
-    if (checkedBatches.includes(batchId)) {
-      // 이미 체크된 경우 제거
-      setCheckedBatches(checkedBatches.filter(id => id !== batchId));
-    } else {
+  const [errorMsg, setErrorMsg] = useState({
+    'farmNameError' : '',
+    'farmNumError' : '',
+    'entryDateError' : '',
+    'initialCountError' : ''
+  });
+
+  const regex = /^[0-9]+$/; //정수 정규식
+
+  //화면에 띄울 배치
+  const displayBatchInfo = 
+  showDeadBatches 
+  ? 
+  batchInfo.filter(batch => batch.currentCount === 0) //폐사 처리된 배치
+  :
+  batchInfo.filter(batch => batch.currentCount > 0); //살아 있는 배치
+
+  // 체크박스 선택/해제
+  const handleCheckbox = (e) => {
+    if (e.target.checked) {
       // 체크 추가
-      setCheckedBatches([...checkedBatches, batchId]);
+      setCheckedBatches([...checkedBatches, e.target.value]);
+    } else {
+      // 이미 체크된 경우 제거
+      setCheckedBatches(checkedBatches.filter(batchId => batchId !== e.target.value));
+      setIsAllChecked(false);
+    }
+  }
+
+  //전체 체크박스 선택/해제 (살아있는 배치 중에서)
+  const handleCheckedAll = (e) => {
+    if(e.target.checked){
+      const allBatchIds = displayBatchInfo
+                          .filter(batch => batch.currentCount !== 0)
+                          .map(batch => String(batch.batchId));
+      setCheckedBatches(allBatchIds);
+      setIsAllChecked(true)
+    }
+    else {
+      setCheckedBatches([]);
+      setIsAllChecked(false);
     }
   }
 
   const handleShipment = async () => {
   if (checkedBatches.length === 0) {
-    alert('출하할 배치를 선택해주세요');
+    alert('출하할 배치를 선택해주세요.');
     return;
   }
 
-  try {
-    await batchAPI.updateShipment(checkedBatches);
-    alert('출하 완료');
-    setCheckedBatches([]);  // 체크박스 초기화
-    setReload(reload + 1);
-  } catch (e) {
-    console.log(e);
-    alert('출하 처리 중 오류가 발생했습니다');
+  if(!confirm(`선택한 ${checkedBatches.length}개 배치를 출하 처리하시겠습니까?`)){
+    return ;
   }
+
+  axios.put('/api/batch/shipment', { batchIdList: checkedBatches })
+    .then(res => {
+      alert('출하가 완료되었습니다.');
+      setCheckedBatches([]);  // 체크박스 초기화
+      setIsAllChecked(false);
+      setReload(reload + 1)
+    })
+    .catch(e => {
+      console.log(e);
+      alert('출하 처리 중 오류가 발생했습니다.');
+    });
 }
+
+  //배치 정보 변경 시 체크박스 초기화
+  useEffect(() => {
+    setCheckedBatches([]);
+    setIsAllChecked(false);
+  }, [showDeadBatches])
+
+  //양계장 번호 조회
+  useEffect(() => {
+    axios.get('/api/farm/num-list')
+    .then(res => setFarmNumList(res.data))
+    .catch(e => console.log(e));
+  }, [])
 
   //배치 정보 불러오기
   useEffect(() => {
-    const fetchBatchInfo = async () => {
-      try {
-        const res = await batchAPI.getBatchInfo();
-        console.log('배치 정보 응답:', res);
-        // API 응답이 {success: true, data: [...]} 형태인지 확인
-        if (res && res.success && Array.isArray(res.data)) {
-          setBatchInfo(res.data);
-        } else if (Array.isArray(res)) {
-          setBatchInfo(res);
-        } else {
-          console.log('배치 정보가 배열이 아닙니다:', res);
-          setBatchInfo([]);
-        }
-      } catch (e) {
-        console.log('배치 정보 로드 오류:', e);
-        setBatchInfo([]);
-      }
-    };
-    fetchBatchInfo();
+    axios.get('/api/batch/info')
+    .then(res => {
+      setBatchInfo(res.data);
+    })
+    .catch(e => console.log(e));
   }, [reload])
 
   //양계장 등록
-  const regFarmName = async () => {
-    try {
-      await farmAPI.createFarm({ farmName: farmName });
-      alert('등록 완료');
-      setFarmName('');
-    } catch (e) {
-      console.log(e);
+  const regFarmName = () => {
+    if(farmName === ''){
+      setErrorMsg({
+        ...errorMsg,
+        'farmNameError' : '양계장 이름을 입력해주세요.'
+      })
+      return ;
     }
+    axios.post(`/api/farm`, {farmName : farmName})
+    .then(res => {
+      alert('양계장 등록이 완료되었습니다.');
+      setFarmName('');
+      changeReload();
+    })
+    .catch(e => {
+      console.log(e)
+    });
   }
 
   //배치 & 개체 동시 등록
-  const regBatchAndChickens = async () => {
-    try {
-      await batchAPI.createBatch(batch);
-      alert('등록 완료');
-      setBatch({
-        'farmNum': '',
-        'entryDate': '',
-        'initialCount': ''
-      });
-    } catch (e) {
-      console.log(e);
+  const regBatchAndChickens = () => {
+    const newErrors = {
+      farmNumError: batch.farmNum === '' ? '양계장을 선택해주세요.' : '',
+      entryDateError: batch.entryDate === '' ? '입식일을 선택해주세요.' : '',
+      initialCountError: batch.initialCount === '' ? '닭 개체 수를 입력해주세요.' :
+                        !regex.test(batch.initialCount) ? '숫자를 입력해주세요.' : ''
+    };
+
+    setErrorMsg({
+      ...errorMsg,
+      ...newErrors
+    });
+
+    //에러가 하나라도 있으면 등록 중단
+    if(Object.values(newErrors).some(error => error !== '')){
+      return ;
     }
+
+    axios.post('/api/batch', batch)
+    .then(res => {
+      alert('배치 등록이 완료되었습니다.');
+      setBatch({
+        'farmNum' : '',
+        'entryDate' : '',
+        'initialCount' : ''
+      });
+      changeReload();
+    })
+    .catch(e => {
+      console.log(e)
+    });
   }
 
   //배치 인풋에 입력한 값으로 변경
@@ -113,7 +188,9 @@ const ChickenManagement = () => {
     })
   }
 
-    
+  const changeReload = () => {
+    setReload(reload + 1);
+  }
 
   return (
     <div className={styles.container}>
@@ -122,12 +199,24 @@ const ChickenManagement = () => {
         <h3>양계장 등록</h3>
         <div className={styles.farm_reg}>
           <span>양계장 이름</span>
-          <Input 
-            value={farmName} 
-            onChange={(e) => setFarmName(e.target.value)}
-            size='120px'
-            height='30px'
-          />
+          <div className={styles.valid}>
+            <Input 
+              value={farmName} 
+              onChange={(e) => {
+                setFarmName(e.target.value);
+                setErrorMsg({
+                  ...errorMsg,
+                  'farmNameError' : e.target.value === '' ? '양계장 이름을 입력해주세요.' : ''
+                })
+              }}
+              size='150px'
+              height='30px'
+              onKeyDown={e => {
+                if(e.key === 'Enter') regFarmName()
+              }}
+              />
+              <p className={styles.error}>{errorMsg.farmNameError}</p>
+          </div>
           <Button 
             size='80px'
             height='30px'
@@ -141,35 +230,72 @@ const ChickenManagement = () => {
         <h3>배치 등록</h3>
         <div className={styles.batch_reg}>
           <div className={styles.input_group}>
-            <span>양계장 번호</span>
-            <Input 
-              size='120px'
-              height='30px'
-              name='farmNum'
-              value={batch.farmNum}
-              onChange={(e) => handleBatch(e)}
-            />
+            <span>양계장</span>
+            <div className={styles.valid}>
+              <select
+                name='farmNum'
+                value={batch.farmNum}
+                onChange={(e) => {
+                  handleBatch(e);
+                  setErrorMsg({
+                  ...errorMsg,
+                  'farmNumError' : e.target.value === '' ? '양계장을 선택해주세요.' : ''
+                  })
+                }}
+              >
+                <option value=''>선택</option>
+                {
+                  farmNumList.map((farm, i) => {
+                    return (
+                      <option key={i} value={farm.farmNum}>{farm.farmNum} - {farm.farmName}</option>
+                    )
+                  })
+                }
+              </select>
+              <p className={styles.error}>{errorMsg.farmNumError}</p>
+            </div>
           </div>
           <div className={styles.input_group}>
             <span>입식일</span>
-            <Input 
-              size='120px'
-              height='30px'
-              type='date'
-              name='entryDate'
-              value={batch.entryDate}
-              onChange={(e) => handleBatch(e)}
-            />
+           <div className={styles.valid}>
+              <Input 
+                size='140px'
+                height='30px'
+                type='date'
+                name='entryDate'
+                value={batch.entryDate}
+                onChange={(e) => {
+                  handleBatch(e);
+                  setErrorMsg({
+                  ...errorMsg,
+                  'entryDateError' 
+                  : e.target.value === '' ? '입식일을 선택해주세요.' : ''
+                  })
+                }}
+              />
+              <p className={styles.error}>{errorMsg.entryDateError}</p>
+           </div>
           </div>
           <div className={styles.input_group}>
-            <span>닭의 수</span>
-            <Input 
-              size='120px'
-              height='30px'
-              name='initialCount'
-              value={batch.initialCount}
-              onChange={(e) => handleBatch(e)}
-            />
+            <span>닭 개체 수</span>
+            <div className={styles.valid}>
+              <Input 
+                size='140px'
+                height='30px'
+                name='initialCount'
+                value={batch.initialCount}
+                onChange={(e) => {
+                  handleBatch(e)
+                  setErrorMsg({
+                  ...errorMsg,
+                  'initialCountError' 
+                  : e.target.value === '' ? '닭 개체 수를 입력해주세요' :
+                    !regex.test(e.target.value) ? '숫자를 입력해주세요.' : ''
+                })
+                }}
+              />
+              <p className={styles.error}>{errorMsg.initialCountError}</p>
+            </div>
           </div>
           <Button 
             size='80px'
@@ -183,7 +309,53 @@ const ChickenManagement = () => {
       <div>
         <h3>배치 목록</h3>
         <div className={styles.batch_list}>
-          <table className={styles.table}>
+          <span>
+            <input 
+              type="checkbox" 
+              checked={isAllChecked}
+              onChange={e => handleCheckedAll(e)}
+            /> 전체 선택
+          </span>
+          {
+            displayBatchInfo.length === 0 
+            ?
+            <table className={styles.table}>
+              <colgroup>
+                <col width='*%'/>
+                <col width='19%'/>
+                <col width='19%'/>
+                <col width='18%'/>
+                <col width='18%'/>
+                <col width='10%'/>
+              </colgroup>
+              <thead>
+                <tr>
+                  <td>양계장 번호</td>
+                  <td>배치 번호</td>
+                  <td>입식일</td>
+                  <td>초기 닭의 수</td>
+                  <td>현재 닭의 수</td>
+                  <td>출하</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colSpan={6} style={{backgroundColor : 'white'}}>
+                    {showDeadBatches ? '폐사 처리된 배치가 없습니다.' : '배치가 존재하지 않습니다.'}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            :
+            <table className={styles.table}>
+              <colgroup>
+                <col width='*%'/>
+                <col width='19%'/>
+                <col width='19%'/>
+                <col width='18%'/>
+                <col width='18%'/>
+                <col width='10%'/>
+              </colgroup>
             <thead>
               <tr>
                 <td>양계장 번호</td>
@@ -196,45 +368,54 @@ const ChickenManagement = () => {
             </thead>
             <tbody>
               {
-                Array.isArray(batchInfo) && batchInfo.length > 0 
-                  ? batchInfo.map((batch, i) => (
-                      <tr key={i} onClick={() => setSelectedBatchId(batch.batchId)}>
-                        <td>{batch.farmNum}</td>
-                        <td>{batch.batchId}</td>
-                        <td>{batch.entryDate}</td>
-                        <td>{batch.initialCount}</td>
-                        <td>{batch.currentCount}</td>
-                        <td onClick={(e) => e.stopPropagation()}>
-                          <input 
-                            type='checkbox'
-                            value={batch.batchId}
-                            checked={checkedBatches.includes(batch.batchId)}
-                            onChange={() => handleCheckbox(batch.batchId)}
-                          />
-                        </td>
-                      </tr>
-                    ))
-                  : (
-                      <tr>
-                        <td colSpan="6" style={{textAlign: 'center', padding: '20px'}}>
-                          배치 데이터가 없습니다.
-                        </td>
-                      </tr>
-                    )
+                displayBatchInfo.map((batch, i) => {
+                  return (
+                    <tr 
+                      key={i} 
+                      onClick={() => setSelectedBatchId(batch.batchId)}
+                      className={batch.currentCount === 0 ? styles.dead_color : ''}
+                    >
+                      <td>{batch.farmNum}</td>
+                      <td>{batch.batchId}</td>
+                      <td>{batch.entryDate}</td>
+                      <td>{batch.initialCount}</td>
+                      <td>{batch.currentCount}</td>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <input 
+                          type='checkbox'
+                          value={batch.batchId}
+                          checked={checkedBatches.includes(String(batch.batchId))}
+                          onChange={(e) => handleCheckbox(e)}
+                          disabled={showDeadBatches}
+                        />
+                      </td>
+                    </tr>
+                  )
+                })
               }
             </tbody>
           </table>
-          <Button 
-            size='80px'
-            height='30px'
-            color='green'
-            title='출하' 
-            onClick={handleShipment}
-          />
+          }
+          <div className={styles.btn_div}>
+            <Button 
+              size='120px'
+              height='30px'
+              color='gray'
+              title={showDeadBatches ? '돌아가기' : '폐사 처리된 배치'}
+              onClick={() => setShowDeadBatches(!showDeadBatches)}
+            />
+            <Button 
+              size='80px'
+              height='30px'
+              color='green'
+              title='출하' 
+              onClick={handleShipment}
+            />
+          </div>
         </div>
       </div>
       {
-        selectedBatchId && <ChickenList batchId={selectedBatchId}/>
+        selectedBatchId && <ChickenList batchId={selectedBatchId} changeReload={changeReload} reload={reload}/>
       }
     </div>
   )
