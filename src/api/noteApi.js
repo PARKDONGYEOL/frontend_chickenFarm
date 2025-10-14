@@ -16,12 +16,27 @@ export const getAllNotes = async (memId) => {
 // 특정 날짜의 일지 조회
 export const getNotesByDate = async (memId, date) => {
   try {
+    console.log('=== getNotesByDate 호출 시작 ===');
+    console.log('memId:', memId);
+    console.log('date:', date);
+    console.log('API URL:', `${API_BASE_URL}/date`);
+    
     const response = await axios.get(`${API_BASE_URL}/date`, {
       params: { memId, date }
     });
+    
+    console.log('=== API 응답 성공 ===');
+    console.log('Response status:', response.status);
+    console.log('Response data:', response.data);
+    
     return response.data;
   } catch (error) {
-    console.error('특정 날짜 일지 조회 실패:', error);
+    console.error('=== getNotesByDate 에러 발생 ===');
+    console.error('Error message:', error.message);
+    console.error('Error response:', error.response?.data);
+    console.error('Error status:', error.response?.status);
+    console.error('Request URL:', error.config?.url);
+    console.error('Request params:', error.config?.params);
     throw error;
   }
 };

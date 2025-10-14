@@ -7,7 +7,7 @@ import {
   Title, Tooltip, Legend, TimeScale,
 } from "chart.js";
 import "chartjs-adapter-date-fns";
-import * as farmStatusApi from "../api/farmStatusApi";
+import { getDailyData, getWeeklyData, getMonthlyData } from "../api/farmStatusApi";
 
 ChartJS.register(
   CategoryScale, LinearScale, PointElement, LineElement,
@@ -25,35 +25,54 @@ const EnvDashboard = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
+      console.log('=== fetchData 시작 ===');
+      console.log('period:', period);
+      console.log('farmId:', farmId);
+      console.log('selectedDate:', selectedDate);
+      
       let response;
 
       if (period === "daily") {
-        response = await farmStatusApi.getDailyData(farmId, selectedDate);
+        console.log('일일 데이터 조회 시도...');
+        response = await getDailyData(farmId, selectedDate);
+        console.log('일일 데이터 응답:', response);
       } else if (period === "weekly") {
+        console.log('주간 데이터 조회 시도...');
         // 선택된 날짜 기준 7일 전부터 7일간
         const endDate = new Date(selectedDate);
         const startDate = new Date(endDate);
         startDate.setDate(startDate.getDate() - 6);
 
-        response = await farmStatusApi.getWeeklyData(
+        response = await getWeeklyData(
           farmId,
           startDate.toISOString().split('T')[0],
           endDate.toISOString().split('T')[0]
         );
+        console.log('주간 데이터 응답:', response);
       } else {
+        console.log('월간 데이터 조회 시도...');
         // 월간: selectedDate에서 연도 추출 (YYYY)
         const year = selectedDate.substring(0, 4);
-        response = await farmStatusApi.getMonthlyData(farmId, year + '-01');
+        response = await getMonthlyData(farmId, year + '-01');
+        console.log('월간 데이터 응답:', response);
       }
 
-      if (response.success) {
+      console.log('=== 응답 처리 시작 ===');
+      console.log('response:', response);
+      console.log('response.success:', response?.success);
+
+      if (response?.success) {
+        console.log('데이터 설정 중...', response.data);
         setFarmData(response.data || []);
       } else {
-        console.error('데이터 조회 실패:', response.message);
+        console.error('데이터 조회 실패:', response?.message);
         setFarmData([]);
       }
     } catch (error) {
-      console.error('데이터 로드 실패:', error);
+      console.error('=== fetchData 에러 발생 ===');
+      console.error('Error:', error);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
       setFarmData([]);
     } finally {
       setLoading(false);
