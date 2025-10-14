@@ -99,7 +99,7 @@ const Settings = () => {
   return (
     <div className={styles.settingsContainer}>
       <div className={styles.settingsHeader}>
-        <button onClick={() => nav("/home")} className={styles.backButton}>
+        <button onClick={() => nav(-1)} className={styles.backButton}>
           ← 뒤로가기
         </button>
         <h1>설정</h1>
