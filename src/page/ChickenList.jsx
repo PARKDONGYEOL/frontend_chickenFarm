@@ -261,7 +261,7 @@ const ChickenList = ({batchId, changeReload, reload}) => {
                       <td>{e.chickenId}</td>
                       <td>{e.age}</td>
                       <td>{e.growthStage}</td>
-                      <td>{e.rawWeight}</td>
+                      <td>{e.rawWeight}g</td>
                       <td>{e.healthStatus}</td>
                     </tr>
                   )
