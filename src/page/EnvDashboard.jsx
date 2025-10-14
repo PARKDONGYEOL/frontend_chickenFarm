@@ -105,6 +105,9 @@ const EnvDashboard = () => {
 
   return (
     <div className={styles.container}>
+      {/* 페이지 제목 */}
+      <h2>통계</h2>
+
       {/* 데이터 모니터링 컨트롤 */}
       <div className={styles.controlPanel}>
         <div className={styles.controlLeft}>

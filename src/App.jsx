@@ -14,30 +14,36 @@ import Diary from './page/Diary'
 import ChickenInoculation from './page/ChickenInoculation'
 import ChickenInoculationList from './page/ChickenInoculationList'
 import ChickenInoculationSchedule from './page/ChickenInoculationSchedule'
+import AlertHistory from './page/AlertHistory'
+import EnvSettings from './page/EnvSettings'
+import { AlertProvider } from './context/AlertContext'
 
 
 function App() {
 
-   return (
-    <Routes>
-      <Route path='/' element={<Login />} />
-      <Route path='/settings' element={<Settings />} />
+  return (
+    <AlertProvider>
+      <Routes>
+        <Route path='/' element={<Login />} />
+        <Route path='/settings' element={<Settings />} />
 
-      <Route path='home' element={<Home />} >
-        <Route path='real' element={<RealTimeMonitoring />} />
-        <Route path='env' element={<EnvDashboard/>}/>
-        <Route path='trend' element={<TrendAnalysis/>}/>
-        <Route path='daily' element={<DailyInformation />} />
-        <Route path='weekly' element={<WeeklyInformation />} />
-        <Route path='chickenmanagement' element={<ChickenManagement />} />
-        <Route path='cctv' element={<CCTV />} />
-        <Route path='diary' element={<Diary />} />
-        <Route path='inoculation' element={<ChickenInoculation />} />
-        <Route path='inoculation-list' element={<ChickenInoculationList />} />
-        <Route path='inoculation-schedule' element={<ChickenInoculationSchedule />} />
-      </Route>
-
-    </Routes>
+        <Route path='home' element={<Home />} >
+          <Route path='real' element={<RealTimeMonitoring />} />
+          <Route path='env' element={<EnvDashboard />} />
+          <Route path='trend' element={<TrendAnalysis />} />
+          <Route path='daily' element={<DailyInformation />} />
+          <Route path='weekly' element={<WeeklyInformation />} />
+          <Route path='chickenmanagement' element={<ChickenManagement />} />
+          <Route path='cctv' element={<CCTV />} />
+          <Route path='diary' element={<Diary />} />
+          <Route path='inoculation' element={<ChickenInoculation />} />
+          <Route path='inoculation-list' element={<ChickenInoculationList />} />
+          <Route path='inoculation-schedule' element={<ChickenInoculationSchedule />} />
+          <Route path='alert-history' element={<AlertHistory />} />
+          <Route path='env-settings' element={<EnvSettings />} />
+        </Route>
+      </Routes>
+    </AlertProvider>
   )
 }
 export default App

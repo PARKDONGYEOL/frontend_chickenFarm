@@ -60,4 +60,7 @@
 .content {
   flex: 1;
   min-height: 0; /* 자식 차트가 높이 100% 사용할 수 있게 */
+  padding: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './ChickenInoculation.module.css'
-import { inoculationAPI } from '../services/api'
+import { inoculationAPI, batchAPI } from '../services/api'
 
 const ChickenInoculation = () => {
   const navigate = useNavigate()
@@ -34,15 +34,32 @@ const ChickenInoculation = () => {
     try {
       setLoading(true)
       setError(null)
-      const batchesData = await inoculationAPI.getBatchesByFarm(1)
-      setBatches(batchesData)
-      if (batchesData.length > 0) {
-        setSelectedBatch(batchesData[0].batchId)
+      console.log('배치 데이터 로드 시작...')
+      
+      // batchAPI.getBatchInfo() 사용
+      const batchesData = await batchAPI.getBatchInfo()
+      console.log('배치 데이터 응답:', batchesData)
+      
+      if (batchesData && Array.isArray(batchesData)) {
+        setBatches(batchesData)
+        if (batchesData.length > 0) {
+          setSelectedBatch(batchesData[0].batchId)
+        }
+        console.log('배치 데이터 로드 성공:', batchesData.length, '건')
+      } else if (batchesData && batchesData.success && Array.isArray(batchesData.data)) {
+        setBatches(batchesData.data)
+        if (batchesData.data.length > 0) {
+          setSelectedBatch(batchesData.data[0].batchId)
+        }
+        console.log('배치 데이터 로드 성공 (data 속성):', batchesData.data.length, '건')
+      } else {
+        console.log('배치 데이터가 없거나 실패:', batchesData)
+        setBatches([])
       }
     } catch (err) {
       console.error('배치 로드 오류:', err)
-      console.log('백엔드 연결 실패, 더미 데이터를 사용합니다.')
-      loadDummyData()
+      setError('배치 정보를 불러오는데 실패했습니다.')
+      setBatches([])
     } finally {
       setLoading(false)
     }
@@ -239,7 +256,7 @@ const ChickenInoculation = () => {
   }
 
   const selectedVaccineInfo = vaccineOptions.find(v => v.value === selectedVaccine)
-  const selectedBatchInfo = batches.find(b => b.batchId === selectedBatch)
+  const selectedBatchInfo = Array.isArray(batches) && batches.length > 0 ? batches.find(b => b.batchId === selectedBatch) : null
 
   if (loading) {
     return (
@@ -252,15 +269,7 @@ const ChickenInoculation = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.topBar}>
-          <div className={styles.titleSection}>
-            <h1 className={styles.title}>💉 예방 접종 관리</h1>
-            <p className={styles.subtitle}>닭 개체별 예방 접종 현황을 확인하고 관리합니다</p>
-          </div>
-          <button className={styles.btnList} onClick={() => navigate('/home/inoculation-list')}>
-            📋 접종 리스트 보기
-          </button>
-        </div>
+        <h2>예방 접종</h2>
 
         <div className={styles.batchSelector}>
           <label className={styles.batchLabel}>배치 선택</label>
@@ -272,11 +281,11 @@ const ChickenInoculation = () => {
               setSelectedIds([])
             }}
           >
-            {batches.map(batch => (
+            {Array.isArray(batches) ? batches.map(batch => (
               <option key={batch.batchId} value={batch.batchId}>
                 {batch.batchId} (입식일: {new Date(batch.entryDate).toLocaleDateString()}, {batch.currentCount}마리)
               </option>
-            ))}
+            )) : <option value="">배치 데이터가 없습니다</option>}
           </select>
         </div>
 
@@ -322,6 +331,12 @@ const ChickenInoculation = () => {
             onClick={() => navigate('/home/inoculation-schedule')}
           >
             📅 접종 스케줄 보기
+          </button>
+          <button
+            className={styles.btnList}
+            onClick={() => navigate('/home/inoculation-list')}
+          >
+            📋 접종 리스트 보기
           </button>
           <div className={styles.selectInfo}>
             {selectedIds.length > 0 && (

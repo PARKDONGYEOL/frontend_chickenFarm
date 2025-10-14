@@ -145,11 +145,8 @@ const ChickenInoculationList = () => {
 
   return (
     <div className={styles.container}>
+      <h2>예방 접종 리스트</h2>
       <div className={styles.header}>
-        <div className={styles.titleSection}>
-          <h1 className={styles.title}>📋 예방 접종 전체 리스트</h1>
-          <p className={styles.subtitle}>모든 개체의 질병별 접종 현황을 한눈에 확인</p>
-        </div>
         <button className={styles.btnBack} onClick={() => navigate('/home/inoculation')}>
           ← 접종 관리로 돌아가기
         </button>
