@@ -151,7 +151,7 @@ const ChickenManagement = () => {
     const newErrors = {
       farmNumError: batch.farmNum === '' ? '양계장을 선택해주세요.' : '',
       entryDateError: batch.entryDate === '' ? '입식일을 선택해주세요.' : '',
-      initialCountError: batch.initialCount === '' ? '닭 개체 수를 입력해주세요.' :
+      initialCountError: batch.initialCount === '' || batch.initialCount < 1 ? '닭 개체 수를 입력해주세요.' :
                         !regex.test(batch.initialCount) ? '숫자를 입력해주세요.' : ''
     };
 
