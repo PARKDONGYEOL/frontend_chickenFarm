@@ -172,11 +172,8 @@ const Diary = () => {
 
   return (
     <div className={styles.container}>
+      <h2>관찰 일지</h2>
       <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <h2 className={styles.title}>관찰 일지</h2>
-          <p className={styles.subtitle}>일일 사육 기록</p>
-        </div>
         <div className={styles.headerRight}>
           <div className={styles.viewModeButtons}>
             <button

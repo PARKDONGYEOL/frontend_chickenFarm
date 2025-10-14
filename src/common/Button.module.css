@@ -126,6 +126,15 @@
   background: linear-gradient(135deg, #78909c 0%, #607d8b 100%);
 }
 
+.red{
+  background-color: #dc143c;
+}
+
+.red:hover{
+  cursor: pointer;
+  background-color: #c41e3f;
+}
+
 .disabled{
   opacity: 0.5;
   cursor: default !important;

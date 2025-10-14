@@ -1,0 +1,71 @@
+.waveChartContainer {
+  position: relative;
+  width: 100%;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.chartWrapper {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.noData {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  z-index: 10;
+}
+
+.noData p {
+  margin: 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Chart.js 컨테이너 스타일링 */
+.chartWrapper canvas {
+  border-radius: 4px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .waveChartContainer {
+    border-radius: 4px;
+  }
+  
+  .chartWrapper {
+    padding: 10px;
+  }
+  
+  .chartWrapper canvas {
+    height: 150px !important;
+  }
+}
+
+/* 다크 모드 지원 */
+@media (prefers-color-scheme: dark) {
+  .waveChartContainer {
+    background: #2d2d2d;
+  }
+  
+  .chartWrapper {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  }
+  
+  .noData p {
+    background: rgba(45, 45, 45, 0.9);
+    color: #ccc;
+  }
+}

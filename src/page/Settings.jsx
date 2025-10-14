@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { memberAPI } from "../services/api";
 import styles from "./Settings.module.css";
 
 const Settings = () => {
@@ -23,7 +23,7 @@ const Settings = () => {
     }
   }, [nav]);
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = async (e) => {
     e.preventDefault();
 
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -42,29 +42,28 @@ const Settings = () => {
     }
 
     // 스프링 서버로 비밀번호 변경 요청
-    axios.put('http://localhost:8080/api/member/password', {
-      memId: loginInfo.memId,
-      currentPassword: currentPassword,
-      newPassword: newPassword
-    })
-    .then(res => {
-      console.log("응답:", res.data);
-      if (res.data.success) {
+    try {
+      await memberAPI.updatePassword({
+        memId: loginInfo.memId,
+        currentPassword: currentPassword,
+        newPassword: newPassword
+      })
+      console.log("응답:", res);
+      if (res.success) {
         setMessage("비밀번호가 변경되었습니다.");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
       } else {
-        setMessage(res.data.message || "비밀번호 변경에 실패했습니다.");
+        setMessage(res.message || "비밀번호 변경에 실패했습니다.");
       }
-    })
-    .catch(err => {
+    } catch (err) {
       console.error("에러:", err);
       setMessage("비밀번호 변경 중 오류가 발생했습니다.");
-    });
+    }
   };
 
-  const handleUsernameChange = (e) => {
+  const handleUsernameChange = async (e) => {
     e.preventDefault();
 
     if (!newUsername.trim()) {
@@ -73,37 +72,32 @@ const Settings = () => {
     }
 
     // 스프링 서버로 아이디(이름) 변경 요청
-    axios.put('http://localhost:8080/api/member/name', {
-      memId: loginInfo.memId,
-      newName: newUsername
-    })
-    .then(res => {
-      console.log("응답:", res.data);
-      if (res.data.success) {
+    try {
+      const res = await memberAPI.updateName({
+        memId: loginInfo.memId,
+        newName: newUsername
+      })
+      console.log("응답:", res);
+      if (res.success) {
         const updatedInfo = { ...loginInfo, name: newUsername };
         sessionStorage.setItem("loginInfo", JSON.stringify(updatedInfo));
         setLoginInfo(updatedInfo);
         setMessage("아이디가 변경되었습니다.");
       } else {
-        setMessage(res.data.message || "아이디 변경에 실패했습니다.");
+        setMessage(res.message || "아이디 변경에 실패했습니다.");
       }
-    })
-    .catch(err => {
+    } catch (err) {
       console.error("에러:", err);
       setMessage("아이디 변경 중 오류가 발생했습니다.");
-    });
+    }
   };
 
   if (!loginInfo) return null;
 
   return (
     <div className={styles.settingsContainer}>
-      <div className={styles.settingsHeader}>
-        <button onClick={() => nav("/home")} className={styles.backButton}>
-          ← 뒤로가기
-        </button>
-        <h1>설정</h1>
-      </div>
+      {/* 페이지 제목 */}
+      <h2>설정</h2>
 
       {message && <div className={styles.message}>{message}</div>}
 

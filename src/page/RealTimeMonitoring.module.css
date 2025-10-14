@@ -1,9 +1,16 @@
 .container {
-  padding: 16px;
+  padding: 2rem;
   height: 100vh;
   background: #f9fafb;
   overflow: auto;
 }
+
+.container h2 {
+  font-size: 2rem;
+  color: #1e293b;
+  text-align: left;
+}
+
 
 .mainGrid {
   display: flex;
@@ -155,6 +162,19 @@
   color: #ef4444;
 }
 
+.statusGood {
+  color: #10b981;
+}
+
+.statusFair {
+  color: #f59e0b;
+}
+
+.statusBad {
+  color: #ef4444;
+}
+
+
 /* 📈 모달 */
 .modalContent {
   display: flex;
@@ -229,5 +249,46 @@
   .modalChart,
   .modalTable {
     flex: 1;
+  }
+}
+
+/* 히스토리 모달 스타일 */
+.historyContainer {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.historyInfo {
+  margin-top: 20px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+}
+
+.historyInfo p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #495057;
+}
+
+.historyInfo p:first-child {
+  font-weight: 600;
+  color: #212529;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .historyContainer {
+    max-width: 100%;
+  }
+  
+  .historyInfo {
+    padding: 12px;
+  }
+  
+  .historyInfo p {
+    font-size: 13px;
   }
 }

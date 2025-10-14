@@ -1,0 +1,150 @@
+/* 개체 목록 섹션 - 배치 표와 동일한 구조 */
+.container {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.container h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.table thead {
+  background: #f8fafc;
+}
+
+.table thead td {
+  padding: 15px;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e2e8f0;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.table tbody td {
+  padding: 15px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.875rem;
+  color: #1e293b;
+  text-align: center;
+}
+
+.table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table input, .check_and_button input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #059669;
+  cursor: pointer;
+}
+
+/* 통계 카드 - 기존 chicken_count 확장 */
+.chicken_count {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.chicken_count > div {
+  flex: 1;
+  background: hsl(163, 54%, 97%);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.chicken_count > div:nth-of-type(3){
+  background: hsl(0, 60%, 98%);
+}
+
+.chicken_count > div > div {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #059669;
+  margin-bottom: 0.5rem;
+}
+
+.chicken_count > div:nth-of-type(3) > div{
+  color: #dd0b0b;
+}
+
+.chicken_count > div > span {
+  display: block;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.chicken_list{
+  display: flex;
+  flex-direction: column;
+}
+
+.btn_div{
+  margin-left: auto;
+  margin-bottom: 15px;
+  display: flex;
+}
+
+.btn_div > button{
+  margin-left: 15px;
+}
+
+.btn_div > button:last-child{
+  font-size: 0.75rem;
+}
+
+.dead_color{
+  background-color: #f7f7f7;
+}
+
+.dead_color:hover{
+  background-color: #f7f7f7 !important;
+}
+
+.sick_color{
+  background-color: #fff5f5;
+}
+
+.sick_color:hover{
+  background-color: #f8ecec !important;
+}
+
+.check_and_button{
+  display: flex;
+  align-items:  center;
+}
+
+.check_and_button input{
+  vertical-align: middle;
+}
+
+.check_and_button > span{
+  font-size: 1.02rem;
+  margin-right: 10px;
+}

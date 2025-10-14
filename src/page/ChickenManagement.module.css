@@ -1,12 +1,161 @@
-.container > div{
-  margin: 30px auto;
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #f9fafb;
 }
 
-.table{
-  border: 1px solid black;
+.container h2 {
+  font-size: 2rem;
+  color: #1e293b;
+  text-align: left;
 }
 
-.table tr, .table td{
-  border: 1px solid black;
-  padding: 5px;
+.container h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
 }
+
+.container > div {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.farm_reg {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.batch_reg {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.input_group{
+  display: flex;
+  align-items: center;
+  gap : 15px;
+}
+
+.input_group input[type='date']{
+  text-align: center;
+}
+
+/* 라벨 스타일 */
+.container span {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+/* 테이블 스타일 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.table thead {
+  background: #f8fafc;
+}
+
+.table thead td {
+  padding: 20px;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e2e8f0;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.table tbody td {
+  padding: 20px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.875rem;
+  color: #1e293b;
+  text-align: center;
+}
+
+.table tbody tr {
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 선택된 행 스타일 */
+.table tbody tr.selected {
+  background-color: #eff6ff;
+}
+
+.table tbody tr.selected:hover {
+  background-color: #dbeafe;
+}
+
+.table input, .batch_list input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #059669;
+  cursor: pointer;
+}
+
+.batch_list{
+  display: flex;
+  flex-direction: column;
+}
+
+.btn_div{
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+  margin-top: 20px;
+}
+
+
+.error{
+  color: red;
+  font-size: 0.75rem;
+  position: absolute;
+  margin-top: 5px;
+}
+
+.valid{
+  position: relative;
+}
+
+.batch_list > span > input{
+  vertical-align: middle;
+}
+
+.batch_list > span{
+  font-size: 1.03rem;
+  margin-bottom: 10px;
+  margin-left: auto;
+}
+
+.dead_color{
+  background-color: #f7f7f7;
+}
+
+.dead_color:hover{
+  background-color: #f7f7f7 !important;
+  cursor: auto;
+}
+

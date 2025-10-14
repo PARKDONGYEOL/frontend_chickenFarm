@@ -2,54 +2,51 @@ import React, { useState } from 'react'
 import Modal from '../common/Modal'
 import Input from '../common/Input'
 import Button from '../common/Button'
+import { memberAPI } from '../services/api'
 import styles from './Login.module.css'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
-
   const nav = useNavigate();
 
   const [loginDate, setLoginDate] = useState({
-    'memId' : '',
-    'memPw' : ''
+    'memId': '',
+    'memPw': ''
   });
 
   const handleLoginData = (e) => {
     setLoginDate({
       ...loginDate,
-      [e.target.name] : e.target.value
+      [e.target.name]: e.target.value
     });
   }
 
-  const login = () => {
-    axios.get('/api/member', { params: loginDate })
-      .then(res => {
-        if (res.data) { 
-
+  const login = async () => {
+    try {
+      const res = await memberAPI.login(loginDate)
+      if (res) { 
         const loginInfo = {
-          'memId': res.data.memId,
-          'name': res.data.name,
-          'role': res.data.role
+          'memId': res.memId,
+          'name': res.name,
+          'role': res.role
         };
 
         sessionStorage.setItem('loginInfo', JSON.stringify(loginInfo));
 
-          if (res.data.role === 'ADMIN') {
-            alert('환영합니다.');
-            nav('/home');
-            setLoginDate({ 'memId': '', 'memPw': '' });
-          }
-
-          // 일반 유저는 아무 동작 없음
-
-        } else { 
-          alert('ID 혹은 비밀번호가 잘못 입력되었습니다.');
+        if (res.role === 'ADMIN') {
+          alert('환영합니다.');
+          nav('/home');
+          setLoginDate({ 'memId': '', 'memPw': '' });
         }
-
-    })
-    .catch(e => console.log(e));
-}
+        // 일반 유저는 아무 동작 없음
+      } else { 
+        alert('ID 혹은 비밀번호가 잘못 입력되었습니다.');
+      }
+    } catch (err) {
+      console.log(err);
+      alert('로그인 중 오류가 발생했습니다.');
+    }
+  }
 
   return (
     <div className={styles.container}>
@@ -64,6 +61,9 @@ const Login = () => {
             value={loginDate.memId}
             onChange={e => handleLoginData(e)}
             className={styles.input}
+            onKeyDown={e => {
+              if(e.key === 'Enter') login()
+            }}
           />
           {
             loginDate.memId && (
@@ -74,7 +74,7 @@ const Login = () => {
                 onClick={() => {
                   setLoginDate({
                     ...loginDate,
-                    'memId' : ''
+                    'memId': ''
                   })
                 }}
               />
@@ -91,6 +91,9 @@ const Login = () => {
             onChange={e => handleLoginData(e)}
             className={styles.input}
             type='password'
+            onKeyDown={e => {
+              if(e.key === 'Enter') login()
+            }}
           />
           {
             loginDate.memPw && (
@@ -101,7 +104,7 @@ const Login = () => {
                 onClick={() => {
                   setLoginDate({
                     ...loginDate,
-                    'memPw' : ''
+                    'memPw': ''
                   })
                 }}
               />

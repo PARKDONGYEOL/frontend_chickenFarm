@@ -1,9 +1,50 @@
+/* 로딩 및 에러 스타일 */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 18px;
+  color: #666;
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 16px;
+  color: #e74c3c;
+  text-align: center;
+}
+
+.error button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.error button:hover {
+  background: #2980b9;
+}
+
 .container {
-  padding: 24px;
-  max-width: 1400px;
+  padding: 2rem;
+  max-width: 1200px;
   margin: 0 auto;
   background: #f9fafb;
   min-height: 100vh;
+}
+
+.container h2 {
+  font-size: 2rem;
+  color: #1e293b;
+  text-align: left;
 }
 
 .header {
