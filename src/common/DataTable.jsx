@@ -10,7 +10,8 @@ import styles from "./DataTable.module.css";
  * - title: (선택) 테이블 제목
  */
 const DataTable = ({ columns = [], data = [], limit = 5, title }) => {
-  const rows = data.slice(-limit).reverse(); // 최근 데이터 5개 (기본)
+  // limit이 데이터 길이보다 크면 모든 데이터 사용, 아니면 limit만큼 사용
+  const rows = limit >= data.length ? data : data.slice(0, limit);
 
   return (
     <div className={styles.tableWrapper}>
@@ -32,7 +33,9 @@ const DataTable = ({ columns = [], data = [], limit = 5, title }) => {
             rows.map((row, i) => (
               <tr key={i}>
                 {columns.map((col) => (
-                  <td key={col.key}>{row[col.key]}</td>
+                  <td key={col.key}>
+                    {col.render ? col.render(row[col.key], row) : row[col.key]}
+                  </td>
                 ))}
               </tr>
             ))

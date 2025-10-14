@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import styles from "./ModalFloat.module.css";
 
 /**
@@ -6,6 +6,7 @@ import styles from "./ModalFloat.module.css";
  * - 배경 클릭 가능(차단하지 않음)
  * - 패널 내부만 클릭 처리
  * - X 버튼으로만 닫힘
+ * - 바깥 클릭 시 닫힘
  */
 const ModalFloat = ({
   isOpen = false,
@@ -15,11 +16,30 @@ const ModalFloat = ({
   height = 420,
   children,
 }) => {
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (panelRef.current && !panelRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
     <div className={styles.overlay} aria-hidden="true">
       <div
+        ref={panelRef}
         className={styles.panel}
         style={{ width, height }}
         role="dialog"

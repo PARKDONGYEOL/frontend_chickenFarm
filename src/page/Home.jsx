@@ -2,30 +2,24 @@ import React, { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import styles from "./Home.module.css";
 import Header from "../layout/Header";
-import ModalFull from "../common/ModalFull"; //추가 cctv
+import ModalFull from "../common/ModalFull";
 import TourGuide from "../common/TourGuide";
 import roosterImg from "../assets/rooster-285432_1280.jpg";
-import image1 from "../assets/image.png";
-import image2 from "../assets/image copy.png";
-import image3 from "../assets/image copy 2.png";
-import image4 from "../assets/image copy 3.png";
 
 
 const Home = () => {
   const location = useLocation();
   const isHomeRoot = location.pathname === "/home";
-  const [isCctvModalOpen, setCctvModalOpen] = useState(false); //추가 cctv
+  const [isCctvModalOpen, setCctvModalOpen] = useState(false);
   const [isTourOpen, setIsTourOpen] = useState(false);
   const [tourSteps, setTourSteps] = useState([]);
 
   const startTour = () => {
-    // 헤더 메뉴 위치 계산
     const menuItems = document.querySelectorAll('header [class*="head_list"] > div');
 
     const steps = [];
 
     menuItems.forEach((item, index) => {
-      // 마지막 항목(가이드)은 제외
       if (index === 4) return;
 
       const rect = item.getBoundingClientRect();
@@ -37,28 +31,22 @@ const Home = () => {
         "닭 개체별 정보를 관리합니다.\n개체 등록, 현황 조회, 건강 상태 확인 등을 할 수 있습니다."
       ];
 
-      // 설명 박스 위치를 각 단계마다 다르게 배치
       let tooltipX, tooltipY;
 
       if (index === 0) {
-        // 첫 번째 (통계)
         tooltipX = window.innerWidth * 0.40;
         tooltipY = window.innerHeight * 0.2;
       } else if (index === 1) {
-        // 두 번째 (실시간)
         tooltipX = window.innerWidth * 0.45;
         tooltipY = window.innerHeight * 0.2;
       } else if (index === 2) {
-        // 세 번째 (통합관리)
         tooltipX = window.innerWidth * 0.50;
         tooltipY = window.innerHeight * 0.2;
       } else {
-        // 네 번째 (개체관리)
         tooltipX = window.innerWidth * 0.55;
         tooltipY = window.innerHeight * 0.2;
       }
 
-      // 타겟 요소의 중심점
       const targetCenterX = rect.left + rect.width / 2;
       const targetCenterY = rect.top + rect.height / 2;
 
@@ -75,13 +63,12 @@ const Home = () => {
           top: `${tooltipY}px`,
           left: `${tooltipX}px`,
         },
-        // 화살표 좌표 (설명 박스 오른쪽 → 메뉴 항목)
         arrowStart: {
-          x: tooltipX + 300, // 설명 박스 오른쪽 끝 (간격 증가)
+          x: tooltipX + 300,
           y: tooltipY + 50,
         },
         arrowEnd: {
-          x: targetCenterX - 30, // 메뉴 항목에서 더 떨어뜨림
+          x: targetCenterX - 30,
           y: targetCenterY + 12,
         }
       });
@@ -93,12 +80,10 @@ const Home = () => {
 
   return (
     <div className={styles.container}>
-      {/* 상단 헤더 */}
-      <Header onGuideClick={startTour} />
+      {/* ✅ currentPath prop 추가 */}
+      <Header onGuideClick={startTour} currentPath={location.pathname} />
 
-      {/* 메인 레이아웃 */}
       <div className={styles.mainLayout}>
-        {/* ✅ 메인 콘텐츠 */}
         <div className={styles.content}>
           {isHomeRoot ? (
             <div className={styles.heroContent}>
@@ -109,25 +94,22 @@ const Home = () => {
               </div>
             </div>
           ) : (
-            <Outlet /> // 서브 라우트 내용 표시
+            <Outlet />
           )}
-
         </div>
       </div>
 
-      {/* 투어 가이드 */}
       <TourGuide
         isOpen={isTourOpen}
         onClose={() => setIsTourOpen(false)}
         steps={tourSteps}
       />
-      {/* ✅ CCTV 모달 */}
+      
       <ModalFull
         isOpen={isCctvModalOpen}
-        onClose={() => setCctvModalOpen(false)} // ✅ 수정2: 닫기 이벤트 연결
+        onClose={() => setCctvModalOpen(false)}
         title="CCTV 모니터링"
       >
-        {/* ✅ 수정3: iframe 기본 속성 확실히 명시 */}
         <iframe
           src="http://192.168.30.71:5090"
           style={{ width: "100%", height: "100%", border: "none" }}
@@ -138,4 +120,4 @@ const Home = () => {
   );
 };
 
-export default Home
+export default Home;

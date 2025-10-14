@@ -1,13 +1,20 @@
 .container {
-  padding: 12px;
+  padding: 2rem;
   background: #f9fafb;
   height: 100vh;
   box-sizing: border-box;
   font-family: "Inter", sans-serif;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   overflow: auto;
 }
+
+.container h2 {
+  font-size: 2rem;
+  color: #1e293b;
+  text-align: left;
+}
+
 
 /* 헤더 */
 .header {

@@ -2,7 +2,7 @@ import React, { use, useEffect, useState } from 'react'
 import styles from './ChickenManagement.module.css'
 import Input from '../common/Input'
 import Button from '../common/Button'
-import axios from 'axios'
+import { batchAPI, farmAPI } from '../services/api'
 import ChickenList from './ChickenList'
 
 const ChickenManagement = () => {
@@ -81,7 +81,7 @@ const ChickenManagement = () => {
     }
   }
 
-  const handleShipment = () => {
+  const handleShipment = async () => {
   if (checkedBatches.length === 0) {
     alert('출하할 배치를 선택해주세요.');
     return;

@@ -4,10 +4,7 @@ import styles from "./CCTV.module.css";
 const CCTV = () => {
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>CCTV 모니터링</h2>
-        <p className={styles.subtitle}>실시간 영상 감시</p>
-      </div>
+      <h2>CCTV</h2>
 
       <div className={styles.videoGrid}>
         {/* CCTV 1 */}

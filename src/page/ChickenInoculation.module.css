@@ -76,11 +76,17 @@
 }
 
 .container {
-  padding: 24px;
-  max-width: 1400px;
+  padding: 2rem;
+  max-width: 1200px;
   margin: 0 auto;
   background: #f9fafb;
   min-height: 100vh;
+}
+
+.container h2 {
+  font-size: 2rem;
+  color: #1e293b;
+  text-align: left;
 }
 
 .header {
@@ -94,24 +100,6 @@
   margin-bottom: 16px;
 }
 
-.btnList {
-  padding: 12px 24px;
-  background: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.btnList:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-}
 
 .batchSelector {
   background: white;
@@ -296,6 +284,24 @@
   background: #7c3aed;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+}
+
+.btnList {
+  padding: 10px 20px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnList:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
 }
 
 .selectInfo {
