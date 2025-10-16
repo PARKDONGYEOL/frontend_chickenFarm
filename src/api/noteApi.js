@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api/note';
+const API_BASE_URL = 'http://192.168.30.152:8080/api/note';
 
 // 전체 일지 조회
 export const getAllNotes = async (memId) => {

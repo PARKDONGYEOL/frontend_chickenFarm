@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // 개발 환경에서는 프록시를 사용하고, 프로덕션에서는 실제 백엔드 주소 사용
-const API_BASE_URL = import.meta.env.DEV ? '' : 'http://localhost:8080'
+const API_BASE_URL = import.meta.env.DEV ? '' : 'http://192.168.30.152:8080'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

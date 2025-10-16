@@ -359,7 +359,7 @@ const RealTimeMonitoring = () => {
               icon={<CO2Icon />}
               label="이산화탄소"
               value={data.co2}
-              max={400}
+              max={1000}
               min={0}
               optimalMax={250}
               unit="ppm"
