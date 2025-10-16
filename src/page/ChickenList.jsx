@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import styles from './ChickenList.module.css'
-import { chickenAPI } from '../services/api'
-import axios from 'axios'
+import { chickenAPI, apiClient } from '../services/api'
 import Button from '../common/Button';
 
 const ChickenList = ({batchId, changeReload, reload}) => {
@@ -26,7 +25,7 @@ const ChickenList = ({batchId, changeReload, reload}) => {
       setIsHealthyChecked(false);
       setIsSickChecked(false);
 
-      axios.get(`/api/chicken/${batchId}`)
+      apiClient.get(`/api/chicken/${batchId}`)
       .then(res => {
         setChickenInfo(res.data);
 
@@ -118,7 +117,7 @@ const ChickenList = ({batchId, changeReload, reload}) => {
       return ;
     }
 
-    axios.put('/api/chicken/death', {batchId : batchId, chickenIdList : checkedChickenId})
+    apiClient.put('/api/chicken/death', {batchId : batchId, chickenIdList : checkedChickenId})
     .then(res => {
       alert('폐사 처리 완료');
       setCheckedChickenId([]);
@@ -133,7 +132,7 @@ const ChickenList = ({batchId, changeReload, reload}) => {
       alert('건강 상태를 변경할 개체를 선택해주세요.')
     }
 
-    axios.put('/api/chicken/update-health', {chickenIdList : checkedChickenId})
+    apiClient.put('/api/chicken/update-health', {chickenIdList : checkedChickenId})
     .then(res => {
       alert('건강 상태 변경 완료');
       setCheckedChickenId([]);

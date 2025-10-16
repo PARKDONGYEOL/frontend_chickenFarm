@@ -24,15 +24,15 @@ const WaveChart = ({
   showGrid = true,
   showLabels = true
 }) => {
-  // 센서 타입별 설정
+  // 센서 타입별 설정 (Y축 범위 포함)
   const sensorConfig = {
-    temperature: { color: 'rgba(255,87,34,1)', unit: '°C', title: '온도' },
-    humidity: { color: 'rgba(33,150,243,1)', unit: '%', title: '습도' },
-    lux: { color: 'rgba(255,193,7,1)', unit: 'lux', title: '조도' },
-    co2: { color: 'rgba(156,39,176,1)', unit: 'ppm', title: 'CO2' },
-    no2: { color: 'rgba(244,67,54,1)', unit: 'ppb', title: 'NO2' },
-    co: { color: 'rgba(121,85,72,1)', unit: 'ppm', title: 'CO' },
-    nh3: { color: 'rgba(96,125,139,1)', unit: 'ppm', title: 'NH3' }
+    temperature: { color: 'rgba(255,87,34,1)', unit: '°C', title: '온도', min: 15, max: 40 },
+    humidity: { color: 'rgba(33,150,243,1)', unit: '%', title: '습도', min: 40, max: 100 },
+    lux: { color: 'rgba(255,193,7,1)', unit: 'lux', title: '조도', min: 1, max: 1000 },
+    co2: { color: 'rgba(156,39,176,1)', unit: 'ppm', title: 'CO2', min: 0, max: 3000 },
+    no2: { color: 'rgba(244,67,54,1)', unit: 'ppb', title: 'NO2', min: 0, max: 50 },
+    co: { color: 'rgba(121,85,72,1)', unit: 'ppm', title: 'CO', min: 0, max: 100 },
+    nh3: { color: 'rgba(96,125,139,1)', unit: 'ppm', title: 'NH3', min: 0, max: 100 }
   };
 
   const config = sensorConfig[sensorType] || { color, unit, title };
@@ -133,8 +133,10 @@ const WaveChart = ({
           }
         }
       },
-      y: { 
+      y: {
         beginAtZero: false,
+        min: config.min !== undefined ? config.min : undefined,
+        max: config.max !== undefined ? config.max : undefined,
         grid: {
           color: showGrid ? 'rgba(224,224,224,0.5)' : 'transparent',
           lineWidth: 1

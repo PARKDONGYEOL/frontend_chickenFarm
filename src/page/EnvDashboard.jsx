@@ -61,11 +61,24 @@ const EnvDashboard = () => {
       console.log('response:', response);
       console.log('response.success:', response?.success);
 
+      console.log('response 전체 구조:', JSON.stringify(response, null, 2));
+
       if (response?.success) {
-        console.log('데이터 설정 중...', response.data);
-        setFarmData(response.data || []);
+        console.log('✅ success = true');
+        console.log('response.data 타입:', Array.isArray(response.data) ? 'Array' : typeof response.data);
+        console.log('response.data 내용:', response.data);
+
+        // 백엔드 응답 구조: { success: true, data: [...], count: N }
+        // farmStatusApi.js에서 response.data를 반환하므로
+        // 여기서 받는 response는 이미 { success, data, count } 형태
+        const dataArray = response.data || [];
+
+        console.log('✅ 최종 데이터 배열 길이:', dataArray.length);
+        console.log('✅ 첫 번째 항목:', dataArray[0]);
+
+        setFarmData(dataArray);
       } else {
-        console.error('데이터 조회 실패:', response?.message);
+        console.error('❌ 데이터 조회 실패:', response?.message);
         setFarmData([]);
       }
     } catch (error) {
@@ -96,8 +109,8 @@ const EnvDashboard = () => {
     hum: { label: "Humidity", unit: "%", min: 40, max: 100, color: "#1e88e5" },
     lux: { label: "Illumination", unit: "lx", min: 1, max: 1000, color: "#fbc02d" },
     nh3: { label: "NH₃", unit: "ppm", min: 0, max: 100, color: "#43a047" },
-    co2: { label: "CO₂", unit: "ppm", min: 0, max: 400, color: "#8e24aa" },
-    no2: { label: "NO₂", unit: "ppb", min: 0, max: 20, color: "#ff5722" },
+    co2: { label: "CO₂", unit: "ppm", min: 0, max: 3000, color: "#8e24aa" },
+    no2: { label: "NO₂", unit: "ppb", min: 0, max: 50, color: "#ff5722" },
     co: { label: "CO", unit: "ppm", min: 0, max: 100, color: "#6d4c41" },
   };
 

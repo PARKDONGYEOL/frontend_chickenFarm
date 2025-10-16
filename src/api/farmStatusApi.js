@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://192.168.30.152:8080/api/farm-status';
+const API_BASE_URL = '/api/farm-status';
 
 // 일일 데이터 조회
 export const getDailyData = async (farmId, date) => {

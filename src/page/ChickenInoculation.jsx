@@ -281,7 +281,7 @@ const ChickenInoculation = () => {
               setSelectedIds([])
             }}
           >
-            {Array.isArray(batches) ? batches.map(batch => (
+            {Array.isArray(batches) ? batches.filter(batch => batch.currentCount > 0).map(batch => (
               <option key={batch.batchId} value={batch.batchId}>
                 {batch.batchId} (입식일: {new Date(batch.entryDate).toLocaleDateString()}, {batch.currentCount}마리)
               </option>

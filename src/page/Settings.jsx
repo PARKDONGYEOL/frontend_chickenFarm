@@ -43,11 +43,11 @@ const Settings = () => {
 
     // 스프링 서버로 비밀번호 변경 요청
     try {
-      await memberAPI.updatePassword({
+      const res = await memberAPI.updatePassword({
         memId: loginInfo.memId,
         currentPassword: currentPassword,
         newPassword: newPassword
-      })
+      });
       console.log("응답:", res);
       if (res.success) {
         setMessage("비밀번호가 변경되었습니다.");
@@ -76,7 +76,7 @@ const Settings = () => {
       const res = await memberAPI.updateName({
         memId: loginInfo.memId,
         newName: newUsername
-      })
+      });
       console.log("응답:", res);
       if (res.success) {
         const updatedInfo = { ...loginInfo, name: newUsername };
@@ -96,16 +96,12 @@ const Settings = () => {
 
   return (
     <div className={styles.settingsContainer}>
-
       <div className={styles.settingsHeader}>
         <button onClick={() => nav(-1)} className={styles.backButton}>
           ← 뒤로가기
         </button>
         <h1>설정</h1>
       </div>
-=======
-      {/* 페이지 제목 */}
-      <h2>설정</h2>
 
       {message && <div className={styles.message}>{message}</div>}
 
