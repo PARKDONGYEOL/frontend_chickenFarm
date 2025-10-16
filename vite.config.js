@@ -7,47 +7,9 @@ const PYTHON_SERVER_IP = process.env.VITE_PYTHON_SERVER_IP || '192.168.30.240' /
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: '0.0.0.0', // 🔥 핵심 설정: 외부 접속 허용
     proxy: {
-      '/api/member': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-      '/api/batch': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-      '/api/farm': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-      '/api/chicken': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-      '/api/inoculation': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-      '/api/danger': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-      '/api/env-settings': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-      },
-      '/raspberry': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/raspberry/, '/api')
-      },
-      // 파이썬 서버의 센서 API 프록시 (다른 컴퓨터에서 실행 중인 서버)
+      // 파이썬 서버의 센서 API 프록시 (다른 컴퓨터에서 실행 중인 서버) - 우선순위 높음
       '/api/realtime': {
         target: `http://${PYTHON_SERVER_IP}:5000`,
         changeOrigin: true,
@@ -62,6 +24,17 @@ export default defineConfig({
       },
       '/api/status': {
         target: `http://${PYTHON_SERVER_IP}:5000`,
+        changeOrigin: true,
+      },
+      // 라즈베리파이 Python 서버 API
+      '/raspberry': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/raspberry/, '/api')
+      },
+      // 스프링 백엔드 API - 모두 /api prefix 통일 (가장 마지막에 위치)
+      '/api': {
+        target: 'http://localhost:8080',
         changeOrigin: true,
       }
     }

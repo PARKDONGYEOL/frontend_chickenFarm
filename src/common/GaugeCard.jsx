@@ -5,11 +5,48 @@ import { Doughnut } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, Tooltip);
 
-const GaugeCard = ({ icon, label, value, max, min, optimalMax, unit, onClick }) => {
-  // 상태 판단
+const GaugeCard = ({ icon, label, value, max, min, optimalMax, unit, onClick, isSleepTime = false, sensorType }) => {
+  // 상태 판단 (범위 기반)
   let status = "Normal";
-  if (value > optimalMax) status = "Caution";
-  if (value > max * 0.9) status = "Danger";
+  let gaugeColor = "#22c55e"; // 초록색 (정상)
+
+  // 조도 센서의 경우 수면시간 고려
+  if (sensorType === "lux") {
+    if (isSleepTime) {
+      // 수면시간: 조도가 높으면 경고
+      if (value > optimalMax) {
+        status = "Caution";
+        gaugeColor = "#f59e0b"; // 주황색 (주의)
+      }
+      if (value > optimalMax * 1.5) {
+        status = "Danger";
+        gaugeColor = "#ef4444"; // 빨간색 (위험)
+      }
+    } else {
+      // 활동시간: 조도가 낮으면 경고
+      if (value < optimalMax) {
+        status = "Caution";
+        gaugeColor = "#f59e0b"; // 주황색 (주의)
+      }
+      if (value < optimalMax * 0.5) {
+        status = "Danger";
+        gaugeColor = "#ef4444"; // 빨간색 (위험)
+      }
+    }
+  } else {
+    // 다른 센서들은 기존 로직 사용
+    // 최소값 미만이거나 최적 최대값 초과 시 주의
+    if (value < min || value > optimalMax) {
+      status = "Caution";
+      gaugeColor = "#f59e0b"; // 주황색 (주의)
+    }
+
+    // 최대값의 90% 초과 시 위험
+    if (value > max * 0.9) {
+      status = "Danger";
+      gaugeColor = "#ef4444"; // 빨간색 (위험)
+    }
+  }
 
   // 자릿수 계산
   const getDigitClass = (num) => {
@@ -25,7 +62,7 @@ const GaugeCard = ({ icon, label, value, max, min, optimalMax, unit, onClick }) 
     datasets: [
       {
         data: [value, Math.max(max - value, 0)],
-        backgroundColor: ["#22c55e", "#e5e7eb"],
+        backgroundColor: [gaugeColor, "#e5e7eb"],
         borderWidth: 0,
         cutout: "50%",
         circumference: 180,

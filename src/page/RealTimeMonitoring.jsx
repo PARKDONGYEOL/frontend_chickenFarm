@@ -4,7 +4,7 @@ import GaugeCard from "../common/GaugeCard";
 import LineTrendChart from "../common/LineTrendChart";
 import ModalFloat from "../common/ModalFloat";
 import WaveChart from "../common/WaveChart";
-import { sensorAPI } from "../services/api";
+import { sensorAPI, envSettingsAPI } from "../services/api";
 
 const ThermoIcon = () => (
   <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -59,6 +59,21 @@ const RealTimeMonitoring = () => {
     co: 0,
   });
 
+  // 환경 설정 상태
+  const [envSettings, setEnvSettings] = useState({
+    sleepModeEnabled: true,
+    sleepStartHour: 22,
+    sleepEndHour: 6,
+    manualLedThreshold: 300,
+    tempHighAlert: 35,
+    tempLowAlert: 10,
+    humidityHighAlert: 85,
+    humidityLowAlert: 30,
+    co2Alert: 2000,
+    coAlert: 50,
+    nh3Alert: 25,
+  });
+
   // 센서 히스토리 관련 상태
   const [sensorHistory, setSensorHistory] = useState({
     temperature: [],
@@ -92,9 +107,9 @@ const RealTimeMonitoring = () => {
   });
 
   const [envStatus, setEnvStatus] = useState({
-    status: "양호",
-    score: 100,
-    issues: []
+    status: "연결 중...",
+    score: 0,
+    issues: ["센서 데이터를 불러오는 중입니다"]
   });
 
   // 센서 박스 클릭 핸들러
@@ -119,15 +134,12 @@ const RealTimeMonitoring = () => {
           console.log(`🎯 모달 열기: ${sensorType}`);
         } else {
           console.warn(`⚠️ ${sensorType} 히스토리 데이터가 비어있습니다.`);
-          alert(`${sensorType} 센서의 최근 데이터가 없습니다. 잠시 후 다시 시도해주세요.`);
         }
       } else {
         console.error(`❌ ${sensorType} 히스토리 조회 실패:`, response.message);
-        alert(`센서 히스토리 조회 실패: ${response.message}`);
       }
     } catch (error) {
       console.error(`💥 ${sensorType} 히스토리 조회 오류:`, error);
-      alert(`센서 히스토리 조회 오류: ${error.message}`);
     }
   };
 
@@ -137,48 +149,82 @@ const RealTimeMonitoring = () => {
     setSelectedSensor(null);
   };
 
-  // 환경 상태 계산 함수
+  // 수면시간 여부 판단 함수
+  const isSleepTime = () => {
+    if (!envSettings.sleepModeEnabled) return false;
+
+    const now = new Date();
+    const currentHour = now.getHours();
+    const { sleepStartHour, sleepEndHour } = envSettings;
+
+    // 예: 22시 ~ 6시 (자정을 넘는 경우)
+    if (sleepStartHour > sleepEndHour) {
+      return currentHour >= sleepStartHour || currentHour < sleepEndHour;
+    }
+    // 예: 6시 ~ 22시 (일반적인 경우는 반대)
+    return currentHour >= sleepStartHour && currentHour < sleepEndHour;
+  };
+
+  // 환경 상태 계산 함수 (환경 설정값 연동)
   const calculateEnvStatus = (sensorData) => {
     const issues = [];
     let score = 100;
 
-    // 온도 체크 (18-28°C가 적정)
-    if (sensorData.temp < 18 || sensorData.temp > 28) {
+    // 온도 체크 (환경설정의 알람 기준 사용)
+    if (sensorData.temp > envSettings.tempHighAlert || sensorData.temp < envSettings.tempLowAlert) {
       issues.push("온도");
       score -= 20;
     }
 
-    // 습도 체크 (40-70%가 적정)
-    if (sensorData.hum < 40 || sensorData.hum > 70) {
+    // 습도 체크 (환경설정의 알람 기준 사용)
+    if (sensorData.hum > envSettings.humidityHighAlert || sensorData.hum < envSettings.humidityLowAlert) {
       issues.push("습도");
       score -= 15;
     }
 
-    // CO2 체크 (1000ppm 이하가 적정)
-    if (sensorData.co2 > 1000) {
+    // CO2 체크 (환경설정의 알람 기준 사용)
+    if (sensorData.co2 > envSettings.co2Alert) {
       issues.push("CO2");
       score -= 25;
     }
 
-    // 암모니아 체크 (25ppm 이하가 적정)
-    if (sensorData.nh3 > 25) {
+    // 암모니아 체크 (환경설정의 알람 기준 사용)
+    if (sensorData.nh3 > envSettings.nh3Alert) {
       issues.push("암모니아");
       score -= 20;
     }
 
-    // 일산화탄소 체크 (50ppm 이하가 적정)
-    if (sensorData.co > 50) {
+    // 일산화탄소 체크 (환경설정의 알람 기준 사용)
+    if (sensorData.co > envSettings.coAlert) {
       issues.push("일산화탄소");
       score -= 30;
     }
 
-    // 조도 체크 (200-500lux가 적정)
-    if (sensorData.lux < 200 || sensorData.lux > 500) {
-      issues.push("조도");
-      score -= 10;
+    // 조도 체크 (수면시간 기반)
+    const sleepTime = isSleepTime();
+    const luxThreshold = envSettings.manualLedThreshold;
+
+    if (sleepTime) {
+      // 수면시간: 조도가 높으면 감점
+      if (sensorData.lux > luxThreshold * 1.5) {
+        issues.push("조도");
+        score -= 15;
+      } else if (sensorData.lux > luxThreshold) {
+        issues.push("조도");
+        score -= 10;
+      }
+    } else {
+      // 활동시간: 조도가 낮으면 감점
+      if (sensorData.lux < luxThreshold * 0.5) {
+        issues.push("조도");
+        score -= 15;
+      } else if (sensorData.lux < luxThreshold) {
+        issues.push("조도");
+        score -= 10;
+      }
     }
 
-    // 상태 결정
+    // 상태 결정 (환경설정의 점수 기준 사용)
     let status;
     if (score >= 80) {
       status = "양호";
@@ -190,6 +236,23 @@ const RealTimeMonitoring = () => {
 
     return { status, score: Math.max(0, score), issues };
   };
+
+  // 환경 설정 불러오기
+  useEffect(() => {
+    const loadEnvSettings = async () => {
+      try {
+        const result = await envSettingsAPI.getSettings();
+        if (result.success && result.data) {
+          setEnvSettings(prev => ({ ...prev, ...result.data }));
+          console.log("환경 설정 로드 성공:", result.data);
+        }
+      } catch (error) {
+        console.error("환경 설정 로드 실패:", error);
+      }
+    };
+
+    loadEnvSettings();
+  }, []);
 
   // 날씨 데이터 가져오기
   useEffect(() => {
@@ -240,13 +303,25 @@ const RealTimeMonitoring = () => {
             co: result.data.co || 0,
           };
           setData(newData);
-          
+
           // 환경 상태 계산
           const envStatusResult = calculateEnvStatus(newData);
           setEnvStatus(envStatusResult);
+        } else {
+          // 데이터를 받지 못한 경우
+          setEnvStatus({
+            status: "데이터 없음",
+            score: 0,
+            issues: ["센서 데이터를 받지 못했습니다"]
+          });
         }
       } catch (error) {
         console.error("센서 데이터 가져오기 실패:", error);
+        setEnvStatus({
+          status: "연결 오류",
+          score: 0,
+          issues: ["센서 서버 연결 실패"]
+        });
       }
     };
 
@@ -269,13 +344,19 @@ const RealTimeMonitoring = () => {
 
     fetchSensorData();
     updateHistoryData(); // 초기 히스토리 업데이트
-    
-    const interval = setInterval(() => {
+
+    const sensorInterval = setInterval(() => {
       fetchSensorData();
-      updateHistoryData(); // 매초마다 히스토리 업데이트
-    }, 1000);
-    
-    return () => clearInterval(interval);
+    }, 1000); // 센서 데이터는 1초마다 업데이트
+
+    const historyInterval = setInterval(() => {
+      updateHistoryData(); // 히스토리 데이터는 5초마다 업데이트
+    }, 5000);
+
+    return () => {
+      clearInterval(sensorInterval);
+      clearInterval(historyInterval);
+    };
   }, [isHistoryModalOpen, selectedSensor]); // 의존성 배열에 모달 상태 추가
 
   // 24시간 시계열 데이터 생성
@@ -341,9 +422,11 @@ const RealTimeMonitoring = () => {
               value={data.lux}
               max={1000}
               min={1}
-              optimalMax={50}
+              optimalMax={envSettings.manualLedThreshold}
               unit="lux"
               onClick={() => handleSensorClick('lux')}
+              isSleepTime={isSleepTime()}
+              sensorType="lux"
             />
             <GaugeCard
               icon={<AmmoniaIcon />}
@@ -359,9 +442,9 @@ const RealTimeMonitoring = () => {
               icon={<CO2Icon />}
               label="이산화탄소"
               value={data.co2}
-              max={400}
+              max={3000}
               min={0}
-              optimalMax={250}
+              optimalMax={2000}
               unit="ppm"
               onClick={() => handleSensorClick('co2')}
             />
@@ -369,9 +452,9 @@ const RealTimeMonitoring = () => {
               icon={<NO2Icon />}
               label="이산화질소"
               value={data.no2}
-              max={20}
+              max={50}
               min={0}
-              optimalMax={10}
+              optimalMax={30}
               unit="ppb"
               onClick={() => handleSensorClick('no2')}
             />
@@ -390,7 +473,12 @@ const RealTimeMonitoring = () => {
               <h3 className={styles.statusTitle}>환경 상태</h3>
               <div className={styles.statusItem}>
                 <span className={styles.statusLabel}>전체 상태</span>
-                <span className={`${styles.statusValue} ${envStatus.status === '양호' ? styles.statusGood : envStatus.status === '좋음' ? styles.statusFair : styles.statusBad}`}>
+                <span className={`${styles.statusValue} ${
+                  envStatus.status === '양호' ? styles.statusGood :
+                  envStatus.status === '좋음' ? styles.statusFair :
+                  envStatus.status === '연결 중...' || envStatus.status === '데이터 없음' || envStatus.status === '연결 오류' ? styles.statusWarning :
+                  styles.statusBad
+                }`}>
                   {envStatus.status}
                 </span>
               </div>
@@ -502,7 +590,7 @@ const RealTimeMonitoring = () => {
       <ModalFloat
         isOpen={isHistoryModalOpen}
         onClose={closeHistoryModal}
-        title={`${selectedSensor ? selectedSensor.toUpperCase() : ''} 센서 히스토리 (최근 30초)`}
+        title={`${selectedSensor ? selectedSensor.toUpperCase() : ''} 센서 히스토리 (최근 5분)`}
         width={900}
         height={500}
       >
@@ -521,7 +609,7 @@ const RealTimeMonitoring = () => {
           {/* 데이터 정보 */}
           <div className={styles.historyInfo}>
             <p>데이터 포인트: {sensorHistory.count || 0}개</p>
-            <p>시간 범위: 최근 30초</p>
+            <p>시간 범위: 최근 5분</p>
             {sensorHistory.values && sensorHistory.values.length > 0 && (
               <p>
                 현재 값: {sensorHistory.values[sensorHistory.values.length - 1]?.toFixed(2)}
