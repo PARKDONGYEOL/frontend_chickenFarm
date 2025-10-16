@@ -12,7 +12,12 @@ export const AlertProvider = ({ children }) => {
     humidityLowAlert: 30,
     co2Alert: 2000,
     coAlert: 50,
-    nh3Alert: 25
+    nh3Alert: 25,
+    // 조도 및 수면시간 설정
+    sleepModeEnabled: true,
+    sleepStartHour: 22,
+    sleepEndHour: 6,
+    manualLedThreshold: 300
   });
   const lastSavedAlertsRef = useRef([]); // useRef를 사용하여 불필요한 리렌더링 없이 이전 상태를 기억
 
@@ -61,7 +66,11 @@ export const AlertProvider = ({ children }) => {
             humidityLowAlert: result.data.humidityLowAlert || 30,
             co2Alert: result.data.co2Alert || 2000,
             coAlert: result.data.coAlert || 50,
-            nh3Alert: result.data.nh3Alert || 25
+            nh3Alert: result.data.nh3Alert || 25,
+            sleepModeEnabled: result.data.sleepModeEnabled !== undefined ? result.data.sleepModeEnabled : true,
+            sleepStartHour: result.data.sleepStartHour || 22,
+            sleepEndHour: result.data.sleepEndHour || 6,
+            manualLedThreshold: result.data.manualLedThreshold || 300
           });
           console.log("알림 설정 로드 완료:", result.data);
         }
@@ -72,6 +81,22 @@ export const AlertProvider = ({ children }) => {
     
     loadSettings();
   }, []);
+
+  // 수면시간 판단 함수
+  const isSleepTime = () => {
+    if (!alertSettings.sleepModeEnabled) return false;
+
+    const now = new Date();
+    const currentHour = now.getHours();
+    const { sleepStartHour, sleepEndHour } = alertSettings;
+
+    // 예: 22시 ~ 6시 (자정을 넘는 경우)
+    if (sleepStartHour > sleepEndHour) {
+      return currentHour >= sleepStartHour || currentHour < sleepEndHour;
+    }
+    // 예: 6시 ~ 22시 (일반적인 경우는 반대)
+    return currentHour >= sleepStartHour && currentHour < sleepEndHour;
+  };
 
   // ✅ 전역에서 센서 데이터 계속 받기
   useEffect(() => {
@@ -102,6 +127,26 @@ export const AlertProvider = ({ children }) => {
             newAlerts.push({ message: `⚠️ CO 농도가 ${data.co.toFixed(3)}ppm으로 위험합니다.`, category: "CO" });
           if (data.nh3 > alertSettings.nh3Alert)
             newAlerts.push({ message: `⚠️ 암모니아 농도가 ${data.nh3.toFixed(3)}ppm으로 높습니다.`, category: "NH3" });
+
+          // 조도 알람 (수면시간 기반)
+          const sleepTime = isSleepTime();
+          const luxThreshold = alertSettings.manualLedThreshold;
+
+          if (sleepTime) {
+            // 수면시간: 조도가 높으면 알람
+            if (data.lux > luxThreshold * 1.5) {
+              newAlerts.push({ message: `💡 수면시간에 조도가 ${data.lux.toFixed(1)}lux로 너무 밝습니다.`, category: "조도" });
+            } else if (data.lux > luxThreshold) {
+              newAlerts.push({ message: `💡 수면시간에 조도가 ${data.lux.toFixed(1)}lux로 밝습니다.`, category: "조도" });
+            }
+          } else {
+            // 활동시간: 조도가 낮으면 알람
+            if (data.lux < luxThreshold * 0.5) {
+              newAlerts.push({ message: `💡 활동시간에 조도가 ${data.lux.toFixed(1)}lux로 너무 어둡습니다.`, category: "조도" });
+            } else if (data.lux < luxThreshold) {
+              newAlerts.push({ message: `💡 활동시간에 조도가 ${data.lux.toFixed(1)}lux로 어둡습니다.`, category: "조도" });
+            }
+          }
 
           setAlerts(newAlerts); // 알림 목록 업데이트
           saveDangerNotice(newAlerts); // 업데이트된 새 알림 목록으로 DB 저장 함수 호출

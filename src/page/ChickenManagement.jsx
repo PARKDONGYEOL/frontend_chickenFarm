@@ -3,7 +3,7 @@ import styles from './ChickenManagement.module.css'
 import Input from '../common/Input'
 import Button from '../common/Button'
 import ChickenList from './ChickenList'
-import axios from 'axios'
+import { apiClient } from '../services/api'
 
 const ChickenManagement = () => {
   //양계장 번호 조회
@@ -91,7 +91,7 @@ const ChickenManagement = () => {
     return ;
   }
 
-  axios.put('/api/batch/shipment', { batchIdList: checkedBatches })
+  apiClient.put('/api/batch/shipment', { batchIdList: checkedBatches })
     .then(res => {
       alert('출하가 완료되었습니다.');
       setCheckedBatches([]);  // 체크박스 초기화
@@ -112,14 +112,14 @@ const ChickenManagement = () => {
 
   //양계장 번호 조회
   useEffect(() => {
-    axios.get('/api/farm/num-list')
+    apiClient.get('/api/farm/num-list')
     .then(res => setFarmNumList(res.data))
     .catch(e => console.log(e));
   }, [])
 
   //배치 정보 불러오기
   useEffect(() => {
-    axios.get('/api/batch/info')
+    apiClient.get('/api/batch/info')
     .then(res => {
       setBatchInfo(res.data);
     })
@@ -135,7 +135,7 @@ const ChickenManagement = () => {
       })
       return ;
     }
-    axios.post(`/api/farm`, {farmName : farmName})
+    apiClient.post(`/api/farm`, {farmName : farmName})
     .then(res => {
       alert('양계장 등록이 완료되었습니다.');
       setFarmName('');
@@ -165,7 +165,7 @@ const ChickenManagement = () => {
       return ;
     }
 
-    axios.post('/api/batch', batch)
+    apiClient.post('/api/batch', batch)
     .then(res => {
       alert('배치 등록이 완료되었습니다.');
       setBatch({

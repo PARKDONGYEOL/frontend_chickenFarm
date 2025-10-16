@@ -164,7 +164,7 @@ export const sensorAPI = {
     return response.data
   },
 
-  // 특정 센서의 최근 30초간 히스토리 데이터 조회
+  // 특정 센서의 최근 5분간 히스토리 데이터 조회
   getSensorHistory: async (sensorType) => {
     try {
       const response = await apiClient.get(`/api/sensor-history/${sensorType}`, {

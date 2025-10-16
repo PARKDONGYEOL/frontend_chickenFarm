@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './ChickenInoculationSchedule.module.css'
-import { inoculationAPI } from '../services/api'
+import { inoculationAPI, batchAPI } from '../services/api'
 
 const ChickenInoculationSchedule = () => {      
   const navigate = useNavigate()
@@ -64,7 +64,7 @@ const ChickenInoculationSchedule = () => {
   const loadBatches = async () => {
     try {
       setLoading(true)
-      const batchesData = await inoculationAPI.getBatchesByFarm(1)
+      const batchesData = await batchAPI.getBatchInfo()
       setBatches(batchesData)
       if (batchesData.length > 0) {
         setSelectedBatch(batchesData[0].batchId)
@@ -205,7 +205,7 @@ const ChickenInoculationSchedule = () => {
         >
           {batches.map(batch => (
             <option key={batch.batchId} value={batch.batchId}>
-              {batch.batchId} (입식일: {new Date(batch.entryDate).toLocaleDateString()})
+              {batch.batchId} (입식일: {new Date(batch.entryDate).toLocaleDateString()}, {batch.currentCount}마리)
             </option>
           ))}
         </select>

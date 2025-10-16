@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './ChickenInoculationList.module.css'
-import { inoculationAPI } from '../services/api'
+import { inoculationAPI, batchAPI } from '../services/api'
 
 const ChickenInoculationList = () => {
   const navigate = useNavigate()
@@ -39,7 +39,7 @@ const ChickenInoculationList = () => {
   const loadBatches = async () => {
     try {
       setLoading(true)
-      const batchesData = await inoculationAPI.getBatchesByFarm(1) // 임시로 농장 번호 1 사용
+      const batchesData = await batchAPI.getBatchInfo() // 임시로 농장 번호 1 사용
       setBatches(batchesData)
       if (batchesData.length > 0) {
         setSelectedBatch(batchesData[0].batchId)
@@ -106,14 +106,14 @@ const ChickenInoculationList = () => {
   // 더미 데이터에서 배치별 닭 목록 로드
   const loadDummyChickensByBatch = (batchId) => {
     const dummyChickens = [
-      { chickenId: 1, batchId: '2025-001', age: 45, weight: 1.8, growthStage: 'FINISHER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: true },
-      { chickenId: 2, batchId: '2025-001', age: 45, weight: 1.9, growthStage: 'FINISHER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: false },
-      { chickenId: 3, batchId: '2025-001', age: 45, weight: 1.7, growthStage: 'FINISHER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: true },
-      { chickenId: 4, batchId: '2025-002', age: 30, weight: 1.4, growthStage: 'GROWER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: false },
-      { chickenId: 5, batchId: '2025-002', age: 30, weight: 1.5, growthStage: 'GROWER', healthStatus: 'HEALTHY', nd: true, hpai: false, ibd: true, ib: false },
-      { chickenId: 6, batchId: '2025-003', age: 15, weight: 1.0, growthStage: 'CHICK', healthStatus: 'HEALTHY', nd: true, hpai: false, ibd: true, ib: false },
-      { chickenId: 7, batchId: '2025-003', age: 15, weight: 1.1, growthStage: 'CHICK', healthStatus: 'HEALTHY', nd: true, hpai: false, ibd: false, ib: false },
-      { chickenId: 8, batchId: '2025-003', age: 15, weight: 0.9, growthStage: 'CHICK', healthStatus: 'HEALTHY', nd: false, hpai: false, ibd: true, ib: false }
+      { chickenId: 1, batchId: '2025-001', age: 45, rawWeight: 1.8, growthStage: 'FINISHER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: true },
+      { chickenId: 2, batchId: '2025-001', age: 45, rawWeight: 1.9, growthStage: 'FINISHER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: false },
+      { chickenId: 3, batchId: '2025-001', age: 45, rawWeight: 1.7, growthStage: 'FINISHER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: true },
+      { chickenId: 4, batchId: '2025-002', age: 30, rawWeight: 1.4, growthStage: 'GROWER', healthStatus: 'HEALTHY', nd: true, hpai: true, ibd: true, ib: false },
+      { chickenId: 5, batchId: '2025-002', age: 30, rawWeight: 1.5, growthStage: 'GROWER', healthStatus: 'HEALTHY', nd: true, hpai: false, ibd: true, ib: false },
+      { chickenId: 6, batchId: '2025-003', age: 15, rawWeight: 1.0, growthStage: 'CHICK', healthStatus: 'HEALTHY', nd: true, hpai: false, ibd: true, ib: false },
+      { chickenId: 7, batchId: '2025-003', age: 15, rawWeight: 1.1, growthStage: 'CHICK', healthStatus: 'HEALTHY', nd: true, hpai: false, ibd: false, ib: false },
+      { chickenId: 8, batchId: '2025-003', age: 15, rawWeight: 0.9, growthStage: 'CHICK', healthStatus: 'HEALTHY', nd: false, hpai: false, ibd: true, ib: false }
     ]
     
     const filteredChickens = dummyChickens.filter(chicken => chicken.batchId === batchId)
@@ -159,7 +159,7 @@ const ChickenInoculationList = () => {
           value={selectedBatch}
           onChange={(e) => setSelectedBatch(e.target.value)}
         >
-          {batches.map(batch => (
+          {batches.filter(batch => batch.currentCount > 0).map(batch => (
             <option key={batch.batchId} value={batch.batchId}>
               {batch.batchId} (입식일: {new Date(batch.entryDate).toLocaleDateString()}, {batch.currentCount}마리)
             </option>
@@ -213,7 +213,7 @@ const ChickenInoculationList = () => {
                 <tr key={chicken.chickenId}>
                   <td className={styles.tag}>C-{chicken.chickenId.toString().padStart(3, '0')}</td>
                   <td>{chicken.age}일</td>
-                  <td>{chicken.weight}</td>
+                  <td>{chicken.rawWeight}</td>
                   {vaccineColumns.map(vaccine => (
                     <td key={vaccine.key} className={styles.vaccineCell}>
                       {chicken[vaccine.key] ? (
