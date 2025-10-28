@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { sensorAPI, dangerNoticeAPI, envSettingsAPI } from "../services/api";
 
 const AlertContext = createContext();
@@ -46,10 +46,9 @@ export const AlertProvider = ({ children }) => {
           });
         }
         lastSavedAlertsRef.current = alertList; // useRef로 이전 알림 목록 업데이트
-        console.log("위험 알림 DB 저장 완료");
       }
     } catch (error) {
-      console.error("위험 알림 저장 중 오류:", error);
+      // 에러 무시
     }
   };
 
@@ -72,10 +71,9 @@ export const AlertProvider = ({ children }) => {
             sleepEndHour: result.data.sleepEndHour || 6,
             manualLedThreshold: result.data.manualLedThreshold || 300
           });
-          console.log("알림 설정 로드 완료:", result.data);
         }
       } catch (error) {
-        console.error("알림 설정 로드 실패:", error);
+        // 에러 무시
       }
     };
     
@@ -105,8 +103,6 @@ export const AlertProvider = ({ children }) => {
     const fetchAndCheckSensors = async () => {
       try {
         const result = await sensorAPI.getRealtimeData();
-
-        console.log("AlertContext - 센서 데이터:", result);
 
         if (result.success && result.data) {
           const data = result.data;
@@ -152,7 +148,7 @@ export const AlertProvider = ({ children }) => {
           saveDangerNotice(newAlerts); // 업데이트된 새 알림 목록으로 DB 저장 함수 호출
         }
       } catch (error) {
-        console.error("센서 데이터 가져오는 중 오류:", error);
+        // 에러 무시
       }
     };
 
