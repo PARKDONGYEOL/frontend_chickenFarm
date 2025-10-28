@@ -3,7 +3,7 @@
 
 import axios from "axios";
 
-const API_BASE = "http://192.168.31.229:5000";
+const API_BASE = "http://192.168.30.71:5000";
 const TIMER_STORAGE_KEY = 'next_record_renewal_time';
 const DEFAULT_DURATION = 300000; // 5분
 

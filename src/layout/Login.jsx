@@ -1,10 +1,9 @@
-import React, { useState } from 'react'
-import Modal from '../common/Modal'
+import { useState } from 'react'
 import Input from '../common/Input'
 import Button from '../common/Button'
-import { memberAPI } from '../services/api'
 import styles from './Login.module.css'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom' 
+import { memberAPI } from '../services/api'
 
 const Login = () => {
   const nav = useNavigate();
@@ -23,28 +22,41 @@ const Login = () => {
 
   const login = async () => {
     try {
-      const res = await memberAPI.login(loginDate)
-      if (res) { 
+      const response = await memberAPI.login(loginDate);
+      console.log('로그인 응답:', response);
+
+      if (response && response.memId) {
         const loginInfo = {
-          'memId': res.memId,
-          'name': res.name,
-          'role': res.role
+          'memId': response.memId,
+          'name': response.name,
+          'role': response.role
         };
 
         sessionStorage.setItem('loginInfo', JSON.stringify(loginInfo));
 
-        if (res.role === 'ADMIN') {
+        if (response.role === 'ADMIN') {
           alert('환영합니다.');
           nav('/home');
           setLoginDate({ 'memId': '', 'memPw': '' });
         }
-        // 일반 유저는 아무 동작 없음
-      } else { 
+      } else {
         alert('ID 혹은 비밀번호가 잘못 입력되었습니다.');
       }
     } catch (err) {
-      console.log(err);
-      alert('로그인 중 오류가 발생했습니다.');
+      console.error('로그인 오류:', err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          alert('ID 혹은 비밀번호가 잘못 입력되었습니다.');
+        } else if (err.response.status === 404) {
+          alert('로그인 서비스를 찾을 수 없습니다. 서버 상태를 확인해주세요.');
+        } else {
+          alert('로그인 중 오류가 발생했습니다.');
+        }
+      } else if (err.request) {
+        alert('서버에 연결할 수 없습니다. 네트워크를 확인해주세요.');
+      } else {
+        alert('로그인 중 오류가 발생했습니다.');
+      }
     }
   }
 
@@ -62,7 +74,7 @@ const Login = () => {
             onChange={e => handleLoginData(e)}
             className={styles.input}
             onKeyDown={e => {
-              if(e.key === 'Enter') login()
+              if (e.key === 'Enter') login()
             }}
           />
           {
@@ -92,7 +104,7 @@ const Login = () => {
             className={styles.input}
             type='password'
             onKeyDown={e => {
-              if(e.key === 'Enter') login()
+              if (e.key === 'Enter') login()
             }}
           />
           {
@@ -112,7 +124,7 @@ const Login = () => {
           }
         </div>
         <div className={styles.button_div}>
-          <Button 
+          <Button
             title='로그인'
             className={styles.button}
             size='500px'
