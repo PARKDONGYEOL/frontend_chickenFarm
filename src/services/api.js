@@ -3,7 +3,7 @@ import axios from 'axios'
 // 환경 설정
 const isDev = import.meta.env.DEV
 const PYTHON_SERVER = isDev ? '' : 'http://192.168.30.240:5000'
-const BACKEND_SERVER = 'http://192.168.30.152:8080'
+const BACKEND_SERVER = 'http://192.168.30.111:8080'
 
 // Axios 인스턴스
 const pythonClient = axios.create({
